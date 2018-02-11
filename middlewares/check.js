@@ -6,46 +6,53 @@ class Check {
 	constructor(){
 		
 	}
-	async checkAdmin(req, res, next){
-		const admin_id = req.session.admin_id;
+	async checkSuperAdmin(req, res, next){
+
+        //本地调试
+        if (process.env.NODE_ENV == 'local') {
+            next();
+            return;
+        }
+
+        const admin_id = req.session.admin_id;
 		if (!admin_id || !Number(admin_id)) {
 			res.send({
-				status: 0,
-				type: 'ERROR_SESSION',
-				message: '亲，您还没有登录',
-			})
-			return
+				ret_code: 1001,
+				ret_msg: 'ERROR_SESSION',
+				extra: '亲，您还没有登录',
+			});
+			return;
 		}else{
-			const admin = await AdminModel.findOne({id: admin_id});
-			if (!admin) {
+			const admin = await AdminModel.findOne({user_id: admin_id});
+			if (!admin || admin.user_type != 0) {
 				res.send({
-					status: 0,
-					type: 'HAS_NO_ACCESS',
-					message: '亲，您还不是管理员',
-				})
-				return
+					ret_code: 1010,
+					ret_msg: 'HAS_NO_ACCESS',
+					extra: '权限不足',
+				});
+				return;
 			}
 		}
 		next()
 	}
-	async checkSuperAdmin(req, res, next){
+	async checkAdminStatus(req, res, next){
 		const admin_id = req.session.admin_id;
 		if (!admin_id || !Number(admin_id)) {
 			res.send({
-				status: 0,
-				type: 'ERROR_SESSION',
-				message: '亲，您还没有登录',
-			})
-			return
+				ret_code: 1001,
+				ret_msg: 'ERROR_SESSION',
+				extra: '亲，您还没有登录',
+			});
+			return;
 		}else{
-			const admin = await AdminModel.findOne({id: admin_id});
-			if (!admin || admin.status != 2) {
+			const admin = await AdminModel.findOne({user_id: admin_id});
+			if (!admin || admin.user_status != 0) {
 				res.send({
-					status: 0,
-					type: 'HAS_NO_ACCESS',
-					message: '亲，您的权限不足',
-				})
-				return
+					ret_code: 1011,
+					ret_msg: 'ERROR_ADMIN_STATUS',
+					extra: '你已经被冻结',
+				});
+				return;
 			}
 		}
 		next()
