@@ -36,7 +36,7 @@
     "express": "^4.15.2",
     "express-session": "^1.15.2",
     "express-winston": "^2.3.0",
-    "formidable": "^1.1.1",
+    "formidable": "*",
     "gm": "^1.23.0",
     "marked": "^0.3.6",
     "moment": "^2.18.1",
@@ -54,8 +54,10 @@
     "mqtt": "*",
     "body-parser": "*",
     "node-xlsx": "*",
-    "formidable": "*",
-    "connect-multiparty": "*"
+    "connect-multiparty": "*",
+    "tushare": "*",
+    "iconv-lite": "*",
+    "node-schedule": "*"
   },
   "devDependencies": {
     "babel-plugin-transform-async-to-generator": "^6.24.1",

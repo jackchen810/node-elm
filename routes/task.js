@@ -15,13 +15,15 @@ console.log("enter route of task");
 router.all('/list', TaskHandle.list);
 
 //新建任务（固件升级，插件升级，脚本执行）
-//router.all('/add', TaskHandle.add);
+router.all('/add', TaskHandle.add);
 
-//查看升级过程状态
-router.all('/status', TaskHandle.status);
+//删除任务
+router.all('/del', TaskHandle.del);
 
-//恢复冻结任务
-router.all('/restore', TaskHandle.restore);
+//开始任务
+router.all('/start', TaskHandle.start);
 
+//停止任务
+router.all('/stop', TaskHandle.stop);
 
 export default router

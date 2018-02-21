@@ -1,3 +1,4 @@
+'use strict';
 import express from 'express';
 import db from './mongodb/db.js';
 
@@ -13,8 +14,8 @@ import expressWinston from 'express-winston';
 import path from 'path';
 import history from 'connect-history-api-fallback';
 import https from 'https'
+const fork = require('child_process').fork;
 const fs = require("fs");
-
 
 
 //excel导入文件存放位置， 不存在则创建
@@ -90,7 +91,36 @@ app.use(express.static('./public'));
 //本地调试, 使用http
 if (process.env.NODE_ENV == 'local') {
     app.listen(config.port);
-    console.log('Http listening at ' + config.port)
+    console.log('Http listening at ' + config.port);
+
+    //添加行情接口
+    //var market = require("./trader/gateway-market/market_sina.js");
+/*
+    var worker = fork('./trader/worker_main.js') //创建一个工作进程
+    worker.on('message', function(m) {//接收工作进程计算结果
+        if ('object' === typeof m && m.type === 'fibo') {
+            worker.kill();//发送杀死进程的信号
+        }
+    });
+
+    var obj = {
+        'symbol': '600089',
+        'ktype': '60',
+        'task_id': '111111111',
+        'strategy_name': 'strategy_macd',
+        'riskctrl_name': 'riskctrl',
+    }
+    worker.send({type: 'task', action: 'add', data:obj});
+
+    // 10分钟钟后
+    setInterval(function(){
+        var obj = {
+            'symbol': '600089',
+            'ktype': '60',
+        }
+        worker.send({type: 'tick', action: 'on', data:obj});
+    }, 5000);
+*/
 }
 else{
     app.use(express.static(path.join(__dirname,'./public/dist')))
@@ -105,3 +135,7 @@ else{
     };
     https.createServer(options,app).listen(config.ssl.port);
 }
+
+
+
+

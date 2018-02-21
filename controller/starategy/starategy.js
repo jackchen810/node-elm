@@ -1,5 +1,6 @@
 'use strict';
 import DB from "../../models/models.js";
+import config from 'config-lite';
 const fs = require("fs");
 const path = require('path');
 
@@ -10,40 +11,20 @@ class StarategyHandle {
     }
     async list(req, res, next){
         console.log('strategy list');
-        console.log(req.body);
 
-        //获取表单数据，josn
-        var page_size = req.body['page_size'];
-        var current_page = req.body['current_page'];
-        var sort = req.body['sort'];
-        var filter = req.body['filter'];
 
-        // 如果没有定义排序规则，添加默认排序
-        if(typeof(sort)==="undefined"){
-            console.log('sort undefined');
-            sort = {"sort_time":-1};
+        try {
+            var path = config.strategy_dir;
+            var files = fs.readdirSync(path);
+            console.log('files', files);
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:files});
         }
-
-        // 如果没有定义排序规则，添加默认排序
-        if(typeof(filter)==="undefined"){
-            console.log('filter undefined');
-            filter = {};
+        catch (e) {
+            console.log(e);
+            res.send({ret_code: -1, ret_msg: 'FAIL', extra:e});
+            return;
         }
 
-        //参数有效性检查
-        if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
-            var query = await DB.TaskTable.find(filter).sort(sort);
-            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
-        }
-        else if (page_size > 0 && current_page > 0) {
-            //var ret = await DB.TaskTable.findByPage(filter, page_size, current_page, sort);
-            var skipnum = (current_page - 1) * page_size;   //跳过数
-            var query = await DB.TaskTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
-            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
-        }
-        else{
-            res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
-        }
         console.log('strategy list end');
     }
 
