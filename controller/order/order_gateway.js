@@ -10,10 +10,10 @@ class OrderGatewayHandle {
 
     }
     async list(req, res, next){
-        console.log('gateway list');
+        console.log('order gateway list');
 
         try {
-            var path = config.market_gateway_dir;
+            var path = config.order_gateway_dir;
             var files = fs.readdirSync(path);
             console.log('files', files);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:files});
@@ -24,7 +24,7 @@ class OrderGatewayHandle {
             return;
         }
 
-        console.log('gateway list end');
+        console.log('order gateway list end');
     }
 
 

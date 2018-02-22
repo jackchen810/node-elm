@@ -70,7 +70,8 @@ class TaskHandle {
         var strategy_type = req.body['strategy_type'];
         var strategy_list = req.body['strategy_list'];        //获取表单数据，josn
         var riskctrl_name = req.body['riskctrl_name'];        //获取表单数据，josn
-        var gateway_name = req.body['gateway_name'];
+        var market_gateway = req.body['market_gateway'];
+        var order_gateway = req.body['order_gateway'];
         var trade_symbol = strategy_list[0]['stock_symbol'];   //交易标的
         var stock_ktype = strategy_list[0]['stock_ktype'];   //交易标的
         var task_id = this.guid();
@@ -101,7 +102,8 @@ class TaskHandle {
             'strategy_list': strategy_list,   //对象数组
             'strategy_name': strategy_name,   //策略名称
             'riskctrl_name': riskctrl_name,   //风控名称
-            'gateway_name': gateway_name,   //交易网关名称
+            'market_gateway': market_gateway,   //交易网关名称
+            'order_gateway': order_gateway,   //交易网关名称
             'create_at':dtime(mytime).format('YYYY-MM-DD HH:mm:ss'),
             'sort_time':mytime.getTime()
         };
@@ -119,7 +121,8 @@ class TaskHandle {
             'trade_ktype': stock_ktype,
             'strategy_list': strategy_list,   //策略名称
             'riskctrl_name': riskctrl_name,   //风控名称
-            'gateway_name': gateway_name,   //交易网关名称
+            'market_gateway': market_gateway,   //交易网关名称
+            'order_gateway': order_gateway,   //交易网关名称
         }
 
         WorkerHnd.addTask({type: 'task', action: 'add', request:message});
@@ -208,7 +211,8 @@ class TaskHandle {
             'trade_ktype': query['trade_ktype'],
             'strategy_list': query['strategy_list'],   //策略名称
             'riskctrl_name': query['riskctrl_name'],   //风控名称
-            'gateway_name': query['gateway_name'],   //交易网关名称
+            'market_gateway': query['market_gateway'],   //交易网关名称
+            'order_gateway': query['order_gateway'],   //交易网关名称
         }
 
         WorkerHnd.addTask({type: 'task', action: 'add',  request:message});

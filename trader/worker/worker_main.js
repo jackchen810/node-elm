@@ -85,7 +85,7 @@ class WorkerClass {
         var trade_ktype = request['trade_ktype'];
         var strategy_list = request['strategy_list'];
         var riskctrl_name = request['riskctrl_name'];
-        var gateway_name = request['gateway_name'];
+        var order_gateway = request['order_gateway'];
         //var response = {ret_code: 0, ret_msg: 'SUCCESS', extra: request};
         //process.send({type: 'task', action: 'add',  response:response});
 
@@ -116,7 +116,7 @@ class WorkerClass {
         }
 
         ///路径有效性检查 gateway
-        var gateway_fullname = path.join(__dirname, '../../', config.gateway_dir, gateway_name);
+        var gateway_fullname = path.join(__dirname, '../../', config.order_gateway_dir, order_gateway);
         if (fs.existsSync(gateway_fullname) == false) {
             console.log('[worker] gateway path not exist:', gateway_fullname);
             var response = {ret_code: -1, ret_msg: 'FAILED', extra: 'gateway path not exist'};

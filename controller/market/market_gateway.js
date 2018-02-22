@@ -10,7 +10,7 @@ class MarketGatewayHandle {
 
     }
     async list(req, res, next){
-        console.log('gateway list');
+        console.log('market gateway list');
 
         try {
             var path = config.market_gateway_dir;
@@ -24,7 +24,7 @@ class MarketGatewayHandle {
             return;
         }
 
-        console.log('gateway list end');
+        console.log('market gateway list end');
     }
 
 
