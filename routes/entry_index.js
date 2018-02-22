@@ -5,7 +5,8 @@ import admin_router from './admin.js'
 import task_router from './task.js'
 import riskctrl_router from './riskctrl.js'
 import strategy_router from './strategy.js'
-import gateway_router from './gateway.js'
+import order_router from './order_gateway.js'
+import market_router from './market_gateway.js'
 
 
 function web_router(app) {
@@ -21,8 +22,11 @@ function web_router(app) {
      //策略管理功能
      app.use('/strategy', strategy_router);
 
-     //gateway管理功能
-     app.use('/gateway', gateway_router);
+     //交易接口管理功能
+     app.use('/order', order_router);
+
+    //行情接口管理功能
+    app.use('/market', market_router);
 
 }
 

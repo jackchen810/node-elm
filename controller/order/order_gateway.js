@@ -5,7 +5,7 @@ const fs = require("fs");
 const path = require('path');
 
 
-class GatewayHandle {
+class OrderGatewayHandle {
     constructor(){
 
     }
@@ -13,7 +13,7 @@ class GatewayHandle {
         console.log('gateway list');
 
         try {
-            var path = config.gateway_dir;
+            var path = config.market_gateway_dir;
             var files = fs.readdirSync(path);
             console.log('files', files);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:files});
@@ -31,7 +31,7 @@ class GatewayHandle {
 
 }
 
-export default new GatewayHandle()
+export default new OrderGatewayHandle()
 
 
 

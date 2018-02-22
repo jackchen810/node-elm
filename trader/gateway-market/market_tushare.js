@@ -1,5 +1,5 @@
 'use strict';
-import WorkerHnd from "../agent/worker_agent";
+import WorkerHnd from "../worker/worker_agent";
 import { stock } from 'tushare';
 
 const BaseMarket = require("../../prototype/marketBaseClass");
@@ -57,11 +57,21 @@ class TushareMarketClass extends BaseMarket {
         console.log('get %s, http url:', ktype, url, new Date());
 
         //get 请求外网
-        http.get(this.url,function(req, res){
-            req.on('data',function(data){
+        http.get(url, function(req, res){
+            var data_buf = [];
+            var bufLength = 0;
+            req.on('data', function(chunk) {
+                data_buf.push(chunk);
+                bufLength += chunk.length;
+            });
+            req.on('end',function(){
                 //console.log('http data:', data.toString());
+                var chunkAll = Buffer.concat(data_buf, bufLength);
+                var strJson = iconv.decode(chunkAll,'gb2312'); // 汉字不乱码
+                //console.log('http data:', strJson);
+
                 var message = new Array();
-                var symbol_array = data.toString().split(";");
+                var symbol_array = strJson.split(";");   ///解析多个标的字符串
                 for (var i = 0; i< symbol_array.length; i++) {
                     //console.log('symobl:', symbol_array[i]);
                     var data_substr = symbol_array[i].match(/\"(\S*)(?=\")/);
@@ -96,7 +106,7 @@ class TushareMarketClass extends BaseMarket {
 
                     message[i]['date'] = fields[30];
                     message[i]['time'] = fields[31];
-                   // symbol_array[i];
+                    // symbol_array[i];
                 }
 
 
@@ -131,7 +141,7 @@ class TushareMarketClass extends BaseMarket {
         this.timer_callback(ktype, timerDict['url'], timerDict['symbol_set']);
     }
 
-    //启动定时器
+    //启动定时器, 行情定时器
     async onStart(stock_symbol, stock_ktype) {
         console.log(__filename, 'onStart:', stock_symbol, stock_ktype);
         //timerMap: ('1', {'symbol_set':new Set(), 'timer': '', 'url':''});
@@ -142,21 +152,21 @@ class TushareMarketClass extends BaseMarket {
 
 
         var timerDict = this.timerMap.get(stock_ktype);
-        console.log('timerDict:', timerDict, stock_ktype);
         var symbol_set = timerDict['symbol_set'];
         var url = timerDict['url'];
         var timer_job_cron = timerDict['timer_job_cron'];
         var timer_callback = timerDict['timer_callback'];
 
-        console.log('timerDict:', timerDict);
+        //console.log('timerDict:', timerDict);
+        console.log('stock_ktype:', stock_ktype);
 
         //添加标的set集合
         symbol_set.add(stock_symbol);
-        if (symbol_set.size > 0){
+        if (symbol_set.size > 0 && timerDict['timer_job_handle'] == ''){
             timerDict['timer_job_handle'] = schedule.scheduleJob(timer_job_cron, timer_callback);
         }
 
-        console.log('timerDict:', timerDict);
+        //console.log('timerDict:', timerDict);
         console.log('baseUrl:', this.url);
 
         //this.url = this.baseUrl;
@@ -183,7 +193,7 @@ class TushareMarketClass extends BaseMarket {
 
 
 
-    //停止定时器
+    //停止定时器, 行情定时器
     async onStop(stock_symbol, stock_ktype) {
 
         var timerDict = this.timerMap.get(stock_ktype);
@@ -192,10 +202,12 @@ class TushareMarketClass extends BaseMarket {
 
         //删除标的set集合
         symbol_set.delete(stock_symbol);
-        if (symbol_set.size == 0){
+        if (symbol_set.size == 0 && timerDict['timer_job_handle'] != ''){
             timerDict['timer_job_handle'].cancel();
+            timerDict['timer_job_handle'] = '';
         }
     }
+
 
 
 }

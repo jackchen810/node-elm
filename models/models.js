@@ -1,5 +1,11 @@
 
 import {TaskTable} from "../models/task/task.js";
+import {StrategyTable} from "../models/strategy/strategy.js";
+import {RiskctrlTable} from "../models/riskctrl/riskctrl.js";
+import {LogTable} from "../models/log/log.js";
+import {BacktestResultTable} from "../models/backtest/backtestResult.js";
+import {SelectResultTable} from "../models/select/selectResult.js";
+import {HistoryTable} from "../models/history/history.js";
 import AdminModel from '../models/admin/admin';
 
 //mqtt 命令
@@ -7,8 +13,12 @@ function DB() {
     //this.RomTable = RomTable;
     this.TaskTable = TaskTable;
     //this.SysinfoTable = SysinfoTable;
-    //this.DeviceTable = DeviceTable;
-    //this.DevtypeTable = DevtypeTable;
+    this.StrategyTable = StrategyTable;
+    this.RiskctrlTable = RiskctrlTable;
+    this.LogTable = LogTable;
+    this.BacktestResultTable = BacktestResultTable;
+    this.SelectResultTable = SelectResultTable;
+    this.HistoryTable = HistoryTable;
     this.AdminModel = AdminModel;
     this.getNowFormatDate = getNowFormatDate;
 

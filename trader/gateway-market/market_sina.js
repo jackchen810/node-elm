@@ -1,5 +1,5 @@
 'use strict';
-import WorkerHnd from "../agent/worker_agent";
+import WorkerHnd from "../worker/worker_agent";
 
 const BaseMarket = require("../../prototype/marketBaseClass");
 const BaseObj = require("../../prototype/objectBaseClass");

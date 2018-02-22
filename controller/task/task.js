@@ -1,6 +1,6 @@
 'use strict';
 import DB from "../../models/models.js";
-import WorkerHnd from "../../trader/agent/worker_agent.js";
+import WorkerHnd from "../../trader/worker/worker_agent.js";
 import dtime from "time-formater";
 const fs = require("fs");
 const path = require('path');
