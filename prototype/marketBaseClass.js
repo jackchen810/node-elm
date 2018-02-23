@@ -1,6 +1,4 @@
 'use strict';
-const emitter = require("../trader/event/event.js");
-var schedule = require('node-schedule');
 
 module.exports = class BaseMarket {
     constructor(){

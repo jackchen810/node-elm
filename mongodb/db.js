@@ -1,14 +1,16 @@
 'use strict';
 
-import mongoose from 'mongoose';
-import config from 'config-lite';
+//import mongoose from 'mongoose';
+//import config from 'config-lite';
+const mongoose = require('mongoose');
+const config = require('config-lite');
 mongoose.connect(config.url, {useMongoClient:true});
 mongoose.Promise = global.Promise;
 
 const db = mongoose.connection;
 
 db.once('open' ,() => {
-	console.log('连接数据库成功')
+	console.log('连接数据库成功, pid:', process.pid);
 })
 
 db.on('error', function(error) {
@@ -21,4 +23,6 @@ db.on('close', function() {
     mongoose.connect(config.url, {server:{auto_reconnect:true}});
 });
 
-export default db;
+//export default db;
+//导出模块
+module.exports = db;

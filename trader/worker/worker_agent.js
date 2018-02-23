@@ -13,38 +13,50 @@ const  emitter = new events.EventEmitter();
 
 class WorkerHandle {
     constructor() {
-        this.worker = fork('./trader/worker/worker_routes.js') //创建一个工作进程
+        this.worker = fork('./trader/worker/worker_entry.js') //创建一个工作进程
         this.worker.on('message', this.onMessage);
         //console.log('create MqttSubHandle');
+
+        //bind
+        //this.log = this.log.bind(this);
     }
 
 
     //消息处理
     async onMessage(message){
         if (process.env.NODE_ENV == 'local') {
-            console.log('worker response:', JSON.stringify(message));
+            console.log('recv worker response:', JSON.stringify(message));
         }
+        var head = message['head'];
+        var body = message['body'];
 
-        var type = message['type'];
-        var action = message['action'];
-        var response = message['response'];
-        emitter.emit(type, action, response);
+        var type = head['type'];
+        var action = head['action'];
+        emitter.emit(type, action, body);
         if (type == 'task') {
-            emitter.emit(response['extra']['task_id'], message['type'], message['action'], response);
+            emitter.emit(body['extra']['task_id'], type, action, body);
         }
     }
+
+
 
     //消息处理
     async addTask(message){
 
         //添加行情定时获取接口
-        market.onStart(message['request']['trade_symbol'], message['request']['trade_ktype']);
+        market.onStart(message['trade_symbol'], message['trade_ktype']);
 
         console.log(__filename, 'add task onstart');
 
 
+        var request = {
+            'head': {'type': 'task', 'action': 'add'},
+            'body': message,
+        }
+
         //向 worker 进程发送任务小心
-        this.worker.send(message);
+        console.log('to---->worker')
+        this.worker.send(request);
     }
 
 
@@ -53,12 +65,46 @@ class WorkerHandle {
     async delTask(message){
 
         //添加行情定时获取接口
-        market.onStop(message['request']['trade_symbol'], message['request']['trade_ktype']);
+        market.onStop(message['trade_symbol'], message['trade_ktype']);
 
+        var request = {
+            'head': {'type': 'task', 'action': 'del'},
+            'body': message,
+        }
 
         //向 worker 进程发送任务小心
-        this.worker.send(message);
+        console.log('to---->worker')
+        this.worker.send(request);
     }
+
+    //消息处理
+    async onTick(message){
+        console.log(__filename, 'add tick');
+
+        var request = {
+            'head': {'type': 'on_tick', 'action': 'add'},
+            'body': message,
+        }
+
+        //向 worker 进程发送任务小心
+        console.log('to---->worker')
+        this.worker.send(request);
+    }
+
+    //消息处理
+    async onBar(ktype, message){
+        console.log(__filename, 'add bar');
+
+        var request = {
+            'head': {'type': 'on_bar', 'action': ktype},
+            'body': message,
+        }
+
+        //向 worker 进程发送任务小心
+        console.log('to---->worker')
+        this.worker.send(request);
+    }
+
 
     //监听事件some_event
 // 仅适用于但命令任务下发，不适用于批量任务
@@ -81,15 +127,3 @@ console.log('startup agent worker ');
 
 
 export default WorkerHnd;
-
-/*
-// 10分钟钟后
-setInterval(function(){
-    var obj = {
-        'symbol': '600089',
-        'ktype': '60',
-    }
-    WorkerHnd.worker.send({type: 'tick', action: 'on', data:obj});
-}, 5000);
-
-*/

@@ -11,8 +11,12 @@ console.log("enter route of task");
 
 
 
-//获取风控列表
+//获取行情列表
 router.all('/list', OrderGatewayHandle.list);
+
+//获取行情列表
+router.all('/add', OrderGatewayHandle.add);
+
 
 
 

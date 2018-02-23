@@ -1,5 +1,4 @@
 'use strict';
-const emitter = require("../trader/event/event.js");
 
 module.exports = class BaseOrder {
     constructor(){

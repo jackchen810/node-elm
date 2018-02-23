@@ -125,7 +125,7 @@ class TaskHandle {
             'order_gateway': order_gateway,   //交易网关名称
         }
 
-        WorkerHnd.addTask({type: 'task', action: 'add', request:message});
+        WorkerHnd.addTask(message);
         WorkerHnd.addOnceListener(task_id, async function(type, action, response) {
             console.log('add task, response', response);
             if (response['ret_code'] == 0) {
@@ -169,7 +169,7 @@ class TaskHandle {
 
 
         //worker 删除任务
-        WorkerHnd.delTask({type: 'task', action: 'del', request:message});
+        WorkerHnd.delTask(message);
         WorkerHnd.addOnceListener(task_id, async function(type, action, response) {
             console.log('del task, response', response);
             if (response['ret_code'] == 0) {
@@ -215,7 +215,7 @@ class TaskHandle {
             'order_gateway': query['order_gateway'],   //交易网关名称
         }
 
-        WorkerHnd.addTask({type: 'task', action: 'add',  request:message});
+        WorkerHnd.addTask(message);
         WorkerHnd.addOnceListener(task_id, async function(type, action, response) {
             //console.log('start task, response', response);
             if (response['ret_code'] == 0) {
@@ -267,7 +267,7 @@ class TaskHandle {
         }
 
 
-        WorkerHnd.delTask({type: 'task', action: 'del', request:message});
+        WorkerHnd.delTask(message);
         WorkerHnd.addOnceListener(task_id, async function(type, action, response) {
             //console.log('stop task, response', response);
             if (response['ret_code'] == 0) {

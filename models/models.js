@@ -6,6 +6,8 @@ import {LogTable} from "../models/log/log.js";
 import {BacktestResultTable} from "../models/backtest/backtestResult.js";
 import {SelectResultTable} from "../models/select/selectResult.js";
 import {HistoryTable} from "../models/history/history.js";
+import {OrderTable} from "../models/order/order.js";
+import {MarketTable} from "../models/market/market.js";
 import AdminModel from '../models/admin/admin';
 
 //mqtt 命令
@@ -19,6 +21,9 @@ function DB() {
     this.BacktestResultTable = BacktestResultTable;
     this.SelectResultTable = SelectResultTable;
     this.HistoryTable = HistoryTable;
+    this.OrderTable = OrderTable;
+    this.MarketTable = MarketTable;
+
     this.AdminModel = AdminModel;
     this.getNowFormatDate = getNowFormatDate;
 

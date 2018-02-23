@@ -19,7 +19,7 @@ module.exports = class BaseStrategy {
     }
 
     //onInit  ----不需要用户修改
-    async onInit(emitter, task_id, symbol, ktype){
+    async onInit(emitter, task_id, symbol, ktype, trade_symbol){
         this.task_id = task_id;
         this.emitter = emitter;
         this.symbol = symbol;
@@ -30,15 +30,11 @@ module.exports = class BaseStrategy {
         this.emitter.on('on_bar', this.on_bar);
         this.emitter.on('on_buy_point', this.on_buy_point);
         this.emitter.on('on_sell_point', this.on_sell_point);
-        //console.log('111111', ktype);
-        return;
-    }
 
-    //onInitMainStrategy  初始化化主策略
-    async onInitMainStrategy(symbol){
-        if (symbol == this.symbol){
+        if (trade_symbol == symbol){
             this.main_strategy = true;
         }
+        //console.log('111111', ktype);
         return;
     }
 

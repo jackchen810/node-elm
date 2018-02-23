@@ -1,6 +1,7 @@
 'use strict';
 import DB from "../../models/models.js";
 import config from "config-lite";
+import dtime from "time-formater";
 const fs = require("fs");
 const path = require('path');
 
@@ -27,7 +28,15 @@ class OrderGatewayHandle {
         console.log('order gateway list end');
     }
 
+    async add(req, res, next){
+        console.log('order gateway add');
 
+        //获取表单数据，josn
+        var file_name = req.body['file_name'];
+        var is_bind = req.body['is_bind'];        //绑定的行情接口
+
+        console.log('order gateway add end');
+    }
 
 }
 

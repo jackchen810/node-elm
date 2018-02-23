@@ -107,7 +107,7 @@ class SinaMarketClass extends BaseMarket {
                 }
 
 
-                WorkerHnd.worker.send({type: 'on_bar', action: ktype,  request:message});
+                WorkerHnd.onBar(ktype, message);
             });
 
             req.on('end',function(){

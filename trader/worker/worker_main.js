@@ -78,7 +78,7 @@ class WorkerClass {
     *
     * */
 
-    async addTask(request) {
+    async addTask(request, response) {
         console.log('[worker] add task');
         var task_id = request['task_id'];
         var trade_symbol = request['trade_symbol'];
@@ -86,8 +86,6 @@ class WorkerClass {
         var strategy_list = request['strategy_list'];
         var riskctrl_name = request['riskctrl_name'];
         var order_gateway = request['order_gateway'];
-        //var response = {ret_code: 0, ret_msg: 'SUCCESS', extra: request};
-        //process.send({type: 'task', action: 'add',  response:response});
 
         ///导入strategy_list
         console.log('[worker] strategy_list:', strategy_list);
@@ -99,8 +97,7 @@ class WorkerClass {
             console.log('[worker] strategy_fullname:', strategy_fullname[i]);
             if (fs.existsSync(strategy_fullname[i]) == false) {
                 console.log('strategy path not exist:', strategy_list[i]['strategy_name']);
-                var response = {ret_code: -1, ret_msg: 'FAILED', extra: 'strategy path not exist'};
-                process.send({type: 'task', action: 'add', response: response});
+                response.send({ret_code: -1, ret_msg: 'FAILED', extra: 'strategy path not exist'});
                 return;
             }
 
@@ -110,8 +107,7 @@ class WorkerClass {
         var riskctrl_fullname = path.join(__dirname, '../../', config.riskctrl_dir, riskctrl_name);
         if (fs.existsSync(riskctrl_fullname) == false) {
             console.log('[worker] riskctrl path not exist:', riskctrl_fullname);
-            var response = {ret_code: -1, ret_msg: 'FAILED', extra: 'riskctrl path not exist'};
-            process.send({type: 'task', action: 'add',  response:response});
+            response.send({ret_code: -1, ret_msg: 'FAILED', extra: 'riskctrl path not exist'});
             return;
         }
 
@@ -119,8 +115,7 @@ class WorkerClass {
         var gateway_fullname = path.join(__dirname, '../../', config.order_gateway_dir, order_gateway);
         if (fs.existsSync(gateway_fullname) == false) {
             console.log('[worker] gateway path not exist:', gateway_fullname);
-            var response = {ret_code: -1, ret_msg: 'FAILED', extra: 'gateway path not exist'};
-            process.send({type: 'task', action: 'add',  response:response});
+            response.send({ret_code: -1, ret_msg: 'FAILED', extra: 'gateway path not exist'});
             return;
         }
 
@@ -133,11 +128,7 @@ class WorkerClass {
                 var k_type = strategy_list[i]['stock_ktype'];
                 //var strategy_name = strategy_list[i]['strategy_name'];
                 strategy[i] = require(strategy_fullname[i]);
-                strategy[i].onInit(emitter, task_id, stock_symbol, k_type);
-                //main strategy
-                if (stock_symbol == trade_symbol){
-                    strategy[i].onInitMainStrategy(trade_symbol);
-                }
+                strategy[i].onInit(emitter, task_id, stock_symbol, k_type, trade_symbol);
             }
 
 
@@ -151,8 +142,7 @@ class WorkerClass {
             var gateway = require(gateway_fullname);
             gateway.onInit(emitter, task_id, trade_symbol, trade_ktype);
 
-            var emitter = require("../event/event.js");
-            var task = {
+             var task = {
                 'task_id': task_id,
                 'trade_symbol': trade_symbol,
                 'trade_ktype': trade_ktype,
@@ -166,26 +156,23 @@ class WorkerClass {
             this.taskMap.set(task_id, task); // 添加新的key-value
         } catch (err) {
             console.log('[worker] add task fail:', err);
-            var response = {ret_code: -1, ret_msg: 'FAILED', extra: err};
-            process.send({type: 'task', action: 'add',  response:response});
+            response.send({ret_code: -1, ret_msg: 'FAILED', extra: err});
             return;
         }
 
         //console.log('add task ok:', task);
-        var response = {ret_code: 0, ret_msg: 'SUCCESS', extra: {'task_id': task_id}};
-        process.send({type: 'task', action: 'add',  response:response});
+        response.send({ret_code: 0, ret_msg: 'SUCCESS', extra: {'task_id': task_id}});
         console.log('[worker] add task ok:');
     }
 
 
-    async delTask(request){
+    async delTask(request, response){
         console.log('[worker] del task');
         var task_id = request['task_id'];
-        var response = {ret_code: 0, ret_msg: 'SUCCESS', extra: request};
 
         //删除实例
         this.taskMap.delete(task_id);
-        process.send({type: 'task', action: 'del',  response:response});
+        response.send({ret_code: 0, ret_msg: 'SUCCESS', extra: request});
     }
 
 
