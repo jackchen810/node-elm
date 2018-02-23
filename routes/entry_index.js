@@ -7,6 +7,7 @@ import riskctrl_router from './riskctrl.js'
 import strategy_router from './strategy.js'
 import order_router from './order_gateway.js'
 import market_router from './market_gateway.js'
+import log_router from './log.js'
 
 
 function web_router(app) {
@@ -27,6 +28,9 @@ function web_router(app) {
 
     //行情接口管理功能
     app.use('/market', market_router);
+
+    //行情接口管理功能
+    app.use('/log', log_router);
 
 }
 

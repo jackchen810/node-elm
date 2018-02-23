@@ -1,4 +1,5 @@
 'use strict';
+const tradeLog = require("../trader/trade-log/log.js");
 
 module.exports = class BaseStrategy {
     constructor(){
@@ -38,6 +39,11 @@ module.exports = class BaseStrategy {
         return;
     }
 
+    //on_tick 收到tick行情数据时回调
+    async log(log_type, log_level, msgstr){
+        //console.log('tardeLog:', log_type);
+        return tradeLog(log_type, log_level, msgstr);
+    }
 
     //on_tick 收到tick行情数据时回调
     async on_tick(msgObj){

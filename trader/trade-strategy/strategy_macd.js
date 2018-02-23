@@ -34,6 +34,7 @@ class StrategyMacdClass extends BaseStrategy {
             'volume': msgObj['volume'],
         }
 
+
         this.to_buy(ktype, buyObj);
 
     }
@@ -41,7 +42,7 @@ class StrategyMacdClass extends BaseStrategy {
     async on_buy_point(ktype, msgObj) {
         console.log('StrategyMacdClass on_buy_point, task_id:', this.task_id);
         console.log('StrategyMacdClass on_buy_point, msg:', JSON.stringify(msgObj));
-
+        this.log('strategy', 1, JSON.stringify(msgObj));
 
     }
 

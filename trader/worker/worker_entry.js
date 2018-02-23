@@ -5,6 +5,7 @@ const path = require("path");
 const events = require("events");
 const  WorkerClassHandle = require("./worker_main");
 const db = require('../../mongodb/db.js');
+const tradeLog = require("../trade-log/log.js");
 
 /*
 * request 格式：{'head': {'type': this.type, 'action': this.action}, body:message}
@@ -51,6 +52,7 @@ process.on('message', function(msg) {
     }
 
     //console.log('process msg:', msg);
+    //tradeLog('system', '1', msg);
 
     //type, action, data
     var head = msg['head'];

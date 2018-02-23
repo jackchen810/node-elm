@@ -4,7 +4,8 @@ const fork = require('child_process').fork;
 const fs = require("fs");
 
 //var market = require("../gateway-market/market_tushare.js");
-var market = require("../gateway-market/market_sina.js");
+const market = require("../gateway-market/market_sina.js");
+const tradeLog = require("../trade-log/log.js");
 
 var events = require("events");
 //创建事件监听的一个对象
@@ -25,8 +26,9 @@ class WorkerHandle {
     //消息处理
     async onMessage(message){
         if (process.env.NODE_ENV == 'local') {
-            console.log('recv worker response:', JSON.stringify(message));
+            console.log('[agent] worker response:', JSON.stringify(message));
         }
+
         var head = message['head'];
         var body = message['body'];
 
@@ -107,7 +109,7 @@ class WorkerHandle {
 
 
     //监听事件some_event
-// 仅适用于但命令任务下发，不适用于批量任务
+    // 仅适用于但命令任务下发，不适用于批量任务
     async addOnceListener(event, listener_callback, timeout){
 
         //监听事件some_event
@@ -120,6 +122,11 @@ class WorkerHandle {
         }, timeout);
     }
 
+    //监听事件some_event
+    async addLoopListener(event, listener_callback) {
+        //监听事件some_event
+        await emitter.on(event, listener_callback);
+    }
 }
 
 const WorkerHnd= new WorkerHandle();

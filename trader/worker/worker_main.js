@@ -3,7 +3,7 @@ const config = require("config-lite");
 const fs = require("fs");
 const path = require("path");
 const events = require("events");
-
+const tradeLog = require("../trade-log/log.js");
 
 
 class WorkerClass {
@@ -89,6 +89,7 @@ class WorkerClass {
 
         ///导入strategy_list
         console.log('[worker] strategy_list:', strategy_list);
+        tradeLog('system', 'test', task_id);
 
         ///路径有效性检查
         var strategy_fullname = [];

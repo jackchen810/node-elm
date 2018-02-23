@@ -110,7 +110,7 @@ class TushareMarketClass extends BaseMarket {
                 }
 
 
-                WorkerHnd.onBar(message);
+                WorkerHnd.onBar(ktype, message);
             });
 
             req.on('end',function(){
