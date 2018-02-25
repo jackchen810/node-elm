@@ -6,6 +6,8 @@ module.exports = {
     riskctrl_dir:'./trader/trade-riskctrl',
     order_gateway_dir:'./trader/gateway-order',
     market_gateway_dir:'./trader/gateway-market',
+    history_dl_dir:'./trader/history-dl',
+
 	device_dir:'./public/device',
 	pkg_dir:'./public/packages',
 	script_dir:'./public/scripts',

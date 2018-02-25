@@ -110,9 +110,6 @@ class SinaMarketClass extends BaseMarket {
                 WorkerHnd.onBar(ktype, message);
             });
 
-            req.on('end',function(){
-                console.log('end');
-            });
         });
     }
 

@@ -1,0 +1,88 @@
+'use strict';
+import DB from "../../models/models.js";
+import config from "config-lite";
+import dtime from "time-formater";
+import WorkerHnd from "../../trader/worker/worker_agent";
+const fs = require("fs");
+const path = require('path');
+
+
+class HistoryHandle {
+    constructor(){
+
+    }
+    async filelist(req, res, next){
+        console.log('history dl list');
+
+        try {
+            var path = config.history_dl_dir;
+            var files = fs.readdirSync(path);
+            console.log('files', files);
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:files});
+        }
+        catch (e) {
+            console.log(e);
+            res.send({ret_code: -1, ret_msg: 'FAIL', extra:e});
+            return;
+        }
+        console.log('history dl list end');
+    }
+
+
+    async planlist(req, res, next){
+        console.log('task plan list');
+
+        var wherestr = {'task_status': 'running'};
+        var query = await DB.TaskPlanTable.find(wherestr).exec();
+        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
+
+        console.log('task plan list end');
+    }
+
+    async planupdate(req, res, next){
+        console.log('task plan update');
+
+        //获取表单数据，josn
+        var task_plan_list = req.body['task_select_list'];
+        var mytime = new Date();
+
+        //console.log('task_plan_list', task_plan_list);
+        for(var i = 0; i< task_plan_list.length; i++) {
+
+            //更新到设备数据库， 设备上线，下线
+            var wherestr = {'task_script': task_plan_list[i]['task_script']};
+            var updatestr = {
+                'task_script': task_plan_list[i]['task_script'],
+                'task_name': task_plan_list[i]['task_script'],   // 名称
+                'task_status':task_plan_list[i]['task_status'],   // 运行状态
+
+                'create_at':dtime(mytime).format('YYYY-MM-DD HH:mm:ss'),
+                'sort_time':mytime.getTime()
+            };
+
+            //参数检查
+            var query = await DB.TaskPlanTable.findOne(wherestr).exec();
+            if (query == null) {
+                await DB.TaskPlanTable.create(updatestr);
+            }
+            else{
+                await DB.TaskPlanTable.findByIdAndUpdate(query['_id'], updatestr).exec();
+            }
+        }
+
+        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:task_plan_list.length});
+        console.log('task plan update end');
+    }
+
+
+}
+
+export default new HistoryHandle()
+
+
+
+//await DB.TaskTable.findOneAndUpdate(wherestr, updatestr).exec();
+//await 可以不调用.exec() 返回值
+//如果没有转await 则必须调用.exec() 才能返回查询结果,不能通过返回值判断
+//如果采用返回值得形式，必须的await
+

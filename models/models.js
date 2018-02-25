@@ -3,11 +3,13 @@ import {TaskTable} from "../models/task/task.js";
 import {StrategyTable} from "../models/strategy/strategy.js";
 import {RiskctrlTable} from "../models/riskctrl/riskctrl.js";
 import {LogTable} from "../models/log/log.js";
-import {BacktestResultTable} from "../models/backtest/backtestResult.js";
-import {SelectResultTable} from "../models/select/selectResult.js";
-import {HistoryTable} from "../models/history/history.js";
+import {BacktestResultTable} from "./backtest/backtest_result.js";
+import {SelectResultTable} from "./select/select_result.js";
+import {DayTable, WeekTable, MonthTable, Min5Table, Min15Table, Min30Table, Min60Table} from "../models/history/history.js";
+import {TaskPlanTable} from "../models/history/task_plan.js";
 import {OrderTable} from "../models/order/order.js";
 import {MarketTable} from "../models/market/market.js";
+
 import AdminModel from '../models/admin/admin';
 
 //mqtt 命令
@@ -20,7 +22,16 @@ function DB() {
     this.LogTable = LogTable;
     this.BacktestResultTable = BacktestResultTable;
     this.SelectResultTable = SelectResultTable;
-    this.HistoryTable = HistoryTable;
+
+    this.DayTable = DayTable;
+    this.WeekTable = WeekTable;
+    this.MonthTable = MonthTable;
+    this.Min5Table = Min5Table;
+    this.Min15Table = Min15Table;
+    this.Min30Table = Min30Table;
+    this.Min60Table = Min60Table;
+
+    this.TaskPlanTable = TaskPlanTable;
     this.OrderTable = OrderTable;
     this.MarketTable = MarketTable;
 
