@@ -1,4 +1,3 @@
-var cp = require('child_process');
 const config = require("config-lite");
 const fs = require("fs");
 const path = require("path");
@@ -26,7 +25,19 @@ class WorkerClass {
         * */
         this.taskMap = new Map(); // 空Map
 
+        /*
+        var strategy_class = require('../trade-strategy/strategy_macd.js');
+        var aaa = new strategy_class();
+        aaa.onInit('null', '11', '22', '22', '22');
 
+        var bbb = new strategy_class();
+        bbb.onInit('null', '333', '22', '22', '22');
+
+        console.log('111111');
+        console.log(aaa);
+        console.log('222222');
+        console.log(bbb);
+*/
 
         //监听事件some_event
         //emitter.on('onTick', this.onTickTest);
@@ -128,18 +139,22 @@ class WorkerClass {
                 var stock_symbol = strategy_list[i]['stock_symbol'];
                 var k_type = strategy_list[i]['stock_ktype'];
                 //var strategy_name = strategy_list[i]['strategy_name'];
-                strategy[i] = require(strategy_fullname[i]);
+                var strategy_class = require(strategy_fullname[i]);
+                strategy[i] = new strategy_class();
                 strategy[i].onInit(emitter, task_id, stock_symbol, k_type, trade_symbol);
+                //console.log('[worker] new strategy_class:', strategy[i]);
             }
 
 
             console.log('[worker] riskctrl_fullname:', riskctrl_fullname);
-            var riskctrl = require(riskctrl_fullname);
+            var riskctrl_class = require(riskctrl_fullname);
+            var riskctrl = new riskctrl_class();
             riskctrl.onInit(emitter, task_id, trade_symbol, trade_ktype);
 
 
 
             console.log('[worker] gateway_fullname:', gateway_fullname);
+            //只允许单实例运行
             var gateway = require(gateway_fullname);
             gateway.onInit(emitter, task_id, trade_symbol, trade_ktype);
 

@@ -2,10 +2,10 @@
 const BaseStrategy = require("../../prototype/strategyBaseClass");
 
 //策略要继承基类
-class StrategyMacdClass extends BaseStrategy {
+module.exports = class StrategyMacdClass extends BaseStrategy {
     constructor(){
         super();
-        console.log('constructor');
+        console.log('StrategyMacdClass constructor');
     }
 
     async on_tick(msgObj) {
@@ -49,7 +49,5 @@ class StrategyMacdClass extends BaseStrategy {
 }
 console.log('create worker StrategyMacdClass');
 
-//导出模块
-module.exports = new StrategyMacdClass();
 
 

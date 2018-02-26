@@ -3,7 +3,7 @@
 const BaseStrategy = require("../../prototype/strategyBaseClass");
 
 //策略要继承基类
-class StrategyClass extends BaseStrategy {
+module.exports = class StrategyClass extends BaseStrategy {
     constructor(){
         super();
     }
@@ -19,7 +19,5 @@ class StrategyClass extends BaseStrategy {
 }
 console.log('create worker StrategyClass');
 
-//导出模块
-module.exports = new StrategyClass();
 
 

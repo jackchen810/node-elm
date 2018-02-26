@@ -7,15 +7,16 @@ const historySchema = new mongoose.Schema({
     symbol: String,    //股票代码
     name:String,    //名称
 
-    price_change:String,    //价格变动
-    p_change:String,    //涨跌幅
-
-    trade:String,    //现价
     open:String,    //开盘价
     high:String,    //最高价
     low:String,    //最低价
+    close:String,  //收盘价
 
+    //trade:String,    //现价
     volume:String,    //成交量
+
+    price_change:String,    //价格变动
+    p_change:String,    //涨跌幅
 
     ma5:String,    //5日均价
     ma10:String,    //10日均价

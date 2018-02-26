@@ -11,7 +11,7 @@ class OrderClass extends BaseOrder {
 }
 console.log('create worker OrderClass');
 
-//导出模块
+//导出模块, 只允许单实例运行
 module.exports = new OrderClass();
 
 

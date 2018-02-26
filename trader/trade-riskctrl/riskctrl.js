@@ -2,7 +2,7 @@
 const BaseRiskctrl = require("../../prototype/riskctrlBaseClass");
 
 //策略要继承基类
-class RisckctrlClass extends BaseRiskctrl {
+module.exports = class RisckctrlClass extends BaseRiskctrl {
     constructor(){
         super();
         console.log('constructor');
@@ -27,7 +27,5 @@ class RisckctrlClass extends BaseRiskctrl {
 }
 console.log('create worker RisckctrlClass');
 
-//导出模块
-module.exports = new RisckctrlClass();
 
 
