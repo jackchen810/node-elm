@@ -51,16 +51,16 @@ process.on('message', function(msg) {
         return;
     }
 
-    //console.log('process msg:', msg);
+    console.log('[worker] recv request:', JSON.stringify(msg));
     //tradeLog('system', '1', msg);
 
     //type, action, data
     var head = msg['head'];
     var body = msg['body'];
-    var response = new ProcessResponse(head.type, head.action);
 
     //接收主进程发送过来的消息
     if(head.type == 'task'){
+        var response = new ProcessResponse(head.type, head.action);
         if (head.action == 'add') {
             WorkerClassHandle.addTask(body, response);
         }

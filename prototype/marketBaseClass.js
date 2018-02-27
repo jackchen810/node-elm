@@ -2,45 +2,18 @@
 
 module.exports = class BaseMarket {
     constructor(){
-        this.uri = '';
-        this.baseUrl = '';
 
+        this.create_bar_min = this.create_bar_min.bind(this);
 
-        this.timer_callback_min1 = this.timer_callback_min1.bind(this);
+        this.all_symbols = new Set();   //任务标的集合
 
-
-        // key: stock_type  每个k线类型起一个定时器实例
-        this.timerMap = new Map(); // 空Map
-        this.timerMap.set('1', {
-            'symbol_set':new Set(),
-            'url':'',
-            'timer_job_cron': '',
-            'timer_job_handle': '',
-            'timer_callback':this.timer_callback_min1});
-        this.timerMap.set('5', {
-            'symbol_set':new Set(),
-            'url':'',
-            'timer_job_cron': '',
-            'timer_job_handle': '',
-            'timer_callback':this.timer_callback_min5});
-        this.timerMap.set('15', {
-            'symbol_set':new Set(),
-            'url':'',
-            'timer_job_cron': '',
-            'timer_job_handle': '',
-            'timer_callback':this.timer_callback_min15});
-        this.timerMap.set('30', {
-            'symbol_set':new Set(),
-            'url':'',
-            'timer_job_cron': '',
-            'timer_job_handle': '',
-            'timer_callback':this.timer_callback_min30});
-        this.timerMap.set('60', {
-            'symbol_set':new Set(),
-            'url':'',
-            'timer_job_cron': '',
-            'timer_job_handle': '',
-            'timer_callback':this.timer_callback_min60});
+        // ktypeMap  每个k线类型记录标的列表
+        this.ktypeMap = new Map(); // 空Map
+        this.ktypeMap.set('1', {'symbol_list' : [], 'bar_obj' : {}});
+        this.ktypeMap.set('5', {'symbol_list' : [], 'bar_obj' : {}});
+        this.ktypeMap.set('15', {'symbol_list' : [], 'bar_obj' : {}});
+        this.ktypeMap.set('30', {'symbol_list' : [], 'bar_obj' : {}});
+        this.ktypeMap.set('60', {'symbol_list' : [], 'bar_obj' : {}});
 
         //console.log('timerMap:', this.timerMap);
 
@@ -50,42 +23,7 @@ module.exports = class BaseMarket {
 
     }
 
-    //定时器注册函数
-    async timer_register_callback(timer, ktype, job_cron, callback_func) {
-        if (timer.has(ktype)) {
-            var timerDict = timer.get(ktype);
-            timerDict['timer_job_cron'] = job_cron;
-            timerDict['timer_callback'] = callback_func;
-            return 0
-        }
-        else{
-            this.timerMap.set(ktype, {
-                'symbol_set':new Set(),
-                'url':'',
-                'timer_job_cron': job_cron,
-                'timer_job_handle': '',
-                'timer_callback':callback_func});
-            return -1;
-        }
 
-    }
-
-    async timer_callback_min1() {
-        throw new Error('timer_callback_min1 需要用户实现');
-    }
-
-    async timer_callback_min5() {
-        throw new Error('timer_callback_min5 需要用户实现');
-    }
-    async timer_callback_min15() {
-        throw new Error('timer_callback_min15 需要用户实现');
-    }
-    async timer_callback_min30() {
-        throw new Error('timer_handle_min30 需要用户实现');
-    }
-    async timer_callback_min60() {
-        throw new Error('timer_handle_min60 需要用户实现');
-    }
 
     //onInit  ----不需要用户修改
     async onInit(emitter, task_id, symbol, ktype){
@@ -96,6 +34,50 @@ module.exports = class BaseMarket {
         //console.log('BaseStrategyComponent onInit');
         return;
     }
+
+
+    async create_bar_min(tickObj, ktype, barCallback) {
+        console.log('create_bar_min:', ktype, JSON.stringify(tickObj));
+
+        var time_array = tickObj['time'].split(':');
+        var tick_minute = time_array[1];
+
+        var ktypeDict = this.ktypeMap.get(ktype);
+        var barObj = ktypeDict['bar_obj'];
+
+        //判断是否是空对象
+        if (Object.keys(barObj).length == 0){
+            barObj['_minute'] = tick_minute;
+        }
+
+        console.log('tick_minute:', barObj['_minute'], tick_minute % Number(ktype) );
+        barCallback(barObj);
+        if (tick_minute != barObj['_minute'] && tick_minute % Number(ktype) == 0) {
+            //回调函数
+            barCallback(barObj);
+
+            barObj['open'] = tickObj['price'] ;
+            barObj['close'] = tickObj['price'];
+            barObj['high'] = tickObj['price'];
+            barObj['low'] = tickObj['price'];
+            barObj['_minute'] = tick_minute;
+        }
+        else{
+            barObj['open'] = barObj['open'] ;
+            barObj['close'] = tickObj['price'];
+            barObj['high'] = (barObj['high'] > tickObj['price']) ? barObj['high'] : tickObj['price'];
+            barObj['low'] = (barObj['low'] < tickObj['price']) ? barObj['low'] : tickObj['price'];
+
+            barObj['symbol'] = tickObj['symbol'];
+            barObj['name'] = tickObj['name'];
+            barObj['price'] = tickObj['price'];
+            barObj['volume'] = barObj['volume'] + tickObj['volume'];
+            barObj['date'] = tickObj['date'];
+            barObj['time'] = tickObj['time'];
+        }
+
+    }
+
 
 }
 

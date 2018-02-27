@@ -26,7 +26,7 @@ class WorkerHandle {
     //消息处理
     async onMessage(message){
         if (process.env.NODE_ENV == 'local') {
-            console.log('[agent] worker response:', JSON.stringify(message));
+            console.log('[agent] recv response:', JSON.stringify(message));
         }
 
         var head = message['head'];
