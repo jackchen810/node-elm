@@ -1,8 +1,8 @@
 'use strict';
 const BaseStrategy = require("../../prototype/strategyBaseClass");
 // load the module and display its version
-var talib = require('talib');
-console.log("TALib Version: " + talib.version);
+const talib = require('talib/build/Release/talib');
+
 
 //策略要继承基类
 module.exports = class StrategyMacdClass extends BaseStrategy {
@@ -36,6 +36,22 @@ module.exports = class StrategyMacdClass extends BaseStrategy {
             'price': msgObj['price'],
             'volume': msgObj['volume'],
         }
+
+        talib.execute({
+            name: "MACD",
+            startIdx: 0,
+            endIdx: marketData.close.length - 1,
+            high: marketData.high,
+            low: marketData.low,
+            close: marketData.close,
+            optInTimePeriod: 9
+        }, function (err, result) {
+
+            console.log("ADX Function Results:");
+            console.log(result);
+
+        });
+
 
 
         this.to_buy(ktype, buyObj);

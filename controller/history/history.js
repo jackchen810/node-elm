@@ -11,6 +11,7 @@ class HistoryHandle {
     constructor(){
         //绑定，this
         this.planrun = this.planrun.bind(this);
+        this.planupdate = this.planupdate.bind(this);
 
     }
     async filelist(req, res, next){
@@ -80,7 +81,7 @@ class HistoryHandle {
         }
 
         res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:task_plan_list.length});
-        HistoryHandle.prototype.planrun();
+        this.planrun();
         console.log('task plan update end');
     }
 

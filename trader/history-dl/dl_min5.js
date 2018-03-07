@@ -9,7 +9,7 @@ const HistoryDataBaseClass_ifeng = require("../../prototype/historyDataBaseClass
 
 async function updateDatabase(data_s, symbol) {
 
-    var record = await data_s.download('5', 'fq', symbol);
+    var record = await data_s.to_download('5', 'fq', symbol);
     var data = record['record'];
     console.log('to min5 db', data[0]);
 

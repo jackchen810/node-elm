@@ -20,6 +20,6 @@ router.all('/bind', MarketGatewayHandle.bind);
 
 
 //绑定行情列表
-router.all('/bindobj', MarketGatewayHandle.bindobj);
+router.all('/get/bindobj', MarketGatewayHandle.get_bindobj);
 
 export default router

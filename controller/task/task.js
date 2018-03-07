@@ -58,6 +58,7 @@ class TaskHandle {
         else{
             res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
         }
+
         console.log('task list end');
     }
 
@@ -121,7 +122,7 @@ class TaskHandle {
             'trade_ktype': stock_ktype,
             'strategy_list': strategy_list,   //策略名称
             'riskctrl_name': riskctrl_name,   //风控名称
-            'market_gateway': market_gateway,   //交易网关名称
+            'market_gateway': market_gateway,   //行情网关名称
             'order_gateway': order_gateway,   //交易网关名称
         }
 

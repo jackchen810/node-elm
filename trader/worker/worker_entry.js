@@ -13,7 +13,6 @@ const tradeLog = require("../trade-log/log.js");
 * */
 
 
-
 class ProcessResponse{
     constructor(type, action){
         //记录任务id

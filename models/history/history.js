@@ -1,10 +1,14 @@
 'use strict';
 
 import mongoose from 'mongoose';
-
+import db_minute5 from '../../mongodb/db.js';
+import db_minute15 from '../../mongodb/db.js';
+import db_minute30 from '../../mongodb/db.js';
+import db_minute60 from '../../mongodb/db.js';
+import db_day from '../../mongodb/db.js';
 
 const historySchema = new mongoose.Schema({
-    symbol: String,    //股票代码
+    code: String,    //股票代码
     name:String,    //名称
 
     open:String,    //开盘价
@@ -15,32 +19,25 @@ const historySchema = new mongoose.Schema({
     //trade:String,    //现价
     volume:String,    //成交量
 
-    price_change:String,    //价格变动
-    p_change:String,    //涨跌幅
-
-    ma5:String,    //5日均价
-    ma10:String,    //10日均价
-    ma20:String,    //20日均价
-
-    v_ma5:String,    //5日均量
-    v_ma10:String,    //10日均量
-    v_ma20:String,    //20日均量
-
     date: String,
     time: String,
-    sort_time:Number, //排序时间戳， string无法排序
-    //create_date: { type: Date, default: Date.now },
-
 });
 
-const HistoryTable = mongoose.model('HistoryTable', historySchema);
 
-const DayTable = mongoose.model('DayTable', historySchema);
-const WeekTable = mongoose.model('WeekTable', historySchema);
-const MonthTable = mongoose.model('MonthTable', historySchema);
-
-const Min5Table = mongoose.model('Min5Table', historySchema);
-const Min15Table = mongoose.model('Min15Table', historySchema);
-const Min30Table = mongoose.model('Min30Table', historySchema);
-const Min60Table = mongoose.model('Min60Table', historySchema);
-export {HistoryTable, DayTable, WeekTable, MonthTable, Min5Table, Min15Table, Min30Table, Min60Table};
+module.exports = function KTable(ktype, table) {
+    if (ktype == '5') {
+        return db_minute5.model(table, historySchema);
+    }
+    else if (ktype == '15') {
+        return db_minute15.model(table, historySchema);
+    }
+    else if (ktype == '30') {
+        return db_minute30.model(table, historySchema);
+    }
+    else if (ktype == '60') {
+        return db_minute60.model(table, historySchema);
+    }
+    else if (ktype == 'day') {
+        return db_day.model(table, historySchema);
+    }
+}

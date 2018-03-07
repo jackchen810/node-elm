@@ -28,8 +28,8 @@ class MarketGatewayHandle {
         console.log('market gateway list end');
     }
 
-    async bindobj(req, res, next){
-        console.log('market gateway bindobj');
+    async get_bindobj(req, res, next){
+        console.log('market gateway get bindobj');
 
         //更新到设备数据库， 设备上线，下线
         var wherestr = {'is_bind': 'true'};

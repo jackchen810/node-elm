@@ -15,6 +15,19 @@ class SinaMarketClass extends BaseMarket {
         super();
 
 
+        this.K_TYPE = {
+            day: 'akdaily',
+            week: 'akweekly',
+            month: 'akmonthly',
+            minute: 'akmin',
+        };
+
+        console.log(('5' in this.K_TYPE) ? this.K_TYPE['5'] : this.K_TYPE.minute)
+
+        //绑定，this
+        this.price_url = this.price_url.bind(this);
+        this.to_download = this.to_download.bind(this);
+
         this.onStart = this.onStart.bind(this);
         this.timer_callback = this.timer_callback.bind(this);
 
@@ -46,7 +59,7 @@ class SinaMarketClass extends BaseMarket {
     }
 
     async timer_callback() {
-        console.log('get tick:',dtime().format('YYYY-MM-DD HH:mm:ss'), ' tick_url_list:',this.tick_url_list);
+        console.log('get tick:', dtime().format('YYYY-MM-DD HH:mm:ss'), ' tick_url_list:',this.tick_url_list);
 
         //get 请求外网
         var self = this;
@@ -132,6 +145,7 @@ class SinaMarketClass extends BaseMarket {
         symbol_list = Array.from(new Set(symbol_list));
         if (symbol_list.length > 0 && this.timer_job_handle === null){
             //this.timer_job_handle = schedule.scheduleJob('*/5 * 9,10,11,13,14 * * 1,2,3,4,5', this.timer_callback);
+            //工作日：1,2,3,4,5  每隔3秒 获取一次tick
             this.timer_job_handle = schedule.scheduleJob('*/3 * * * * 1,2,3,4,5', this.timer_callback);
         }
 
@@ -173,6 +187,50 @@ class SinaMarketClass extends BaseMarket {
         if (symbol_list.length == 0 && this.timer_job_handle != null){
             this.timer_job_handle.cancel();
         }
+    }
+
+
+    async price_url(ktype, autype, symbol) {
+        var _symbol = ('6' === symbol[0]) ? ('sh'+symbol) : ('sz'+symbol);
+        var _ktype = (ktype in this.K_TYPE) ? this.K_TYPE[ktype] : this.K_TYPE.minute;
+        var type = (_ktype === this.K_TYPE.minute ? ktype : autype);
+        var codeStr = (_ktype === this.K_TYPE.minute ? 'scode' : 'code');
+        return `http://api.finance.ifeng.com/${_ktype}/?${codeStr}=${_symbol}&type=${type}`;
+    };
+
+    //http://api.finance.ifeng.com/akdaily/?code=sh601989&type=last
+    //http://api.finance.ifeng.com/akmin/?scode=sh601989&type=5
+    //http://api.finance.ifeng.com/akmin/?scode=sz002500&type=5
+    async to_download(ktype, autype, symbol) {
+
+        var url = this.price_url(ktype, autype, symbol);
+        console.log('get %s, http url:', ktype, url, new Date());
+
+        //get 请求外网
+        http.get(url, function (req, res) {
+            var data_str = '';
+            req.on('data', function (chunk) {
+                data_str += chunk
+            });
+
+            req.on('end', function () {
+                try{
+                    var jsonObj = JSON.parse(data_str);
+                }
+                catch(err) {
+                    return [];
+                }
+
+                //console.log('http data:', jsonObj);
+                return jsonObj;
+            });
+
+            req.on('error', function (e) {
+                console.log('problem with request: ' + e.message);
+                return [];
+            });
+
+        });
     }
 
 

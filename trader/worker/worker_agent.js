@@ -1,11 +1,15 @@
 'use strict';
 
+import DB from "../../models/models";
+
 const fork = require('child_process').fork;
 const fs = require("fs");
+const path = require('path');
 
 //var market = require("../gateway-market/market_tushare.js");
 const market = require("../gateway-market/market_sina.js");
 const tradeLog = require("../trade-log/log.js");
+const config = require("config-lite");
 
 var events = require("events");
 //创建事件监听的一个对象
@@ -46,17 +50,34 @@ class WorkerHandle {
     async addTask(message){
 
         //添加行情定时获取接口
-        market.onStart(message['trade_symbol'], message['trade_ktype']);
+        //market.onStart(message['trade_symbol'], message['trade_ktype']);
 
+        ///路径有效性检查 riskctrl
+        var market_gateway_fullname = path.join(__dirname, '../../', config.market_gateway_dir, message['market_gateway']);
+        if (fs.existsSync(market_gateway_fullname) == false) {
+            console.log('[worker] market_gateway path not exist:', market_gateway_fullname);
+            return -1;
+        }
+
+        //1. 加载market
+        var market_gateway_class = require(market_gateway_fullname);
+
+        DB.KHistory.findOne(wherestr).exec();
+
+        //2. 加载market，启动定时器
+        market_gateway_class.onStart(message['trade_symbol'], message['trade_ktype']);
         console.log(__filename, 'add task onstart');
 
+        //3. 下载数据，进行同步
+        market_gateway_class.to_download('day', 'fq', message['trade_symbol']);
 
+        //添加任务到策略进程
         var request = {
             'head': {'type': 'task', 'action': 'add'},
             'body': message,
         }
 
-        //向 worker 进程发送任务小心
+        //向 worker 进程发送任务消息
         console.log('to---->worker')
         this.worker.send(request);
     }
@@ -74,7 +95,7 @@ class WorkerHandle {
             'body': message,
         }
 
-        //向 worker 进程发送任务小心
+        //向 worker 进程发送任务消息
         console.log('to---->worker')
         this.worker.send(request);
     }

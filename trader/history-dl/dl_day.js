@@ -9,7 +9,7 @@ const HistoryDataBaseClass_ifeng = require("../../prototype/historyDataBaseClass
 
 async function updateDatabase(data_s, symbol) {
 
-    var record = await data_s.download('day', 'fq', symbol);
+    var record = await data_s.to_download('day', 'fq', symbol);
     var data = record['record'];
     console.log('to day db', data[0]);
 
