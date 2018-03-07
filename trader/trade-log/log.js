@@ -1,6 +1,6 @@
 'use strict';
 
-//策略要继承基类
+//log要继承基类
 module.exports = function tradeLog(log_type, log_level, msgstr){
     console.log('[worker] send log:', log_type, log_level, msgstr);
     var res = {

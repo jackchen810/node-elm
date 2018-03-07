@@ -3,7 +3,7 @@
 module.exports = class BaseMarket {
     constructor(){
 
-        this.create_bar_min = this.create_bar_min.bind(this);
+        //this.create_bar_min = this.create_bar_min.bind(this);
 
         this.all_symbols = new Set();   //任务标的集合
 
@@ -37,22 +37,26 @@ module.exports = class BaseMarket {
 
 
     async create_bar_min(tickObj, ktype, barCallback) {
-        console.log('create_bar_min:', ktype, JSON.stringify(tickObj));
+        console.log('create_bar_min:', ktype, 'tick:', JSON.stringify(tickObj));
 
         var time_array = tickObj['time'].split(':');
-        var tick_minute = time_array[1];
+        var tick_minute = Number(time_array[1]);
 
         var ktypeDict = this.ktypeMap.get(ktype);
-        var barObj = ktypeDict['bar_obj'];
+        var barObj = ktypeDict['bar_obj']
 
         //判断是否是空对象
         if (Object.keys(barObj).length == 0){
-            barObj['_minute'] = tick_minute;
+            barObj['symbol'] = '';
+            barObj['date'] = tickObj['date'];
+            barObj['time'] = tickObj['time'];
+            barObj['_before_minute'] = tick_minute;
+            barObj['_begin_volume'] = tickObj['volume'];
         }
 
-        console.log('tick_minute:', barObj['_minute'], tick_minute % Number(ktype) );
-        barCallback(barObj);
-        if (tick_minute != barObj['_minute'] && tick_minute % Number(ktype) == 0) {
+        //console.log('_before_minute:', barObj['_before_minute'], 'tick_minute:', tick_minute);
+        if (tick_minute != barObj['_before_minute'] && Number(tick_minute) % Number(ktype) == 0) {
+
             //回调函数
             barCallback(barObj);
 
@@ -60,7 +64,13 @@ module.exports = class BaseMarket {
             barObj['close'] = tickObj['price'];
             barObj['high'] = tickObj['price'];
             barObj['low'] = tickObj['price'];
-            barObj['_minute'] = tick_minute;
+            barObj['date'] = tickObj['date'];
+            barObj['time'] = tickObj['time'];
+
+            //记录上一个成交量
+            barObj['_begin_volume'] = tickObj['volume'];
+            barObj['volume'] = '0';
+            barObj['_before_minute'] = tick_minute;
         }
         else{
             barObj['open'] = barObj['open'] ;
@@ -71,9 +81,10 @@ module.exports = class BaseMarket {
             barObj['symbol'] = tickObj['symbol'];
             barObj['name'] = tickObj['name'];
             barObj['price'] = tickObj['price'];
-            barObj['volume'] = barObj['volume'] + tickObj['volume'];
-            barObj['date'] = tickObj['date'];
-            barObj['time'] = tickObj['time'];
+            barObj['volume'] = barObj['volume'] ? ((Number(tickObj['volume']) - Number(barObj['_begin_volume'])).toString()): '0';
+            //console.log('volume:',Number(tickObj['volume']), 'begin', Number(barObj['_begin_volume']));
+            //barObj['date'] = tickObj['date'];
+            //barObj['time'] = tickObj['time'];
         }
 
     }

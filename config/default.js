@@ -11,7 +11,7 @@ module.exports = {
 	device_dir:'./public/device',
 	pkg_dir:'./public/packages',
 	script_dir:'./public/scripts',
-	url: 'mongodb://localhost:27017/iotks',
+	url: 'mongodb://localhost:27017/nodequant',
 	amount_every_task: '500',
 	interval_every_task: '600000',  //单位：ms
 	ssl:{
@@ -28,17 +28,4 @@ module.exports = {
 			maxAge:   2 * 60 * 60 * 1000,
 		}
 	},
-	mqtt: {
-		username: 'kunteng-iotks',
-		protocol:'mqtt',
-		rejectUnauthorized: false,  //false
-		port: 8883,
-		//host: 'safe.kunteng.org',
-		host: 'emqtt.kunteng.org',
-		ca_path: './mqttclient/files',
-		key_file : 'apfree.key',
-		cert_file : 'apfree.crt',
-		trusted_ca_list : 'apfree.ca',
-		node_topic: '$SYS/brokers/aisino@127.0.0.1/',
-	}
 }

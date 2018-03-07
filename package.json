@@ -57,6 +57,7 @@
     "connect-multiparty": "*",
     "tushare": "*",
     "iconv-lite": "*",
+    "talib": "*",
     "node-schedule": "*"
   },
   "devDependencies": {

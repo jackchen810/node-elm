@@ -99,7 +99,7 @@ class WorkerClass {
         var order_gateway = request['order_gateway'];
 
         ///导入strategy_list
-        console.log('[worker] strategy_list:', strategy_list);
+        console.log('[worker] strategy_list:', JSON.stringify(strategy_list));
         tradeLog('system', 'test', task_id);
 
         ///路径有效性检查

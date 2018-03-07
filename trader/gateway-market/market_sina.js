@@ -45,8 +45,7 @@ class SinaMarketClass extends BaseMarket {
     }
 
     async timer_callback() {
-        console.log('get tick:',new Date());
-        console.log('tick_url_list:',this.tick_url_list);
+        console.log('get tick:',new Date(), ' tick_url_list:',this.tick_url_list);
 
         //get 请求外网
         var self = this;
@@ -132,7 +131,7 @@ class SinaMarketClass extends BaseMarket {
         symbol_list = Array.from(new Set(symbol_list));
         if (symbol_list.length > 0 && this.timer_job_handle === null){
             //this.timer_job_handle = schedule.scheduleJob('*/5 * 9,10,11,13,14 * * 1,2,3,4,5', this.timer_callback);
-            this.timer_job_handle = schedule.scheduleJob('*/10 * * * * 1,2,3,4,5', this.timer_callback);
+            this.timer_job_handle = schedule.scheduleJob('*/3 * * * * 1,2,3,4,5', this.timer_callback);
         }
 
         console.log('symbol_list:', symbol_list);

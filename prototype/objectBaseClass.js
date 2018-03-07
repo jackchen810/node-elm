@@ -35,12 +35,12 @@ class BaseObjectData {
             low: '',              // k 线柱体 最低价
             close: '',           // k 线柱体 收盘价
 
-            price: '',           // 当前价格
+            price:'',           // 当前价格
+            volume: '',             // 成交量
 
             date: '',            // bar开始的时间，日期
             time: '',            // 时间
 
-            volume: '',             // 成交量
             openInterest: '',       // 持仓量
         }
 

@@ -1,5 +1,8 @@
 'use strict';
 const BaseStrategy = require("../../prototype/strategyBaseClass");
+// load the module and display its version
+var talib = require('talib');
+console.log("TALib Version: " + talib.version);
 
 //策略要继承基类
 module.exports = class StrategyMacdClass extends BaseStrategy {
