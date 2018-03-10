@@ -3,7 +3,7 @@
 module.exports = class BaseMarket {
     constructor(){
 
-        //this.create_bar_min = this.create_bar_min.bind(this);
+        this.create_bar_min = this.create_bar_min.bind(this);
         this.to_download = this.to_download.bind(this);
 
         this.all_symbols = new Set();   //任务标的集合
@@ -39,7 +39,7 @@ module.exports = class BaseMarket {
     //tickObj tick对象
     //
     async create_bar_min(tickObj, ktype, barCallback) {
-        console.log('create_bar_min:', ktype, 'tick:', JSON.stringify(tickObj));
+        //console.log('create_bar_min:', ktype, 'tick:', JSON.stringify(tickObj));
 
         var time_array = tickObj['time'].split(':');
         var tick_minute = Number(time_array[1]);
@@ -50,7 +50,7 @@ module.exports = class BaseMarket {
         //判断是否是空对象
         if (Object.keys(barObj).length == 0){
             barObj['symbol'] = '';
-            barObj['date'] = tickObj['date'];
+            barObj['date'] = tickObj['date'] + ' ' +  tickObj['time'].substring(0, 5);  //bar数据兼容tushare
             barObj['time'] = tickObj['time'];
             barObj['_before_minute'] = tick_minute;
             barObj['_begin_volume'] = tickObj['volume'];
@@ -93,7 +93,7 @@ module.exports = class BaseMarket {
     }
 
     async to_download(ktype, autype, symbol) {
-        throw new Error('to_download on_sell 需要用户实现');
+        throw new Error('to_download 需要用户实现');
     }
 
 }

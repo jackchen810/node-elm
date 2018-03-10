@@ -1,3 +1,4 @@
+
 const config = require("config-lite");
 const fs = require("fs");
 const path = require("path");
@@ -62,18 +63,22 @@ class WorkerClass {
 
 
 
-    async on_bar(ktype, msgObj){
-        console.log('WorkerClass on_bar', ktype, msgObj['symbol']);
+    async on_bar(ktype, barObj){
+        console.log('WorkerClass on_bar', ktype, barObj['code'], barObj['date']);
         //emitter.emit(msgObj[''], msgObj['symbol'], msgObj['ktype'], msgObj);
 
         //收到bar数据， 循环调用对应的策略模块进行处理
         this.taskMap.forEach(function (value, key, map) {
             //console.log('taskMap task_id:', key, value);
-            if (msgObj['symbol'] == value['trade_symbol']) {
-                var strategy_list = value['strategy_list'];
-                //console.log (__filename,"strategy_list", strategy_list);
-                for (var i = 0; i < strategy_list.length; i++) {
-                    value['strategy_list'][i].on_bar(ktype, msgObj);
+            var strategy_list = value['strategy_list'];
+            //console.log (__filename,"strategy_list", strategy_list);
+
+            //查找匹配的标的，发送bar数据
+            for (var i = 0; i < strategy_list.length; i++) {
+                if (barObj['code'] == strategy_list[i]['stock_symbol'] &&
+                    ktype == strategy_list[i]['stock_ktype']) {
+                    //console.log('strategy_list instance:', strategy_list[i]['instance']);
+                    strategy_list[i]['instance'].on_bar(ktype, barObj);
                 }
             }
         });
@@ -137,12 +142,20 @@ class WorkerClass {
             var strategy = [];
             for (var i = 0; i < strategy_list.length; i++) {
                 var stock_symbol = strategy_list[i]['stock_symbol'];
-                var k_type = strategy_list[i]['stock_ktype'];
-                //var strategy_name = strategy_list[i]['strategy_name'];
+                var stock_ktype = strategy_list[i]['stock_ktype'];
+                var strategy_name = strategy_list[i]['strategy_name'];
                 var strategy_class = require(strategy_fullname[i]);
-                strategy[i] = new strategy_class();
-                strategy[i].onInit(emitter, task_id, stock_symbol, k_type, trade_symbol);
+                var instance = new strategy_class();
+                instance.onInit(emitter, task_id, stock_symbol, stock_ktype, trade_symbol);
                 //console.log('[worker] new strategy_class:', strategy[i]);
+
+                var obj = {
+                    'stock_symbol': stock_symbol,
+                    'stock_ktype': stock_ktype,
+                    'strategy_name': strategy_name,
+                    'instance': instance,   //策略实例
+                };
+                strategy.push(obj);
             }
 
 
@@ -189,6 +202,30 @@ class WorkerClass {
         //删除实例
         this.taskMap.delete(task_id);
         response.send({ret_code: 0, ret_msg: 'SUCCESS', extra: request});
+    }
+
+
+    async dataSync(request, bardata, response){
+        console.log('[worker] dataSync');
+        var task_id = request['task_id'];
+        var stock_ktype = request['stock_ktype'];
+        var stock_symbol = request['stock_symbol'];
+
+        //获取实例
+        var task = this.taskMap.get(task_id);
+        if(typeof(task)==="undefined"){
+            return;
+        }
+
+        //策略实例数组
+        var strategy_list = task['strategy_list'];
+        //console.log('[worker] dataSync', strategy_list);
+        for (var i = 0; i< strategy_list.length; i++){
+            if (strategy_list[i]['stock_symbol'] == stock_symbol && strategy_list[i]['stock_ktype'] == stock_ktype){
+                strategy_list[i]['instance'].onInitBar(bardata);
+            }
+        }
+        response.send({ret_code: 0, ret_msg: 'SUCCESS', extra: task_id});
     }
 
 

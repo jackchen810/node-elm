@@ -73,8 +73,8 @@ class TaskHandle {
         var riskctrl_name = req.body['riskctrl_name'];        //获取表单数据，josn
         var market_gateway = req.body['market_gateway'];
         var order_gateway = req.body['order_gateway'];
-        var trade_symbol = strategy_list[0]['stock_symbol'];   //交易标的
-        var stock_ktype = strategy_list[0]['stock_ktype'];   //交易标的
+        var trade_symbol = strategy_list[0]['stock_symbol'];   //交易标的， 主策略标的
+        var stock_ktype = strategy_list[0]['stock_ktype'];   //交易标的，主策略标的
         var task_id = this.guid();
         var mytime = new Date();
 
@@ -166,6 +166,10 @@ class TaskHandle {
             'task_id': task_id,
             'trade_symbol': query['trade_symbol'],
             'trade_ktype': query['trade_ktype'],
+            'strategy_list': query['strategy_list'],   //策略名称
+            'riskctrl_name': query['riskctrl_name'],   //风控名称
+            'market_gateway': query['market_gateway'],   //行情网关名称
+            'order_gateway': query['order_gateway'],   //交易网关名称
         }
 
 
@@ -265,6 +269,10 @@ class TaskHandle {
             'task_id': task_id,
             'trade_symbol': query['trade_symbol'],
             'trade_ktype': query['trade_ktype'],
+            'strategy_list': query['strategy_list'],   //策略名称
+            'riskctrl_name': query['riskctrl_name'],   //风控名称
+            'market_gateway': query['market_gateway'],   //行情网关名称
+            'order_gateway': query['order_gateway'],   //交易网关名称
         }
 
 

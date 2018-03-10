@@ -19,9 +19,9 @@ async function updateDatabase(data_s, symbol) {
         //console.log('to item', item);
 
         //更新到设备数据库
-        var wherestr = {'symbol': symbol, 'date': time_array[0], 'time': time_array[1]};
+        var wherestr = {'code': symbol, 'date': time_array[0]};
         var updatestr = {
-            'symbol': symbol,
+            'code': symbol,
             'name': '',
 
             'date': time_array[0],
@@ -31,28 +31,16 @@ async function updateDatabase(data_s, symbol) {
             'high': item[2],
             'close': item[3],
             'low': item[4],
-
-            'volume': item[5],
-            'price_change': item[6],
-            'p_change': item[7],
-
-            'ma5': item[8],
-            'ma10': item[9],
-            'ma15': item[10],
-
-            'v_ma5': item[11],
-            'v_ma10': item[12],
-            'v_ma20': item[13],
         };
 
 
         //参数检查
-        var query = await DB.DayTable.findOne(wherestr).exec();
+        var query = await DB.KHistory('day', symbol).findOne(wherestr).exec();
         if (query == null) {
-            await DB.DayTable.create(updatestr);
+            await DB.KHistory('day', symbol).create(updatestr);
         }
         else {
-            await DB.DayTable.findByIdAndUpdate(query['_id'], updatestr).exec();
+            //await DB.KHistory('day', symbol).findByIdAndUpdate(query['_id'], updatestr).exec();
         }
     }
 }

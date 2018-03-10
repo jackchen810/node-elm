@@ -8,6 +8,7 @@ module.exports = class BaseStrategy {
         this.emitter = '';
         this.symbol = '';
         this.ktype = '';
+        this.history_bar = [];   // 历史数据，初次启动需要同步一次历史数据，防止指标计算错误
         this.main_strategy = false;
 
         //绑定，this
@@ -15,8 +16,7 @@ module.exports = class BaseStrategy {
         this.on_bar = this.on_bar.bind(this);
         this.on_buy_point = this.on_buy_point.bind(this);
         this.on_sell_point = this.on_sell_point.bind(this);
-
-
+        this.decimal = this.decimal.bind(this);
     }
 
     //onInit  ----不需要用户修改
@@ -37,6 +37,12 @@ module.exports = class BaseStrategy {
         }
         //console.log('111111', ktype);
         return;
+    }
+
+    //onInit  ----不需要用户修改
+    async onInitBar(bar) {
+        this.history_bar = bar;
+        console.log('history_bar', this.history_bar[0]);
     }
 
     //on_tick 收到tick行情数据时回调
@@ -95,6 +101,13 @@ module.exports = class BaseStrategy {
             this.emitter.emit('on_sell_point', ktype, msgObj);
         }
         return;
+    }
+
+    //num表示要四舍五入的数,v表示要保留的小数位数。
+    async decimal(num,v)
+    {
+        var vv = Math.pow(10,v);
+        return Math.round(num*vv)/vv;
     }
 }
 

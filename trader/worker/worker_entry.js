@@ -71,15 +71,19 @@ process.on('message', function(msg) {
         WorkerClassHandle.on_tick(body);
     }
     else if (head.type == 'on_bar'){
-        if (!(Array.isArray(body))) {
+        if (Array.isArray(body)) {
+            //数组处理， 多个标的的数据以数组方式传递
+            for (var i = 0; i < body.length; i++) {
+                WorkerClassHandle.on_bar(head.action, body[i]);
+            }
+        }
+        else{
             WorkerClassHandle.on_bar(head.action, body);
-            return;
         }
-
-        //数组处理， 多个标的的数据以数组方式传递
-        for (var i = 0; i < body.length; i++) {
-            WorkerClassHandle.on_bar(head.action, body[i]);
-        }
+    }
+    else if (head.type == 'data' && head.action == 'sync'){
+        var response = new ProcessResponse(head.type, head.action);
+        WorkerClassHandle.dataSync(msg['body'], msg['data'], response);
     }
 
 });

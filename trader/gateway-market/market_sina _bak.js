@@ -201,6 +201,41 @@ class SinaMarketClass extends BaseMarket {
             timerDict['timer_job_handle'] = '';
         }
     }
+    //http://api.finance.ifeng.com/akdaily/?code=sh601989&type=last
+    //http://api.finance.ifeng.com/akmin/?scode=sh601989&type=5
+    //http://api.finance.ifeng.com/akmin/?scode=sz002500&type=5
+    async to_download(ktype, autype, symbol, func_callback) {
+
+        var url = this.price_url(ktype, autype, symbol);
+        console.log('get %s, http url:', ktype, url, new Date());
+
+        //get 请求外网
+        http.get(url, function (req, res) {
+            var data_str = '';
+            req.on('data', function (chunk) {
+                data_str += chunk
+            });
+
+            req.on('end', function () {
+                try{
+                    var jsonObj = JSON.parse(data_str);
+                }
+                catch(err) {
+                    return;
+                }
+
+                console.log('http data:', jsonObj);
+                func_callback(jsonObj);
+                return;
+            });
+
+            req.on('error', function (e) {
+                console.log('problem with request: ' + e.message);
+                return;
+            });
+        });
+    }
+
 
 
 }

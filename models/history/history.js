@@ -7,6 +7,7 @@ import db_minute30 from '../../mongodb/db.js';
 import db_minute60 from '../../mongodb/db.js';
 import db_day from '../../mongodb/db.js';
 
+//tushare 中数据库字段兼容
 const historySchema = new mongoose.Schema({
     code: String,    //股票代码
     name:String,    //名称

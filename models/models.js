@@ -8,10 +8,11 @@ import {SelectResultTable} from "./select/select_result.js";
 import {TaskPlanTable} from "../models/history/task_plan.js";
 import {OrderTable} from "../models/order/order.js";
 import {MarketTable} from "../models/market/market.js";
+import {BasicsTable} from "../models/basics/basics.js";
 import KTable from "../models/history/history.js";
 
 import AdminModel from '../models/admin/admin';
-import db_minute5 from "../mongodb/db";
+
 
 //mqtt 命令
 function DB() {
@@ -29,6 +30,7 @@ function DB() {
     this.MarketTable = MarketTable;
 
     this.AdminModel = AdminModel;
+    this.BasicsTable = BasicsTable;
     this.KHistory = KTable;
 
 }

@@ -8,6 +8,7 @@ var http = require('http');
 var iconv = require('iconv-lite');
 var schedule = require('node-schedule');
 import dtime from "time-formater";
+import DB from "../../models/models";
 
 //策略要继承基类
 class SinaMarketClass extends BaseMarket {
@@ -131,7 +132,7 @@ class SinaMarketClass extends BaseMarket {
     async onStart(stock_symbol, stock_ktype) {
         console.log(__filename, 'onStart:', stock_symbol, stock_ktype);
         //timerMap: ('1', {'symbol_set':new Set(), 'timer': '', 'url':''});
-
+        //是否有对应的k 线字典，如果没有，直接返回
         if (!(this.ktypeMap.has(stock_ktype))){
             return -1;
         }
@@ -198,38 +199,75 @@ class SinaMarketClass extends BaseMarket {
         return `http://api.finance.ifeng.com/${_ktype}/?${codeStr}=${_symbol}&type=${type}`;
     };
 
+    async change_bar(symbol, data_str) {
+
+        //字符串转换成对象
+        try{
+            var jsonObj = JSON.parse(data_str);
+        }
+        catch(err) {
+            console.log('catch error: ' + err);
+            return [];
+        }
+
+        var data = jsonObj['record'];
+        //console.log('slice data, length:%d, data0:', data.length, data[0]);
+
+        var barList = [];
+        for (var i = 0; i < data.length; i++) {
+            var item = data[i];
+            //var time_array = item[0].split(" ");
+
+            //console.log('to item', item);
+            var barObj = {
+                'code': symbol,
+                'name': '',
+
+                'open': item[1],
+                'high': item[2],
+                'close': item[3],
+                'low': item[4],
+
+                'volume': item[5],
+
+                'date': item[0].slice(0, 16),
+                'time': item[0],
+            };
+            barList.push(barObj);
+        }
+
+        //console.log('barList, length:%d, barList0:', barList.length, barList[0])
+        return barList;
+    };
+
     //http://api.finance.ifeng.com/akdaily/?code=sh601989&type=last
     //http://api.finance.ifeng.com/akmin/?scode=sh601989&type=5
     //http://api.finance.ifeng.com/akmin/?scode=sz002500&type=5
     async to_download(ktype, autype, symbol) {
+        var self = this;
+        return new Promise(async function(resovle, reject) {
+            var url = await self.price_url(ktype, autype, symbol);
+            console.log('get %s, http url:', ktype, url, new Date());
 
-        var url = this.price_url(ktype, autype, symbol);
-        console.log('get %s, http url:', ktype, url, new Date());
+            //get 请求外网
+            http.get(url, function (req, res) {
+                var data_str = '';
+                req.on('data', function (chunk) {
+                    data_str += chunk
+                });
 
-        //get 请求外网
-        http.get(url, function (req, res) {
-            var data_str = '';
-            req.on('data', function (chunk) {
-                data_str += chunk
+                req.on('end', function () {
+                    //console.log('http data_str:', data_str);
+                    var barList = self.change_bar(symbol, data_str);
+                    //console.log('http data:', barList[0]);
+                    return resovle(barList);
+                });
+
+                req.on('error', function (e) {
+                    console.log('problem with request: ' + e.message);
+                    return resovle([]);
+                });
             });
-
-            req.on('end', function () {
-                try{
-                    var jsonObj = JSON.parse(data_str);
-                }
-                catch(err) {
-                    return [];
-                }
-
-                //console.log('http data:', jsonObj);
-                return jsonObj;
-            });
-
-            req.on('error', function (e) {
-                console.log('problem with request: ' + e.message);
-                return [];
-            });
-
         });
     }
 

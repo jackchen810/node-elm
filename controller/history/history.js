@@ -51,7 +51,8 @@ class HistoryHandle {
         var exectime = new Date(task_exce_time);
         var mytime = new Date();
 
-        console.log('task_exce_time, task_plan_list', task_exce_time, task_plan_list);
+        console.log('task_exce_time', task_exce_time);
+        console.log('task_plan_list', task_plan_list);
         console.log('exectime', exectime.getHours(), exectime.getMinutes(), exectime.getSeconds());
         for(var i = 0; i< task_plan_list.length; i++) {
 
