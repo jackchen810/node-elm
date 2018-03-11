@@ -1,15 +1,11 @@
 # About
 
-因为前端项目是根据饿了么官网接口写的，所以后台系统也保持了和官网一致的API接口。
-
-整个项目分为两部分：前台项目接口、后台管理接口，共60多个。涉及登陆、注册、添加商品、商品展示、筛选排序、购物车、下单、用户中心等，构成一个完整的流程。
 
 __注：此项目纯属个人瞎搞，不用于任何商业用途。__
 
 
 # 说明
 
->  node-elm 接口文档: [接口文档地址](https://github.com/bailicangdu/node-elm/blob/master/API.md) 
 
 >  如果对您对此项目有兴趣，可以点 "Star" 支持一下 谢谢！ ^_^
 
@@ -51,93 +47,12 @@ npm run dev
 ```
 
 
-# 效果演示
-
-#### (可在后台管理系统添加商铺，食品等数据，并在前端地址查看效果)
-
-### 前端网址
-[前端网址戳这里](http://elm.cangdu.org/)（请用chrome手机模式预览）
-
-###### 移动端扫描下方二维码
-
-<img src="https://github.com/bailicangdu/node-elm/blob/master/screenshots/ewm.png" width="250" height="250"/>
-
-### 后台管理系统网址
-[后台管理网址戳这里](http://cangdu.org/manage/)
-
-
-
-
-## 目标功能
-
-- [x] IP定位 -- 完成
-- [x] 城市列表 -- 完成
-- [x] 搜索地址 -- 完成
-- [x] 上传图片 -- 完成
-- [x] 添加商铺 -- 完成
-- [x] 添加食品 -- 完成
-- [x] 测量距离 -- 完成
-- [x] 搜索美食，餐馆 -- 完成
-- [x] 根据距离、销量、评分、特色菜、配送方式等进行排序和筛选 -- 完成
-- [x] 评价列表 -- 完成
-- [x] 食品详情 -- 完成
-- [x] 商家详情 -- 完成
-- [x] 购物车功能 -- 完成
-- [x] 登录、注册 -- 完成
-- [x] 修改密码 -- 完成
-- [x] 用户信息 -- 完成
-- [x] 添加、删除、修改收货地址 -- 完成
-- [x] 下单  -- 完成 ✨✨
-- [x] 订单信息 -- 完成
-- [x] 红包 -- 完成
-- [x] 商铺管理 -- 完成
-- [x] 食品管理 -- 完成
-- [x] 管理员权限验证 -- 完成
-- [x] 超级管理员 -- 完成
-- [x] 订单管理 -- 完成
-- [x] 流量统计 -- 完成
-- [x] 前后台路由同构 -- 完成
-- [x] 部署上线 -- 完成
-
-
-# API接口文档
-
-## [接口文档地址](https://github.com/bailicangdu/node-elm/blob/master/API.md)
-
-
-
-
-
-## 部分截图
-
-#### 部分前台页面
-
-<img src="https://github.com/bailicangdu/node-elm/blob/master/screenshots/elm_msite.png" width="365" height="619"/> <img src="https://github.com/bailicangdu/node-elm/blob/master/screenshots/elm_shop.png" width="365" height="619"/>
-
-#### 部分后台管理系统页面
-
-<img src="https://github.com/bailicangdu/node-elm/blob/master/screenshots/manage_home.png"/>
-
-<img src="https://github.com/bailicangdu/node-elm/blob/master/screenshots/manage_shop.png"/>
-
-
 
 
 # 项目布局
 
 ```
 .
-├── InitData                        初始化数据
-│   ├── activity.js                 餐馆活动
-│   ├── category.js                 餐馆分类
-│   ├── cities.js                   城市列表
-│   ├── delivery.js                 配送方式
-│   ├── entry.js                    食品分类
-│   ├── explain.js                  解释说明
-│   ├── hongbao.js                  红包
-│   ├── payments.js                 支付方式
-│   ├── rate.js                     评论
-│   └── remark.js                   备注列表
 ├── config                          运行配置
 │   ├── default.js                  默认配置
 │   └── development.js              开发环境
@@ -253,6 +168,5 @@ npm run dev
 
 # License
 
-[GPL](https://github.com/bailicangdu/node-elm/blob/master/COPYING)
 
 
