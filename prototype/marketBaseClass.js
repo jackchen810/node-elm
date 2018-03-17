@@ -49,7 +49,7 @@ module.exports = class BaseMarket {
 
         //判断是否是空对象
         if (Object.keys(barObj).length == 0){
-            barObj['symbol'] = '';
+            barObj['code'] = '';
             barObj['date'] = tickObj['date'] + ' ' +  tickObj['time'].substring(0, 5);  //bar数据兼容tushare
             barObj['time'] = tickObj['time'];
             barObj['_before_minute'] = tick_minute;
@@ -81,7 +81,7 @@ module.exports = class BaseMarket {
             barObj['high'] = (barObj['high'] > tickObj['price']) ? barObj['high'] : tickObj['price'];
             barObj['low'] = (barObj['low'] < tickObj['price']) ? barObj['low'] : tickObj['price'];
 
-            barObj['symbol'] = tickObj['symbol'];
+            barObj['code'] = tickObj['code'];
             barObj['name'] = tickObj['name'];
             barObj['price'] = tickObj['price'];
             barObj['volume'] = barObj['volume'] ? ((Number(tickObj['volume']) - Number(barObj['_begin_volume'])).toString()): '0';

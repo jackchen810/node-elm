@@ -201,7 +201,7 @@ class WorkerClass {
 
         //删除实例
         this.taskMap.delete(task_id);
-        response.send({ret_code: 0, ret_msg: 'SUCCESS', extra: request});
+        response.send({ret_code: 0, ret_msg: 'SUCCESS', extra: {'task_id': task_id}});
     }
 
 

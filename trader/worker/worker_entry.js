@@ -30,7 +30,7 @@ class ProcessResponse{
             'body': message,
         }
         //console.log('[worker] send:', JSON.stringify(res));
-        console.log('worker--->to');
+        console.log('worker--->main');
         process.send(res);
         return;
     }
@@ -82,8 +82,8 @@ process.on('message', function(msg) {
         }
     }
     else if (head.type == 'data' && head.action == 'sync'){
-        var response = new ProcessResponse(head.type, head.action);
-        WorkerClassHandle.dataSync(msg['body'], msg['data'], response);
+        //var response = new ProcessResponse(head.type, head.action);
+        //WorkerClassHandle.dataSync(msg['body'], msg['data'], response);
     }
 
 });

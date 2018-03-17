@@ -1,5 +1,6 @@
 'use strict';
 const tradeLog = require("../trader/trade-log/log.js");
+const talib = require('talib/build/Release/talib');
 
 module.exports = class BaseStrategy {
     constructor(){
@@ -104,10 +105,23 @@ module.exports = class BaseStrategy {
     }
 
     //num表示要四舍五入的数,v表示要保留的小数位数。
-    async decimal(num,v)
-    {
+    decimal(num,v){
         var vv = Math.pow(10,v);
         return Math.round(num*vv)/vv;
+    }
+
+    //talib 同步代码
+    async talibSync(talibObj) {
+        //console.log('talibSync:', talibObj);
+        var pms =  new Promise((resolve, reject) => {
+            talib.execute(talibObj, function (err, result) {
+                //console.log("result Function err:", err);
+                //console.log("Results, result:", result);
+                resolve(result);
+            });
+        });
+
+        return pms;
     }
 }
 

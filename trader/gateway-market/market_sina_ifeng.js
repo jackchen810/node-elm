@@ -98,7 +98,7 @@ class SinaMarketClass extends BaseMarket {
                     var symobl = symbol_array[i].substr(n, 6);
 
                     //console.log('symobl %s match:', symobl, fields);
-                    tick_data['symbol'] = symobl;
+                    tick_data['code'] = symobl;
                     tick_data['name'] = fields[0];
 
                     tick_data['price'] = fields[3];
@@ -130,7 +130,7 @@ class SinaMarketClass extends BaseMarket {
 
     //启动定时器, 行情定时器
     async onStart(stock_symbol, stock_ktype) {
-        console.log(__filename, 'onStart:', stock_symbol, stock_ktype);
+        console.log(__filename, 'Market Timer onStart:', stock_symbol, stock_ktype);
         //timerMap: ('1', {'symbol_set':new Set(), 'timer': '', 'url':''});
         //是否有对应的k 线字典，如果没有，直接返回
         if (!(this.ktypeMap.has(stock_ktype))){
@@ -138,7 +138,18 @@ class SinaMarketClass extends BaseMarket {
         }
 
         var ktypeDict = this.ktypeMap.get(stock_ktype);
+        if(typeof(ktypeDict)==="undefined"){
+            console.log('ktypeDict undefined, ktype:', stock_ktype);
+            return;
+        }
+
         var symbol_list = ktypeDict['symbol_list'];
+        // 如果没有定义symbol_list
+        if(typeof(symbol_list)==="undefined"){
+            console.log('symbol_list undefined, ktype:', stock_ktype);
+            return;
+        }
+
         console.log('stock_ktype:', stock_ktype);
 
         //添加标的到对应数组
@@ -171,9 +182,20 @@ class SinaMarketClass extends BaseMarket {
 
     //停止定时器, 行情定时器
     async onStop(stock_symbol, stock_ktype) {
+        console.log(__filename, 'Market Timer onStop:', stock_symbol, stock_ktype);
 
         var ktypeDict = this.ktypeMap.get(stock_ktype);
+        if(typeof(ktypeDict)==="undefined"){
+            console.log('ktypeDict undefined, ktype:', stock_ktype);
+            return;
+        }
+
         var symbol_list = ktypeDict['symbol_list'];
+        // 如果没有定义symbol_list
+        if(typeof(symbol_list)==="undefined"){
+            console.log('symbol_list undefined, ktype:', stock_ktype);
+            return;
+        }
 
         //删除标的set集合
         this.all_symbols.delete(stock_symbol);

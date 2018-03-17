@@ -67,7 +67,7 @@ class WorkerHandle {
         }
 
         //向 worker 进程发送任务消息
-        console.log('to---->worker')
+        console.log('main---->worker')
         this.worker.send(request);
 
 
@@ -122,7 +122,7 @@ class WorkerHandle {
         }
 
         //向 worker 进程发送任务消息
-        console.log('to---->worker')
+        console.log('main---->worker')
         this.worker.send(request);
     }
 
@@ -136,7 +136,7 @@ class WorkerHandle {
         }
 
         //向 worker 进程发送任务小心
-        console.log('to---->worker')
+        console.log('main---->worker')
         this.worker.send(request);
     }
 
@@ -150,7 +150,7 @@ class WorkerHandle {
         }
 
         //向 worker 进程发送任务小心
-        console.log('to---->worker')
+        console.log('main---->worker')
         this.worker.send(request);
     }
 
