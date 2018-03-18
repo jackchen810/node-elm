@@ -110,6 +110,21 @@ class HistoryHandle {
     }
 
 
+    async history_data(){
+        console.log('history_data run');
+
+        //获取表单数据，josn
+        var code = req.body['code'];
+        var date_start = req.body['date_start'];
+        var date_end = req.body['date_end'];
+
+        var wherestr = {'date': { $gt: date_start, $lte: date_end}};
+        var query = await DB.KHistory(ktype, code).find(wherestr).exec();
+
+        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
+        console.log('history_data run end');
+    }
+
 }
 
 export default new HistoryHandle()
