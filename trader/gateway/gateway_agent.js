@@ -16,7 +16,7 @@ var events = require("events");
 const  emitter = new events.EventEmitter();
 
 
-class WorkerAgentHandle {
+class GatewayAgentHandle {
     constructor() {
         this.worker = fork('./trader/worker/worker_entry.js') //创建一个工作进程
         this.worker.on('message', this.onMessage);
@@ -176,7 +176,7 @@ class WorkerAgentHandle {
     }
 }
 
-const WorkerHnd= new WorkerAgentHandle();
+const WorkerHnd= new GatewayAgentHandle();
 console.log('startup agent worker ');
 
 

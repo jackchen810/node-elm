@@ -1,5 +1,5 @@
 'use strict';
-import DB from "../../models/models.js";
+import DB from "../../../models/models.js";
 import config from "config-lite";
 import dtime from "time-formater";
 const fs = require("fs");

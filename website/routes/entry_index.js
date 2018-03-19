@@ -9,6 +9,7 @@ import order_router from './order_gateway.js'
 import market_router from './market_gateway.js'
 import log_router from './log.js'
 import history_router from './history.js'
+import backtest_router from './backtest.js'
 
 
 
@@ -36,6 +37,9 @@ function web_router(app) {
 
     //行情接口管理功能
     app.use('/history', history_router);
+
+    //回测接口管理功能
+    app.use('/backtest', backtest_router);
 
 
 }
