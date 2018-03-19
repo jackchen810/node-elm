@@ -1,6 +1,6 @@
 'use strict';
 
-import AdminModel from '../models/admin/admin'
+import AdminModel from '../../models/admin/admin'
 
 class Check {
 	constructor(){

@@ -1,8 +1,7 @@
 'use strict';
-import DB from "../../models/models.js";
+import DB from "../../../models/models.js";
 import config from "config-lite";
 import dtime from "time-formater";
-import WorkerHnd from "../../trader/worker/worker_agent";
 const fs = require("fs");
 const path = require('path');
 const schedule = require('node-schedule');

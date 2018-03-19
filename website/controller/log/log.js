@@ -1,5 +1,5 @@
 'use strict';
-import DB from "../../models/models.js";
+import DB from "../../../models/models.js";
 import config from "config-lite";
 const fs = require("fs");
 const path = require('path');

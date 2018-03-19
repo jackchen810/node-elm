@@ -1,19 +1,20 @@
 'use strict';
-import DB from "../../models/models.js";
+import DB from "../../../models/models.js";
 import config from "config-lite";
+import dtime from "time-formater";
 const fs = require("fs");
 const path = require('path');
 
 
-class RiskctrlHandle {
+class OrderGatewayHandle {
     constructor(){
 
     }
     async list(req, res, next){
-        console.log('riskctrl list');
+        console.log('order gateway list');
 
         try {
-            var path = config.riskctrl_dir;
+            var path = config.order_gateway_dir;
             var files = fs.readdirSync(path);
             console.log('files', files);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:files});
@@ -24,15 +25,22 @@ class RiskctrlHandle {
             return;
         }
 
-        console.log('riskctrl list end');
+        console.log('order gateway list end');
     }
 
+    async add(req, res, next){
+        console.log('order gateway add');
 
+        //获取表单数据，josn
+        var file_name = req.body['file_name'];
+        var is_bind = req.body['is_bind'];        //绑定的行情接口
 
+        console.log('order gateway add end');
+    }
 
 }
 
-export default new RiskctrlHandle()
+export default new OrderGatewayHandle()
 
 
 

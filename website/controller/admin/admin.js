@@ -1,7 +1,7 @@
 'use strict';
 
-import AdminModel from '../../models/admin/admin'
-import BaseComponent from '../../prototype/baseComponent'
+import AdminModel from '../../../models/admin/admin'
+import BaseComponent from '../../../prototype/baseComponent'
 import crypto from 'crypto'
 import dtime from 'time-formater'
 import config from "config-lite";

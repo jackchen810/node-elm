@@ -3,7 +3,7 @@ import express from 'express';
 import db from './mongodb/db.js';
 
 import config from 'config-lite';
-import web_router from './routes/entry_index.js';
+import web_router from './website/routes/entry_index.js';
 
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
