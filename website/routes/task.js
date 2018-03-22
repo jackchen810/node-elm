@@ -1,7 +1,7 @@
 'use strict';
 
-import express from 'express'
-import TaskHandle from '../controller/task/task.js'
+const express = require('express');
+const TaskHandle = require('../controller/task/task.js');
 
 
 const router = express.Router();
@@ -26,4 +26,4 @@ router.all('/start', TaskHandle.start);
 //停止任务
 router.all('/stop', TaskHandle.stop);
 
-export default router
+module.exports = router;

@@ -1,6 +1,6 @@
 'use strict';
 
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 
 const selectResultSchema = new mongoose.Schema({
@@ -15,4 +15,4 @@ const selectResultSchema = new mongoose.Schema({
 });
 
 const SelectResultTable = mongoose.model('SelectResultTable', selectResultSchema);
-export {SelectResultTable};
+module.exports = SelectResultTable;

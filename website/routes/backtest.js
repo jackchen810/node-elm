@@ -1,7 +1,7 @@
 'use strict';
 
-import express from 'express'
-import BacktestHandle from '../controller/backtest/backtest.js'
+const express = require('express');
+const BacktestHandle = require('../controller/backtest/backtest.js');
 
 
 const router = express.Router();
@@ -15,4 +15,4 @@ router.all('/start', BacktestHandle.start);
 
 
 
-export default router
+module.exports = router

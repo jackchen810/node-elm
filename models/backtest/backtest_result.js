@@ -1,6 +1,6 @@
 'use strict';
 
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 
 const backResultSchema = new mongoose.Schema({
@@ -15,4 +15,4 @@ const backResultSchema = new mongoose.Schema({
 });
 
 const BacktestResultTable = mongoose.model('BacktestResultTable', backResultSchema);
-export {BacktestResultTable};
+module.exports = BacktestResultTable;

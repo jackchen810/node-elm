@@ -1,6 +1,6 @@
 'use strict';
 
-import AdminModel from '../../models/admin/admin'
+const AdminModel = require('../../models/admin/admin');
 
 class Check {
 	constructor(){
@@ -59,4 +59,4 @@ class Check {
 	}
 }
 
-export default new Check()
+module.exports = new Check()

@@ -1,11 +1,11 @@
 'use strict';
 
-import mongoose from 'mongoose';
-import db_minute5 from '../../mongodb/db.js';
-import db_minute15 from '../../mongodb/db.js';
-import db_minute30 from '../../mongodb/db.js';
-import db_minute60 from '../../mongodb/db.js';
-import db_day from '../../mongodb/db.js';
+const mongoose = require('mongoose');
+const db_minute5 = require('../../mongodb/db.js');
+const db_minute15 = require('../../mongodb/db.js');
+const db_minute30 = require('../../mongodb/db.js');
+const db_minute60 = require('../../mongodb/db.js');
+const db_day = require('../../mongodb/db.js');
 
 //tushare 中数据库字段兼容
 const historySchema = new mongoose.Schema({

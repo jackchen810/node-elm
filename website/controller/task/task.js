@@ -1,7 +1,7 @@
 'use strict';
-import DB from "../../../models/models.js";
-import WorkerHnd from "../../../trader/worker/worker_agent.js";
-import dtime from "time-formater";
+const DB = require('../../../models/models.js');
+const WebsiteRxTx = require('../../../website/website_rxtx.js');
+const dtime = require('time-formater');
 const fs = require("fs");
 const path = require('path');
 
@@ -63,8 +63,8 @@ class TaskHandle {
     }
 
 
-
-    async add(req, res, next) {
+/*
+    async add_bak(req, res, next) {
         console.log('task add');
 
         //获取表单数据，josn
@@ -126,7 +126,7 @@ class TaskHandle {
             'order_gateway': order_gateway,   //交易网关名称
         }
 
-        WorkerHnd.addTask(message);
+        WorkerHnd.add_task(message);
         WorkerHnd.addOnceListener(task_id, async function(type, action, response) {
             console.log('add task, response', response);
             if (response['ret_code'] == 0) {
@@ -139,11 +139,85 @@ class TaskHandle {
             }
         }, 3000);
     }
+*/
 
+    async add(req, res, next) {
+        console.log('[website] task add');
+
+        //获取表单数据，josn
+        var strategy_type = req.body['strategy_type'];
+        var strategy_list = req.body['strategy_list'];        //获取表单数据，josn
+        var riskctrl_name = req.body['riskctrl_name'];        //获取表单数据，josn
+        var market_gateway = req.body['market_gateway'];
+        var order_gateway = req.body['order_gateway'];
+        var task_id = this.guid();
+        var mytime = new Date();
+
+
+        //更新到设备数据库， 交易的标的不能够重复, index=0 是主策略
+        var wherestr = {'task_type': 'orderd', 'trade_symbol': strategy_list[0]['stock_symbol']};
+
+        //参数检查
+        var query = await DB.TaskTable.findOne(wherestr).exec();
+        if (query != null) {
+            res.send({ret_code: -1, ret_msg: 'FAILED', extra:'任务重复'});
+            return;
+        }
+
+        var message = [];
+        for(var i = 0; i< strategy_list.length; i++) {
+
+            var updatestr = {
+                'task_id': task_id,
+                'task_type': (i==0 ? 'order':'order_point'),  //任务结果
+                'task_status': 'stop',   // 运行状态
+
+                //输入
+                'trade_symbol': strategy_list[i]['stock_symbol'],   ///index=0的使用交易symbol
+                'trade_trigger': strategy_list[i]['stock_ktype'],   ///index=0的使用交易symbol
+
+
+                //过程
+                'strategy_type': strategy_type,   //策略类型
+                'strategy_name': strategy_list[i]['strategy_name'],   //策略名称
+                'riskctrl_name': (i==0 ? riskctrl_name: ''),   //风控名称
+                'market_gateway': (i==0 ? market_gateway: ''),   //交易网关名称
+                'order_gateway': (i==0 ? order_gateway: ''),   //交易网关名称
+
+                'create_at': dtime(mytime).format('YYYY-MM-DD HH:mm:ss'),
+                'sort_time': mytime.getTime()
+            };
+
+            var task_item = await DB.TaskTable.create(updatestr);
+            if (task_item == null) {
+                res.send({ret_code: -1, ret_msg: 'FAILED', extra: '任务添加数据库失败'});
+                return;
+            }
+
+            console.log('strategy_list:', strategy_list);
+            message.push(updatestr);
+        }
+
+        //发送任务
+        WebsiteRxTx.send(message, 'task', 'add', ['worker', 'gateway']);
+        WebsiteRxTx.addOnceListener(task_id, async function(type, action, response) {
+            //console.log('add task, response', response);
+            if (response['ret_code'] == 0) {
+                res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:task_id});
+                console.log('[website] task add end');
+            }
+            else{
+                console.log('worker return error:', response['extra']);
+                res.send(response);
+                var wherestr = {'task_id': task_id};
+                await DB.TaskTable.remove(wherestr).exec();
+            }
+        }, 3000);
+    }
 
 
     async del(req, res, next) {
-        console.log('task del');
+        console.log('[website] task del');
 
         //获取表单数据，josn
         var task_id = req.body['task_id'];        //获取表单数据，josn
@@ -156,30 +230,48 @@ class TaskHandle {
 
         console.log('task_id:', task_id);
         var wherestr = {'task_id': task_id};
-        var query = await DB.TaskTable.findOne(wherestr).exec();
-        if (query == null) {
-            res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'任务不存在'});
+        var queryList = await DB.TaskTable.find(wherestr).exec();
+
+        //发送任务,worker 删除任务
+        WebsiteRxTx.send(queryList, 'task', 'del', ['worker', 'gateway']);
+        WebsiteRxTx.addOnceListener(task_id, async function(type, action, response) {
+            //console.log('del task, response', response);
+            if (response['ret_code'] == 0) {
+                await DB.TaskTable.remove(wherestr).exec();
+                res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: task_id});
+                console.log('[website] task del end');
+            }
+            else{
+                console.log('error:', response['extra']);
+                res.send(response);
+            }
+        }, 3000);
+    }
+
+    async start(req, res, next) {
+        console.log('[website] task start');
+
+        //获取表单数据，josn
+        var task_id = req.body['task_id'];        //获取表单数据，josn
+
+        //参数有效性检查
+        if(typeof(task_id)==="undefined" ){
+            res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
             return;
         }
 
-        var message = {
-            'task_id': task_id,
-            'trade_symbol': query['trade_symbol'],
-            'trade_ktype': query['trade_ktype'],
-            'strategy_list': query['strategy_list'],   //策略名称
-            'riskctrl_name': query['riskctrl_name'],   //风控名称
-            'market_gateway': query['market_gateway'],   //行情网关名称
-            'order_gateway': query['order_gateway'],   //交易网关名称
-        }
+        //更新到设备数据库， 设备上线，下线
+        var wherestr = {'task_id': task_id};
+        var queryList = await DB.TaskTable.find(wherestr).exec();
 
-
-        //worker 删除任务
-        WorkerHnd.delTask(message);
-        WorkerHnd.addOnceListener(task_id, async function(type, action, response) {
-            console.log('del task, response', response);
+        WebsiteRxTx.send(queryList, 'task', 'add', ['worker', 'gateway']);
+        WebsiteRxTx.addOnceListener(task_id, async function(type, action, response) {
+            //console.log('start task, response', response);
             if (response['ret_code'] == 0) {
-                await DB.TaskTable.findByIdAndRemove(query['_id']).exec();
+                var updatestr = {'task_status': 'running'};
+                await DB.TaskTable.update(wherestr, updatestr).exec();
                 res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: task_id});
+                console.log('[website] task start end');
             }
             else{
                 console.log('error:', response['extra']);
@@ -189,7 +281,39 @@ class TaskHandle {
     }
 
 
+    async stop(req, res, next) {
+        console.log('[website] task stop');
 
+        //获取表单数据，josn
+        var task_id = req.body['task_id'];        //获取表单数据，josn
+
+        //参数有效性检查
+        if(typeof(task_id)==="undefined" ){
+            res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
+            return;
+        }
+
+        //更新到设备数据库， stop
+        var wherestr = {'task_id': task_id};
+        var queryList = await DB.TaskTable.find(wherestr).exec();
+
+        WebsiteRxTx.send(queryList, 'task', 'del', ['worker', 'gateway']);
+        WebsiteRxTx.addOnceListener(task_id, async function(type, action, response) {
+            //console.log('stop task, response', response);
+            if (response['ret_code'] == 0) {
+                var updatestr = {'task_status': 'stop'};
+                await DB.TaskTable.update(wherestr, updatestr).exec();
+                res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: task_id});
+                console.log('[website] task stop end');
+            }
+            else{
+                console.log('error:', response['extra']);
+                res.send(response);
+            }
+        }, 3000);
+    }
+
+/*
     async start(req, res, next) {
         console.log('[entry] task start');
 
@@ -220,7 +344,7 @@ class TaskHandle {
             'order_gateway': query['order_gateway'],   //交易网关名称
         }
 
-        WorkerHnd.addTask(message);
+        WorkerHnd.add_task(message);
         WorkerHnd.addOnceListener(task_id, async function(type, action, response) {
             //console.log('start task, response', response);
             if (response['ret_code'] == 0) {
@@ -276,7 +400,7 @@ class TaskHandle {
         }
 
 
-        WorkerHnd.delTask(message);
+        WorkerHnd.delete_task(message);
         WorkerHnd.addOnceListener(task_id, async function(type, action, response) {
             //console.log('stop task, response', response);
             if (response['ret_code'] == 0) {
@@ -290,10 +414,10 @@ class TaskHandle {
             }
         }, 3000);
     }
-
+*/
 }
 
-export default new TaskHandle()
+module.exports = new TaskHandle()
 
 
 

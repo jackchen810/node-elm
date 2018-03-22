@@ -1,15 +1,15 @@
 'use strict';
 
 
-import admin_router from './admin.js'
-import task_router from './task.js'
-import riskctrl_router from './riskctrl.js'
-import strategy_router from './strategy.js'
-import order_router from './order_gateway.js'
-import market_router from './market_gateway.js'
-import log_router from './log.js'
-import history_router from './history.js'
-import backtest_router from './backtest.js'
+const admin_router = require('./admin.js');
+const task_router = require('./task.js');
+const riskctrl_router = require('./riskctrl.js');
+const strategy_router = require('./strategy.js');
+const order_router = require('./order_gateway.js');
+const market_router = require('./market_gateway.js');
+const log_router = require('./log.js');
+const history_router = require('./history.js');
+const backtest_router = require('./backtest.js');
 
 
 
@@ -46,4 +46,4 @@ function web_router(app) {
 
 
 //导出模块
-export default web_router;
+module.exports = web_router;

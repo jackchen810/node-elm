@@ -1,7 +1,7 @@
 'use strict';
 
-import express from 'express'
-import OrderGatewayHandle from '../controller/order/order_gateway.js'
+const express = require('express');
+const OrderGatewayHandle = require('../controller/order/order_gateway.js');
 
 
 const router = express.Router();
@@ -20,4 +20,4 @@ router.all('/add', OrderGatewayHandle.add);
 
 
 
-export default router
+module.exports = router

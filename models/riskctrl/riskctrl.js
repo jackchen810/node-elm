@@ -1,6 +1,6 @@
 'use strict';
 
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 
 const risckctrlSchema = new mongoose.Schema({
@@ -15,4 +15,4 @@ const risckctrlSchema = new mongoose.Schema({
 });
 
 const RiskctrlTable = mongoose.model('RiskctrlTable', risckctrlSchema);
-export {RiskctrlTable};
+module.exports = RiskctrlTable;

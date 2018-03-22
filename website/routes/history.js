@@ -1,7 +1,7 @@
 'use strict';
 
-import express from 'express'
-import HistoryHandle from '../controller/history/history.js'
+const express = require('express');
+const HistoryHandle = require('../controller/history/history.js');
 
 
 const router = express.Router();
@@ -20,4 +20,4 @@ router.all('/download/plan/list', HistoryHandle.planlist);
 
 router.all('/download/plan/update', HistoryHandle.planupdate);
 
-export default router
+module.exports = router

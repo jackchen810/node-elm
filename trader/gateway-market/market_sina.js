@@ -1,5 +1,5 @@
 'use strict';
-import WorkerHnd from "../worker/worker_agent";
+import WorkerHnd from "../worker/worker_phandle";
 
 const BaseMarket = require("../../prototype/marketBaseClass");
 const BaseObj = require("../../prototype/objectBaseClass");
@@ -15,7 +15,7 @@ class SinaMarketClass extends BaseMarket {
         super();
 
 
-        this.onStart = this.onStart.bind(this);
+        this.on_start = this.on_start.bind(this);
         this.timer_callback = this.timer_callback.bind(this);
 
 
@@ -31,8 +31,8 @@ class SinaMarketClass extends BaseMarket {
         //初始化行情接口，连接行情接口
         this.onInit();
 
-        //this.onStart('002500', '5');
-        //this.onStart('002501', '5');
+        //this.on_start('002500', '5');
+        //this.on_start('002501', '5');
     }
 
 
@@ -115,8 +115,8 @@ class SinaMarketClass extends BaseMarket {
 
 
     //启动定时器, 行情定时器
-    async onStart(stock_symbol, stock_ktype) {
-        console.log(__filename, 'onStart:', stock_symbol, stock_ktype);
+    async on_start(stock_symbol, stock_ktype) {
+        console.log(__filename, 'on_start:', stock_symbol, stock_ktype);
         //timerMap: ('1', {'symbol_set':new Set(), 'timer': '', 'url':''});
 
         if (!(this.ktypeMap.has(stock_ktype))){
@@ -155,7 +155,7 @@ class SinaMarketClass extends BaseMarket {
 
 
     //停止定时器, 行情定时器
-    async onStop(stock_symbol, stock_ktype) {
+    async on_stop(stock_symbol, stock_ktype) {
 
         var ktypeDict = this.ktypeMap.get(stock_ktype);
         var symbol_list = ktypeDict['symbol_list'];

@@ -2,87 +2,14 @@
 const config = require("config-lite");
 const fs = require("fs");
 const path = require("path");
-const events = require("events");
-const tradeLog = require("../trade-log/log.js");
-
+//const response = require("./gateway_rxtx");
 
 class GatewayClass {
     constructor(){
-        this.strategyList = new Array();
-        this.strategyList[0] = ['obj1', 'obj2'];
 
-        //key:task_id      value: {strategy[], riskctrl, gateway}
-        /*
-        * var task = {
-                'task_id': task_id,
-                'trade_symbol': trade_symbol,
-                'trade_ktype': trade_ktype,
-                'emitter': emitter,
-                'strategy_list': strategy_list,
-                'riskctrl': riskctrl,
-                'gateway': gateway,
-            }
-        *
-        * */
         this.taskMap = new Map(); // 空Map
-
-        /*
-        var strategy_class = require('../trade-strategy/strategy_macd.js');
-        var aaa = new strategy_class();
-        aaa.onInit('null', '11', '22', '22', '22');
-
-        var bbb = new strategy_class();
-        bbb.onInit('null', '333', '22', '22', '22');
-
-        console.log('111111');
-        console.log(aaa);
-        console.log('222222');
-        console.log(bbb);
-*/
-
-        //监听事件some_event
-        //emitter.on('onTick', this.onTickTest);
     }
 
-
-    async on_tick(ktype, msgObj){
-        console.log('WorkerClass on_tick', msgObj['symbol']);
-        //emitter.emit(msgObj[''], msgObj['symbol'], msgObj['ktype'], msgObj);
-
-        //收到tick数据， 循环调用对应的策略模块进行处理
-        this.taskMap.forEach(function (value, key, map) {
-            //console.log('taskMap task_id:', key);
-            if (msgObj['symbol'] == value['trade_symbol']) {
-                var strategy_list = value['strategy'];
-                for (i = 0; i < strategy_list.length; i++) {
-                    strategy_list[i].on_tick(msgObj);
-                }
-            }
-        });
-    }
-
-
-
-    async on_bar(ktype, barObj){
-        console.log('WorkerClass on_bar', ktype, barObj['code'], barObj['date']);
-        //emitter.emit(msgObj[''], msgObj['symbol'], msgObj['ktype'], msgObj);
-
-        //收到bar数据， 循环调用对应的策略模块进行处理
-        this.taskMap.forEach(function (value, key, map) {
-            //console.log('taskMap task_id:', key, value);
-            var strategy_list = value['strategy_list'];
-            //console.log (__filename,"strategy_list", strategy_list);
-
-            //查找匹配的标的，发送bar数据
-            for (var i = 0; i < strategy_list.length; i++) {
-                if (barObj['code'] == strategy_list[i]['stock_symbol'] &&
-                    ktype == strategy_list[i]['stock_ktype']) {
-                    //console.log('strategy_list instance:', strategy_list[i]['instance']);
-                    strategy_list[i]['instance'].on_bar(ktype, barObj);
-                }
-            }
-        });
-    }
 
 
     /*
@@ -95,152 +22,127 @@ class GatewayClass {
     * */
 
     async addTask(request, response) {
-        console.log('[worker] add task');
-        var task_id = request['task_id'];
-        var trade_symbol = request['trade_symbol'];
-        var trade_ktype = request['trade_ktype'];
-        var strategy_list = request['strategy_list'];
-        var riskctrl_name = request['riskctrl_name'];
-        var order_gateway = request['order_gateway'];
+        console.log('[gateway] add task');
 
-        ///导入strategy_list
-        console.log('[worker] strategy_list:', JSON.stringify(strategy_list));
-        tradeLog('system', 'test', task_id);
+        var task_group = [];
 
-        ///路径有效性检查
-        var strategy_fullname = [];
-        for (var i = 0; i < strategy_list.length; i++) {
-            strategy_fullname[i] = path.join(__dirname, '../../', config.strategy_dir, strategy_list[i]['strategy_name']);
-            console.log('[worker] strategy_fullname:', strategy_fullname[i]);
-            if (fs.existsSync(strategy_fullname[i]) == false) {
-                console.log('strategy path not exist:', strategy_list[i]['strategy_name']);
-                response.send({ret_code: -1, ret_msg: 'FAILED', extra: 'strategy path not exist'});
-                return;
+        // 3. 发送已有的bar数据，启动定时器发送
+        // 启动任务，行情
+        for (var i = 0; i < request.length; i++){
+
+            var task_id = request[i]['task_id'];
+            var task_type = request[i]['task_type'];
+            var trade_symbol = request[i]['trade_symbol'];
+            var trade_trigger = request[i]['trade_trigger'];
+            var market_gateway = request[i]['market_gateway'];
+
+            ///导入strategy_list
+            console.log('[gateway] trade_symbol:', trade_symbol);
+            console.log('[gateway] market_gateway:', market_gateway);
+            //tradeLog('system', 'start timer', task_id);
+
+            //触发者是交易点，不需要器定时器， 只有ktype才需要起定时器
+            if (trade_trigger == 'order_point'){
+                continue;
             }
 
-        }
-
-        ///路径有效性检查 riskctrl
-        var riskctrl_fullname = path.join(__dirname, '../../', config.riskctrl_dir, riskctrl_name);
-        if (fs.existsSync(riskctrl_fullname) == false) {
-            console.log('[worker] riskctrl path not exist:', riskctrl_fullname);
-            response.send({ret_code: -1, ret_msg: 'FAILED', extra: 'riskctrl path not exist'});
-            return;
-        }
-
-        ///路径有效性检查 gateway
-        var gateway_fullname = path.join(__dirname, '../../', config.order_gateway_dir, order_gateway);
-        if (fs.existsSync(gateway_fullname) == false) {
-            console.log('[worker] gateway path not exist:', gateway_fullname);
-            response.send({ret_code: -1, ret_msg: 'FAILED', extra: 'gateway path not exist'});
-            return;
-        }
-
-        //添加策略实例, 线创建emitter实例
-        var emitter = new events.EventEmitter();
-        try {
-            var strategy = [];
-            for (var i = 0; i < strategy_list.length; i++) {
-                var stock_symbol = strategy_list[i]['stock_symbol'];
-                var stock_ktype = strategy_list[i]['stock_ktype'];
-                var strategy_name = strategy_list[i]['strategy_name'];
-                var strategy_class = require(strategy_fullname[i]);
-                var instance = new strategy_class();
-                instance.onInit(emitter, task_id, stock_symbol, stock_ktype, trade_symbol);
-                //console.log('[worker] new strategy_class:', strategy[i]);
-
-                var obj = {
-                    'stock_symbol': stock_symbol,
-                    'stock_ktype': stock_ktype,
-                    'strategy_name': strategy_name,
-                    'instance': instance,   //策略实例
-                };
-                strategy.push(obj);
+            // 路径有效性检查 riskctrl
+            var market_gateway_fullname = path.join(__dirname, '../../', config.market_gateway_dir, market_gateway);
+            if (fs.existsSync(market_gateway_fullname) == false) {
+                var msgObj = {ret_code: -1, ret_msg: 'FAIL', extra: task_id};
+                response.send(msgObj);
+                console.log('[gateway] market_gateway path not exist:', market_gateway_fullname);
+                return -1;
             }
 
 
-            console.log('[worker] riskctrl_fullname:', riskctrl_fullname);
-            var riskctrl_class = require(riskctrl_fullname);
-            var riskctrl = new riskctrl_class();
-            riskctrl.onInit(emitter, task_id, trade_symbol, trade_ktype);
+            //console.log('[gateway] to_download', market_gateway_fullname);
+            //3. 下载数据，进行同步, 根据策略中的标的和ktype 进行同步
+            var market_gateway = require(market_gateway_fullname);
+            var barList = await market_gateway.to_download(trade_trigger, 'fq', trade_symbol);
 
+            // 发送已有bar数据
+            if (barList.length > 0) {
+                console.log('to_download data:', barList[0]);
+                response.send(barList, 'on_bar_sync', trade_trigger, 'worker');
+            }
 
+            //4. 加载market，启动定时器， 发出on_bar 数据
+            market_gateway.on_start(trade_symbol, trade_trigger);
+            //console.log(__filename, 'add task on_start');
 
-            console.log('[worker] gateway_fullname:', gateway_fullname);
-            //只允许单实例运行
-            var gateway = require(gateway_fullname);
-            gateway.onInit(emitter, task_id, trade_symbol, trade_ktype);
-
-             var task = {
+            var task = {
                 'task_id': task_id,
+                'task_type': task_type,
                 'trade_symbol': trade_symbol,
-                'trade_ktype': trade_ktype,
-                'emitter': emitter,
-                'strategy_list': strategy,    //数组形式
-                'riskctrl': riskctrl,
-                'gateway': gateway,
+                'trade_trigger': trade_trigger,
+                'market_gateway': market_gateway,
             }
 
-            //同一个emitter 可以event通信，不同
-            this.taskMap.set(task_id, task); // 添加新的key-value
-        } catch (err) {
-            console.log('[worker] add task fail:', err);
-            response.send({ret_code: -1, ret_msg: 'FAILED', extra: err});
-            return;
+            task_group.push(task);
         }
+
+        //同一个emitter 可以event通信，不同
+        this.taskMap.set(task_id, task_group); // 添加新的key-value
 
         //console.log('add task ok:', task);
-        response.send({ret_code: 0, ret_msg: 'SUCCESS', extra: {'task_id': task_id}});
-        console.log('[worker] add task ok:');
+        var msgObj = {ret_code: 0, ret_msg: 'SUCCESS', extra: task_id};
+        response.send(msgObj);
+        console.log('[gateway] add task ok');
     }
 
 
     async delTask(request, response){
-        console.log('[worker] del task');
-        var task_id = request['task_id'];
+        console.log('[gateway] del task');
+
+        // 启动任务，行情
+        for (var i = 0; i < request.length; i++){
+            var task_id = request[i]['task_id'];
+            var trade_symbol = request[i]['trade_symbol'];
+            var trade_trigger = request[i]['trade_trigger'];
+            var market_gateway = request[i]['market_gateway'];
+
+            ///导入strategy_list
+            console.log('[gateway] trade_symbol:', trade_symbol);
+            //tradeLog('system', 'stop timer', task_id);
+
+            //触发者是交易点，不需要器定时器， 只有ktype才需要起定时器
+            if (trade_trigger == 'order_point'){
+                continue;
+            }
+
+            // 路径有效性检查 riskctrl
+            //添加行情定时获取接口
+            var market_gateway_fullname = path.join(__dirname, '../../', config.market_gateway_dir, market_gateway);
+            if (fs.existsSync(market_gateway_fullname) == false) {
+                var msgObj = {ret_code: -1, ret_msg: 'FAIL', extra: task_id};
+                response.send(msgObj);
+                console.log('[gateway] market_gateway path not exist:', market_gateway_fullname);
+                return -1;
+            }
+
+            //1. 加载market
+            var market_gateway_class = require(market_gateway_fullname);
+            market_gateway_class.on_stop(trade_symbol, trade_trigger);
+            //console.log(__filename, 'del task on_stop');
+        }
+
+
+        console.log('[gateway] delete taskMap');
 
         //删除实例
         this.taskMap.delete(task_id);
-        response.send({ret_code: 0, ret_msg: 'SUCCESS', extra: {'task_id': task_id}});
+        var msgObj = {ret_code: 0, ret_msg: 'SUCCESS', extra: task_id};
+        response.send(msgObj);
+        console.log('[gateway] del task ok');
+    }
+
+    async handle_add(handle) {
+        console.log('[gateway] add handle');
+        this.WorkerHnd = handle; // 空Map
     }
 
 
-    async dataSync(request, bardata, response){
-        console.log('[worker] dataSync');
-        var task_id = request['task_id'];
-        var stock_ktype = request['stock_ktype'];
-        var stock_symbol = request['stock_symbol'];
-
-        //获取实例
-        var task = this.taskMap.get(task_id);
-        if(typeof(task)==="undefined"){
-            return;
-        }
-
-        //策略实例数组
-        var strategy_list = task['strategy_list'];
-        //console.log('[worker] dataSync', strategy_list);
-        for (var i = 0; i< strategy_list.length; i++){
-            if (strategy_list[i]['stock_symbol'] == stock_symbol && strategy_list[i]['stock_ktype'] == stock_ktype){
-                strategy_list[i]['instance'].onInitBar(bardata);
-            }
-        }
-        response.send({ret_code: 0, ret_msg: 'SUCCESS', extra: task_id});
-    }
-
-
-
-
-    async process(symbol, ktype, next){
-        var list = this.strategyList[symbol];
-        for (var i = 0; i < list.length(); i++){
-
-            //1. 发送event:task_id 事件， 任务更新使用
-            //emitter.emit(symbol, ktype, msgObj);
-
-        }
-        console.log('task list');
-    }
 }
 
 //导出模块

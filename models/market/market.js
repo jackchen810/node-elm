@@ -1,6 +1,6 @@
 'use strict';
 
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 
 const marketSchema = new mongoose.Schema({
@@ -16,4 +16,4 @@ const marketSchema = new mongoose.Schema({
 });
 
 const MarketTable = mongoose.model('MarketTable', marketSchema);
-export {MarketTable};
+module.exports = MarketTable;

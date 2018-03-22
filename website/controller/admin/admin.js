@@ -1,10 +1,9 @@
 'use strict';
 
-import AdminModel from '../../../models/admin/admin'
-import BaseComponent from '../../../prototype/baseComponent'
-import crypto from 'crypto'
-import dtime from 'time-formater'
-import config from "config-lite";
+const AdminModel = require('../../../models/admin/admin');
+const BaseComponent = require('../../../prototype/baseComponent');
+const crypto = require('crypto');
+const dtime = require('time-formater');
 
 class Admin extends BaseComponent {
 	constructor() {
@@ -515,7 +514,7 @@ class Admin extends BaseComponent {
 	*/
 }
 
-export default new Admin()
+module.exports = new Admin()
 
 
 var addDefaultAccount = async function (user_account, user_password) {

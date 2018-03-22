@@ -1,8 +1,8 @@
 'use strict';
 
-import express from 'express'
-import MarketGatewayHandle from '../controller/market/market_gateway.js'
-import OrderGatewayHandle from "../controller/order/order_gateway";
+const express = require('express');
+const MarketGatewayHandle = require('../controller/market/market_gateway.js');
+const OrderGatewayHandle = require('../controller/order/order_gateway');
 
 
 const router = express.Router();
@@ -22,4 +22,4 @@ router.all('/bind', MarketGatewayHandle.bind);
 //绑定行情列表
 router.all('/get/bindobj', MarketGatewayHandle.get_bindobj);
 
-export default router
+module.exports = router

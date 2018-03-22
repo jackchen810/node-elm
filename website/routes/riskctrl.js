@@ -1,7 +1,7 @@
 'use strict';
 
-import express from 'express'
-import RiskctrlHandle from '../controller/riskctrl/riskctrl.js'
+const express = require('express');
+const RiskctrlHandle = require('../controller/riskctrl/riskctrl.js');
 
 
 const router = express.Router();
@@ -16,4 +16,4 @@ router.all('/list', RiskctrlHandle.list);
 
 
 
-export default router
+module.exports = router;

@@ -1,20 +1,17 @@
 'use strict';
-import WorkerHnd from "../worker/worker_agent";
-
+const GatewayRxTx = require("../gateway/gateway_rxtx");
 const BaseMarket = require("../../prototype/marketBaseClass");
 const BaseObj = require("../../prototype/objectBaseClass");
 
-var http = require('http');
-var iconv = require('iconv-lite');
-var schedule = require('node-schedule');
-import dtime from "time-formater";
-import DB from "../../models/models";
+const http = require('http');
+const iconv = require('iconv-lite');
+const schedule = require('node-schedule');
+const dtime = require("time-formater");
 
 //策略要继承基类
-class SinaMarketClass extends BaseMarket {
+class IfengMarketClass extends BaseMarket {
     constructor(){
         super();
-
 
         this.K_TYPE = {
             day: 'akdaily',
@@ -29,7 +26,7 @@ class SinaMarketClass extends BaseMarket {
         this.price_url = this.price_url.bind(this);
         this.to_download = this.to_download.bind(this);
 
-        this.onStart = this.onStart.bind(this);
+        this.on_start = this.on_start.bind(this);
         this.timer_callback = this.timer_callback.bind(this);
 
 
@@ -45,22 +42,22 @@ class SinaMarketClass extends BaseMarket {
         //初始化行情接口，连接行情接口
         this.onInit();
 
-        //this.onStart('002500', '5');
-        //this.onStart('002501', '5');
+        //this.on_start('002500', '5');
+        //this.on_start('002501', '5');
     }
 
 
     async onInit() {
-        console.log('market onInit:');
+        console.log('[market] market onInit:');
 
     }
     async onDestory() {
-        console.log('market onDestory:');
+        console.log('[market] market onDestory:');
 
     }
 
     async timer_callback() {
-        console.log('get tick:', dtime().format('YYYY-MM-DD HH:mm:ss'), ' tick_url_list:',this.tick_url_list);
+        console.log('[market] get tick:', dtime().format('YYYY-MM-DD HH:mm:ss'), ' tick_url_list:',this.tick_url_list);
 
         //get 请求外网
         var self = this;
@@ -108,14 +105,22 @@ class SinaMarketClass extends BaseMarket {
 
                     tick_data['date'] = fields[30];
                     tick_data['time'] = fields[31];
+
+                    //////使用当前时间进行测试/////
+                    //tick_data['date'] = dtime().format('YYYY-MM-DD');
+                    //tick_data['time'] = dtime().format('HH:mm:ss');
+                    ////////////////////////
                    // symbol_array[i];
 
-                    //WorkerHnd.onTick([tick_data]);
+                    //WorkerHnd.onTick(tick_data);
+                    //GatewayRxTx.send(tick_data, 'on_tick', '', 'worker');
                     self.create_bar_min(tick_data, '1', function (barObj) {
-                        WorkerHnd.onBar('1', barObj);
+                        GatewayRxTx.send(tick_data, 'on_bar', '1', 'worker');
+                        //WorkerHnd.onBar('1', barObj);
                     });
                     self.create_bar_min(tick_data, '5', function (barObj) {
-                        WorkerHnd.onBar('5', barObj);
+                        GatewayRxTx.send(tick_data, 'on_bar', '5', 'worker');
+                        //WorkerHnd.onBar('5', barObj);
                     });
                 }
 
@@ -129,8 +134,8 @@ class SinaMarketClass extends BaseMarket {
 
 
     //启动定时器, 行情定时器
-    async onStart(stock_symbol, stock_ktype) {
-        console.log(__filename, 'Market Timer onStart:', stock_symbol, stock_ktype);
+    async on_start(stock_symbol, stock_ktype) {
+        console.log('[market] Timer on_start:', stock_symbol, stock_ktype);
         //timerMap: ('1', {'symbol_set':new Set(), 'timer': '', 'url':''});
         //是否有对应的k 线字典，如果没有，直接返回
         if (!(this.ktypeMap.has(stock_ktype))){
@@ -139,18 +144,18 @@ class SinaMarketClass extends BaseMarket {
 
         var ktypeDict = this.ktypeMap.get(stock_ktype);
         if(typeof(ktypeDict)==="undefined"){
-            console.log('ktypeDict undefined, ktype:', stock_ktype);
+            console.log('[market] ktypeDict undefined, ktype:', stock_ktype);
             return;
         }
 
         var symbol_list = ktypeDict['symbol_list'];
         // 如果没有定义symbol_list
         if(typeof(symbol_list)==="undefined"){
-            console.log('symbol_list undefined, ktype:', stock_ktype);
+            console.log('[market] symbol_list undefined, ktype:', stock_ktype);
             return;
         }
 
-        console.log('stock_ktype:', stock_ktype);
+        console.log('[market] stock_ktype:', stock_ktype);
 
         //添加标的到对应数组
         symbol_list.push(stock_symbol);
@@ -161,7 +166,7 @@ class SinaMarketClass extends BaseMarket {
             this.timer_job_handle = schedule.scheduleJob('*/3 * * * * 1,2,3,4,5', this.timer_callback);
         }
 
-        console.log('symbol_list:', symbol_list);
+        console.log('[market] symbol_list:', symbol_list);
 
         //this.url = this.baseUrl;
         if (stock_symbol[0] == 6) {
@@ -181,19 +186,19 @@ class SinaMarketClass extends BaseMarket {
 
 
     //停止定时器, 行情定时器
-    async onStop(stock_symbol, stock_ktype) {
-        console.log(__filename, 'Market Timer onStop:', stock_symbol, stock_ktype);
+    async on_stop(stock_symbol, stock_ktype) {
+        console.log('[market] Timer on_stop:', stock_symbol, stock_ktype);
 
         var ktypeDict = this.ktypeMap.get(stock_ktype);
         if(typeof(ktypeDict)==="undefined"){
-            console.log('ktypeDict undefined, ktype:', stock_ktype);
+            console.log('[market] ktypeDict undefined, ktype:', stock_ktype);
             return;
         }
 
         var symbol_list = ktypeDict['symbol_list'];
         // 如果没有定义symbol_list
         if(typeof(symbol_list)==="undefined"){
-            console.log('symbol_list undefined, ktype:', stock_ktype);
+            console.log('[market] symbol_list undefined, ktype:', stock_ktype);
             return;
         }
 
@@ -228,7 +233,7 @@ class SinaMarketClass extends BaseMarket {
             var jsonObj = JSON.parse(data_str);
         }
         catch(err) {
-            console.log('catch error: ' + err);
+            console.log(symbol, ' price_url catch error: ' + err, ',data_str:', data_str);
             return [];
         }
 
@@ -269,7 +274,7 @@ class SinaMarketClass extends BaseMarket {
         var self = this;
         return new Promise(async function(resovle, reject) {
             var url = await self.price_url(ktype, autype, symbol);
-            console.log('get %s, http url:', ktype, url, new Date());
+            console.log('[market] get %s, http url:', ktype, url, new Date());
 
             //get 请求外网
             http.get(url, function (req, res) {
@@ -295,7 +300,7 @@ class SinaMarketClass extends BaseMarket {
 
 
 }
-console.log('create worker SinaMarketClass');
+console.log('create worker IfengMarketClass');
 
 //导出模块
-module.exports = new SinaMarketClass();
+module.exports = new IfengMarketClass();

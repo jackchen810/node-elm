@@ -1,5 +1,5 @@
 'use strict';
-import WorkerHnd from "../worker/worker_agent";
+import WorkerHnd from "../worker/worker_phandle";
 import { stock } from 'tushare';
 
 const BaseMarket = require("../../prototype/marketBaseClass");
@@ -20,7 +20,7 @@ class TushareMarketClass extends BaseMarket {
         //this.timer_callback_min30 = this.timer_callback_min30.bind(this);
         //this.timer_callback_min60 = this.timer_callback_min60.bind(this);
 
-        this.onStart = this.onStart.bind(this);
+        this.on_start = this.on_start.bind(this);
 
         this.url = 'http://hq.sinajs.cn/list=';
         this.baseUrl = 'http://hq.sinajs.cn/list=';
@@ -35,8 +35,8 @@ class TushareMarketClass extends BaseMarket {
         //初始化行情接口，连接行情接口
         this.onInit();
 
-        //this.onStart('002500', '5');
-        //this.onStart('002501', '5');
+        //this.on_start('002500', '5');
+        //this.on_start('002501', '5');
         stock.getAllStocks().then(({ data }) => {
             console.log('tushare', data);
         });
@@ -142,8 +142,8 @@ class TushareMarketClass extends BaseMarket {
     }
 
     //启动定时器, 行情定时器
-    async onStart(stock_symbol, stock_ktype) {
-        console.log(__filename, 'onStart:', stock_symbol, stock_ktype);
+    async on_start(stock_symbol, stock_ktype) {
+        console.log(__filename, 'on_start:', stock_symbol, stock_ktype);
         //timerMap: ('1', {'symbol_set':new Set(), 'timer': '', 'url':''});
 
         if (!(this.timerMap.has(stock_ktype))){
@@ -194,7 +194,7 @@ class TushareMarketClass extends BaseMarket {
 
 
     //停止定时器, 行情定时器
-    async onStop(stock_symbol, stock_ktype) {
+    async on_stop(stock_symbol, stock_ktype) {
 
         var timerDict = this.timerMap.get(stock_ktype);
         var symbol_set = timerDict['symbol_set'];
