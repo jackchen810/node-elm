@@ -1,6 +1,6 @@
 'use strict';
-import DB from "../../../models/models.js";
-import config from 'config-lite';
+const DB = require('../../../models/models.js');
+const config = require('config-lite');
 const fs = require("fs");
 const path = require('path');
 
@@ -276,7 +276,7 @@ class StrategyHandle {
 
 }
 
-export default new StrategyHandle()
+module.exports = new StrategyHandle()
 
 
 

@@ -1,6 +1,6 @@
-import Ids from '../models/ids'
+const Ids = require('../models/ids');
 
-export default class BaseComponent {
+module.exports = class BaseComponent {
 	constructor(){
 		this.idList = ['rom_id', 'pkg_id', 'script_id', 'task_id', 'device_id', 'img_id', 'admin_id'];
 	}

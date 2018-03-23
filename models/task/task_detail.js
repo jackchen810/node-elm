@@ -1,18 +1,13 @@
-'use strict'
+'use strict';
 
 const mongoose = require('mongoose');
 const taskSchema = new mongoose.Schema({
     task_id: String,
-    task_type: String,  //任务类型，trade:交易型任务, order_point：买卖点任务，backtest:回测任务， select：选股任务
     task_status:String,  // 运行状态
-
-    //输入
-    trade_symbol: String,  // 数据标的
-    trade_trigger: String,  // 数据触发条件，5,15：等k线类型；order_point：交易点
+    trade_symbol: String,  //strategy_list[0] 的股票代码
+    trade_ktype: String,  //strategy_list[0] 的股票ktype
     symbol_name: String,  //标的名称
-
-    //
-    strategy_type: String,  //策略类型， 1：简单策略，2：多级别分析策略， 3：综合分析策略， 4：选股策略
+    strategy_list: mongoose.Schema.Types.Mixed,   //策略对象列表
     market_gateway: String,  //行情接口名称
     strategy_name: String,  //策略名称
     riskctrl_name: String,  //风控名称
@@ -24,4 +19,4 @@ const taskSchema = new mongoose.Schema({
 
 
 const TaskTable = mongoose.model('TaskTable', taskSchema);
-module.exports = TaskTable;
+export {TaskTable};

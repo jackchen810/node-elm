@@ -1,9 +1,9 @@
 'use strict';
 
-import mongoose from 'mongoose';
-import WorkerHnd from "../../trader/worker/worker_agent.js";
-import DB from "../models";
-import dtime from "time-formater";
+const mongoose = require('mongoose');
+//const WorkerHnd = require('../../trader/worker/worker_phandle.js');
+const DB = require('../models');
+const dtime = require('time-formater');
 
 const logSchema = new mongoose.Schema({
     log_type: String,    //log 类型
@@ -18,9 +18,10 @@ const logSchema = new mongoose.Schema({
 });
 
 const LogTable = mongoose.model('LogTable', logSchema);
-export {LogTable};
+module.exports = LogTable;
 
 
+/*
 WorkerHnd.addLoopListener('log', function(action, body) {
     //console.log('log->db, body', body);
     var mytime = new Date();
@@ -35,3 +36,4 @@ WorkerHnd.addLoopListener('log', function(action, body) {
 
     LogTable.create(updatestr);
 });
+*/

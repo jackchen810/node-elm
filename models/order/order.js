@@ -1,6 +1,6 @@
 'use strict';
 
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 
 const orderSchema = new mongoose.Schema({
@@ -16,4 +16,4 @@ const orderSchema = new mongoose.Schema({
 });
 
 const OrderTable = mongoose.model('OrderTable', orderSchema);
-export {OrderTable};
+module.exports = OrderTable;

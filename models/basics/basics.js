@@ -1,6 +1,6 @@
 'use strict';
 
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 //tushare 中数据库字段兼容
 const basicsSchema = new mongoose.Schema({
@@ -31,4 +31,4 @@ const basicsSchema = new mongoose.Schema({
 
 //module.exports = mongoose.model('BasicsTable', basicsSchema);
 const BasicsTable = mongoose.model('BasicsTable', basicsSchema);
-export {BasicsTable};
+module.exports = BasicsTable;

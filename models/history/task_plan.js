@@ -1,6 +1,6 @@
 'use strict';
 
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 
 const taskPlanSchema = new mongoose.Schema({
@@ -17,4 +17,4 @@ const taskPlanSchema = new mongoose.Schema({
 });
 
 const TaskPlanTable = mongoose.model('TaskPlanTable', taskPlanSchema);
-export {TaskPlanTable};
+module.exports = TaskPlanTable;

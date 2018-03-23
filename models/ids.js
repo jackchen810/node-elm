@@ -1,6 +1,6 @@
-'use stict';
+'use strict';
 
-import mongoose from 'mongoose'
+const mongoose = require('mongoose');
 
 const idsSchema = new mongoose.Schema({
 	rom_id: Number,
@@ -28,4 +28,4 @@ Ids.findOne((err, data) => {
 		newIds.save();
 	}
 })
-export default Ids
+module.exports = Ids

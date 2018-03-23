@@ -1,8 +1,8 @@
 'use strict';
 
-import express from 'express'
-import StrategyHandle from '../controller/starategy/starategy.js'
-import Check from '../middlewares/check'
+const express = require('express');
+const StrategyHandle = require('../controller/starategy/starategy.js');
+const Check = require('../middlewares/check');
 
 const router = express.Router();
 
@@ -35,4 +35,4 @@ router.all('/release', Check.checkSuperAdmin, StrategyHandle.release);
 router.all('/revoke', Check.checkSuperAdmin, StrategyHandle.revoke);
 
 
-export default router
+module.exports = router;

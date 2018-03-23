@@ -1,6 +1,6 @@
 'use strict';
 
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 
 const strategySchema = new mongoose.Schema({
@@ -15,4 +15,4 @@ const strategySchema = new mongoose.Schema({
 });
 
 const StrategyTable = mongoose.model('StrategyTable', strategySchema);
-export {StrategyTable};
+module.exports = StrategyTable;

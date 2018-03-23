@@ -1,6 +1,6 @@
 'use strict';
 
-import mongoose from 'mongoose'
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const adminSchema = new Schema({
@@ -24,4 +24,4 @@ adminSchema.index({user_id: 1});
 
 const Admin = mongoose.model('Admin',adminSchema);
 
-export default Admin
+module.exports = Admin;

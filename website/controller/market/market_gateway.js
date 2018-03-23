@@ -1,7 +1,7 @@
 'use strict';
-import DB from "../../../models/models.js";
-import config from "config-lite";
-import dtime from "time-formater";
+const DB = require('../../../models/models.js');
+const config = require('config-lite');
+const dtime = require('time-formater');
 const fs = require("fs");
 const path = require('path');
 
@@ -76,7 +76,7 @@ class MarketGatewayHandle {
 
 }
 
-export default new MarketGatewayHandle()
+module.exports = new MarketGatewayHandle()
 
 
 

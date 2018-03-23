@@ -1,7 +1,7 @@
 'use strict';
 
-import express from 'express'
-import HistoryHandle from '../controller/history/history.js'
+const express = require('express');
+const HistoryHandle = require('../controller/history/history.js');
 
 
 const router = express.Router();
@@ -20,7 +20,9 @@ router.all('/download/plan/list', HistoryHandle.planlist);
 //计划任务更新
 router.all('/download/plan/update', HistoryHandle.planupdate);
 
+
 //获取历史数据
 router.all('/history/data', HistoryHandle.history_data);
 
-export default router
+module.exports = router
+

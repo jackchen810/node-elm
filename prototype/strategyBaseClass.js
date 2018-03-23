@@ -1,5 +1,5 @@
 'use strict';
-const tradeLog = require("../trader/trade-log/log.js");
+const WorkerRxTx = require("../trader/worker/worker_rxtx.js");
 const talib = require('talib/build/Release/talib');
 
 module.exports = class BaseStrategy {
@@ -21,8 +21,9 @@ module.exports = class BaseStrategy {
     }
 
     //onInit  ----不需要用户修改
-    async onInit(emitter, task_id, symbol, ktype, trade_symbol){
+    async onInit(emitter, task_id, task_type, symbol, ktype){
         this.task_id = task_id;
+        this.task_type = task_type;
         this.emitter = emitter;
         this.symbol = symbol;
         this.ktype = ktype;
@@ -33,7 +34,7 @@ module.exports = class BaseStrategy {
         this.emitter.on('on_buy_point', this.on_buy_point);
         this.emitter.on('on_sell_point', this.on_sell_point);
 
-        if (trade_symbol == symbol){
+        if (task_type == 'order'){
             this.main_strategy = true;
         }
         //console.log('111111', ktype);
@@ -49,7 +50,8 @@ module.exports = class BaseStrategy {
     //on_tick 收到tick行情数据时回调
     async log(log_type, log_level, msgstr){
         //console.log('tardeLog:', log_type);
-        return tradeLog(log_type, log_level, msgstr);
+        WorkerRxTx.send(msgstr, log_type, log_level, 'website');
+        return;
     }
 
     //on_tick 收到tick行情数据时回调
@@ -88,6 +90,10 @@ module.exports = class BaseStrategy {
         else {
             this.emitter.emit('on_buy_point', ktype, msgObj);
         }
+
+        //记录到买卖点数据库
+        WorkerRxTx.send(msgObj, 'buy_point', 'db', 'website');
+        WorkerRxTx.send(msgObj, 'buy_point', 'log', 'website');
         return;
     }
 
@@ -101,6 +107,10 @@ module.exports = class BaseStrategy {
         else {
             this.emitter.emit('on_sell_point', ktype, msgObj);
         }
+
+        //记录到买卖点数据库
+        WorkerRxTx.send(msgObj, 'sell_point', 'db', 'website');
+        WorkerRxTx.send(msgObj, 'buy_point', 'log', 'website');
         return;
     }
 

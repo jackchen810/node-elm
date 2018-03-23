@@ -1,17 +1,20 @@
 
-import {TaskTable} from "../models/task/task.js";
-import {StrategyTable} from "../models/strategy/strategy.js";
-import {RiskctrlTable} from "../models/riskctrl/riskctrl.js";
-import {LogTable} from "../models/log/log.js";
-import {BacktestResultTable} from "./backtest/backtest_result.js";
-import {SelectResultTable} from "./select/select_result.js";
-import {TaskPlanTable} from "../models/history/task_plan.js";
-import {OrderTable} from "../models/order/order.js";
-import {MarketTable} from "../models/market/market.js";
-//import {BasicsTable} from "../models/basics/basics.js";
-import KTable from "../models/history/history.js";
 
-import AdminModel from '../models/admin/admin';
+const TaskTable = require('../models/task/task.js');
+const StrategyTable = require('../models/strategy/strategy.js');
+const RiskctrlTable = require('../models/riskctrl/riskctrl.js');
+const LogTable = require('../models/log/log.js');
+const BacktestResultTable = require('./backtest/backtest_result.js');
+const SelectResultTable = require('./select/select_result.js');
+const TaskPlanTable = require('../models/history/task_plan.js');
+const OrderTable = require('../models/order/order.js');
+const MarketTable = require('../models/market/market.js');
+const BasicsTable = require('../models/basics/basics.js');
+const KTable = require('../models/history/history.js');
+const BacktestTaskTable = require('../models/backtest/backtest_task.js');
+
+const AdminModel = require('../models/admin/admin');
+
 
 
 //mqtt 命令
@@ -23,6 +26,7 @@ function DB() {
     this.RiskctrlTable = RiskctrlTable;
     this.LogTable = LogTable;
     this.BacktestResultTable = BacktestResultTable;
+    this.BacktestTaskTable = BacktestTaskTable;
     this.SelectResultTable = SelectResultTable;
 
     this.TaskPlanTable = TaskPlanTable;
@@ -36,4 +40,4 @@ function DB() {
 }
 
 
-export default new DB();
+module.exports = new DB();

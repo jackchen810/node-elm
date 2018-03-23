@@ -1,6 +1,5 @@
 'use strict';
-import DB from "../../../models/models.js";
-import config from "config-lite";
+const config = require('config-lite');
 const fs = require("fs");
 const path = require('path');
 
@@ -27,12 +26,9 @@ class RiskctrlHandle {
         console.log('riskctrl list end');
     }
 
-
-
-
 }
 
-export default new RiskctrlHandle()
+module.exports = new RiskctrlHandle()
 
 
 

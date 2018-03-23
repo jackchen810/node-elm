@@ -1,8 +1,8 @@
 'use strict';
 
-import express from 'express'
-import Admin from '../controller/admin/admin'
-import Check from '../middlewares/check'
+const express = require('express');
+const Admin = require('../controller/admin/admin');
+const Check = require('../middlewares/check');
 const router = express.Router()
 
 console.log("enter route of admin");
@@ -20,4 +20,4 @@ router.all('/info',Check.checkAdminStatus, Admin.getAdminInfo);
 //router.all('/count', Admin.getAdminCount);
 //router.all('/update/avatar/:admin_id', Admin.updateAvatar);
 
-export default router
+module.exports = router
