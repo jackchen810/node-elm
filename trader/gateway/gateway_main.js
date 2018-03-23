@@ -137,11 +137,6 @@ class GatewayClass {
         console.log('[gateway] del task ok');
     }
 
-    async handle_add(handle) {
-        console.log('[gateway] add handle');
-        this.WorkerHnd = handle; // 空Map
-    }
-
 
 }
 

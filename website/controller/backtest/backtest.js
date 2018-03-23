@@ -26,7 +26,7 @@ class BacktestHandle {
 
 
     async list(req, res, next){
-        console.log('task list');
+        console.log('[website] backtest task list');
         //console.log(req.body);
 
         //获取表单数据，josn
@@ -49,19 +49,19 @@ class BacktestHandle {
 
         //参数有效性检查
         if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
-            var query = await DB.BacktestBacktestTaskTable.find(filter).sort(sort);
+            var query = await DB.BacktestTaskTable.find(filter).sort(sort);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
         }
         else if (page_size > 0 && current_page > 0) {
             var skipnum = (current_page - 1) * page_size;   //跳过数
-            var query = await DB.BacktestBacktestTaskTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
+            var query = await DB.BacktestTaskTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
         }
         else{
             res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
         }
 
-        console.log('task list end');
+        console.log('[website] backtest task list end');
     }
 
 
@@ -94,7 +94,7 @@ class BacktestHandle {
 
             var updatestr = {
                 'task_id': task_id,
-                'task_type': (i==0 ? 'order':'order_point'),  //任务结果
+                'task_type': (i==0 ? 'trade':'order_point'),  //任务结果
                 'task_status': 'stop',   // 运行状态
 
                 //输入
@@ -190,7 +190,7 @@ class BacktestHandle {
         var wherestr = {'task_id': task_id};
         var queryList = await DB.BacktestTaskTable.find(wherestr).exec();
 
-        WebsiteRxTx.send(queryList, 'task', 'add', ['worker', 'gateway']);
+        WebsiteRxTx.send(queryList, 'backtest', 'add', ['worker', 'gateway']);
         WebsiteRxTx.addOnceListener(task_id, async function(type, action, response) {
             //console.log('start task, response', response);
             if (response['ret_code'] == 0) {
@@ -223,7 +223,7 @@ class BacktestHandle {
         var wherestr = {'task_id': task_id};
         var queryList = await DB.BacktestTaskTable.find(wherestr).exec();
 
-        WebsiteRxTx.send(queryList, 'task', 'del', ['worker', 'gateway']);
+        WebsiteRxTx.send(queryList, 'backtest', 'del', ['worker', 'gateway']);
         WebsiteRxTx.addOnceListener(task_id, async function(type, action, response) {
             //console.log('stop task, response', response);
             if (response['ret_code'] == 0) {

@@ -4,14 +4,14 @@ const TaskTable = require('../models/task/task.js');
 const StrategyTable = require('../models/strategy/strategy.js');
 const RiskctrlTable = require('../models/riskctrl/riskctrl.js');
 const LogTable = require('../models/log/log.js');
-const BacktestResultTable = require('./backtest/backtest_result.js');
 const SelectResultTable = require('./select/select_result.js');
 const TaskPlanTable = require('../models/history/task_plan.js');
 const OrderTable = require('../models/order/order.js');
 const MarketTable = require('../models/market/market.js');
 const BasicsTable = require('../models/basics/basics.js');
 const KTable = require('../models/history/history.js');
-const BacktestTaskTable = require('../models/backtest/backtest_task.js');
+const BacktestResultTable = require('./backtest/backtest_result.js');
+const BacktestTaskTable = require('./backtest/backtest_task.js');
 
 const AdminModel = require('../models/admin/admin');
 

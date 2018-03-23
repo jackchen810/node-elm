@@ -127,7 +127,7 @@ class WorkerClass {
             instance.onInit(emitter, task_id, task_type, trade_symbol, trade_trigger);
 
             ///路径有效性检查 riskctrl
-            if (task_type == 'order'){
+            if (task_type == 'trade'){
                 var riskctrl_fullname = path.join(__dirname, '../../', config.riskctrl_dir, riskctrl_name);
                 if (fs.existsSync(riskctrl_fullname) == false) {
                     console.log('[worker] riskctrl path not exist:', riskctrl_fullname);
@@ -197,7 +197,7 @@ class WorkerClass {
         //删除实例
         this.taskMap.delete(task_id);
         var msgObj = {ret_code: 0, ret_msg: 'SUCCESS', extra: task_id};
-        //response.send(msgObj);
+        response.send(msgObj);
         //response.send(msgObj, 'log', 'log', 'website');
     }
 

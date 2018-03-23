@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const events = require("events");
 const  GatewayClassHandle = require("./gateway_main");
+const  GatewayBacktestClassHandle = require("./gateway_backtest");
 const db = require('../../mongodb/db.js');
 
 /*
@@ -74,16 +75,22 @@ class GatewayRxTx{
         this.head = head;
 
         //接收主进程发送过来的消息
-        if(head.type == 'task'){
+        if(head.type == 'task') {
             //var response = new GatewayRxTx(head.type, head.action, head.source);
             if (head.action == 'add') {
                 GatewayClassHandle.addTask(body, this);
             }
-            else if(head.action == 'del') {
+            else if (head.action == 'del') {
                 GatewayClassHandle.delTask(body, this);
             }
-            else if(head.action == 'handle') {
-                GatewayClassHandle.handle_add(body);
+        }
+        else if(head.type == 'backtest'){
+            //var response = new GatewayRxTx(head.type, head.action, head.source);
+            if (head.action == 'add') {
+                GatewayBacktestClassHandle.backtest_addTask(body, this);
+            }
+            else if(head.action == 'del') {
+                GatewayBacktestClassHandle.backtest_delTask(body, this);
             }
         }
     }

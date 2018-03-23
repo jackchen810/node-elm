@@ -1,5 +1,6 @@
 const config = require("config-lite");
 const  WorkerClassHandle = require("./worker_main");
+const  WorkerBacktestClassHandle = require("./worker_backtest");
 
 /*
 * request 格式：{'head': {'type': this.type, 'action': this.action}, body:message}
@@ -68,6 +69,20 @@ class WorkerRxTx{
             }
             //var response = new WorkerRxTx(head.type, head.action);
             //WorkerClassHandle.dataSync(msg['body'], msg['data'], response);
+        }
+        else if(head.type == 'backtest') {
+            if (head.action == 'add') {
+                WorkerBacktestClassHandle.backtest_addTask(body, this);
+            }
+            else if (head.action == 'del') {
+                WorkerBacktestClassHandle.backtest_delTask(body, this);
+            }
+        }
+        else if(head.type == 'backtest_bar'){
+            //数组处理， 多个标的的数据以数组方式传递
+            for (var i = 0; i < body.length; i++) {
+                WorkerBacktestClassHandle.backtest_bar(head.action, body[i]);
+            }
         }
 
     }

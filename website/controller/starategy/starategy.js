@@ -16,7 +16,7 @@ class StrategyHandle {
         try {
             var path = config.strategy_dir;
             var files = fs.readdirSync(path);
-            console.log('files', files);
+            //console.log('files', files);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:files});
         }
         catch (e) {
