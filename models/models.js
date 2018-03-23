@@ -10,6 +10,7 @@ const OrderTable = require('../models/order/order.js');
 const MarketTable = require('../models/market/market.js');
 const BasicsTable = require('../models/basics/basics.js');
 const KTable = require('../models/history/history.js');
+const BacktestTaskTable = require('../models/backtest/backtest_task.js');
 
 const AdminModel = require('../models/admin/admin');
 
@@ -23,6 +24,7 @@ function DB() {
     this.RiskctrlTable = RiskctrlTable;
     this.LogTable = LogTable;
     this.BacktestResultTable = BacktestResultTable;
+    this.BacktestTaskTable = BacktestTaskTable;
     this.SelectResultTable = SelectResultTable;
 
     this.TaskPlanTable = TaskPlanTable;

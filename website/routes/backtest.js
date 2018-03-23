@@ -10,9 +10,16 @@ const router = express.Router();
 console.log("enter route of backtest");
 
 
-//获取任务列表
+//新建任务
+router.all('/add', BacktestHandle.add);
+
+//删除任务
+router.all('/del', BacktestHandle.del);
+
+//开始任务
 router.all('/start', BacktestHandle.start);
 
-
+//停止任务
+router.all('/stop', BacktestHandle.stop);
 
 module.exports = router
