@@ -8,7 +8,7 @@ const taskSchema = new mongoose.Schema({
 
     //输入
     trade_symbol: String,  // 数据标的
-    trade_trigger: String,  // 数据触发条件，5,15：等k线类型；order_point：交易点
+    trade_ktype: String,  // 数据触发条件，5,15：等k线类型；order_point：交易点
     symbol_name: String,  //标的名称
 
     //

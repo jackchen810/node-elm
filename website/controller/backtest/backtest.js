@@ -94,12 +94,12 @@ class BacktestHandle {
 
             var updatestr = {
                 'task_id': task_id,
-                'task_type': (i==0 ? 'trade':'order_point'),  //任务结果
+                'task_type': 'backtest',  //任务结果
                 'task_status': 'stop',   // 运行状态
 
                 //输入
                 'trade_symbol': strategy_list[i]['stock_symbol'],   ///index=0的使用交易symbol
-                'trade_trigger': strategy_list[i]['stock_ktype'],   ///index=0的使用交易symbol
+                'trade_ktype': strategy_list[i]['stock_ktype'],   ///index=0的使用交易symbol
 
 
                 //过程

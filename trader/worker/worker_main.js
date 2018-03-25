@@ -17,7 +17,7 @@ class WorkerClass {
                 'task_id': task_id,
                 'task_type': task_type,
                 'trade_symbol': trade_symbol,
-                'trade_trigger': trade_trigger,
+                'trade_ktype': trade_ktype,
                 'emitter': emitter,
                 'strategy': instance,
                 'riskctrl': riskctrl,
@@ -78,7 +78,7 @@ class WorkerClass {
             //查找匹配的标的，发送bar数据
             for (var i = 0; i < taskList.length; i++) {
                 if (barObj['code'] == taskList[i]['trade_symbol'] &&
-                    ktype == taskList[i]['trade_trigger']) {
+                    ktype == taskList[i]['trade_ktype']) {
                     console.log('strategy instance:', taskList[i]['strategy']);
                     taskList[i]['strategy'].on_bar(ktype, barObj);
                 }
@@ -101,7 +101,7 @@ class WorkerClass {
             var task_id = request[i]['task_id'];
             var task_type = request[i]['task_type'];
             var trade_symbol = request[i]['trade_symbol'];
-            var trade_trigger = request[i]['trade_trigger'];
+            var trade_ktype = request[i]['trade_ktype'];
 
             var strategy_name = request[i]['strategy_name'];
             var riskctrl_name = request[i]['riskctrl_name'];
@@ -124,7 +124,7 @@ class WorkerClass {
             // 创建实例
             var strategy_class = require(strategy_fullname);
             var instance = new strategy_class();
-            instance.onInit(emitter, task_id, task_type, trade_symbol, trade_trigger);
+            instance.onInit(emitter, task_id, task_type, trade_symbol, trade_ktype);
 
             ///路径有效性检查 riskctrl
             if (task_type == 'trade'){
@@ -140,7 +140,7 @@ class WorkerClass {
                 console.log('[worker] riskctrl_fullname:', riskctrl_fullname);
                 var riskctrl_class = require(riskctrl_fullname);
                 var riskctrl = new riskctrl_class();
-                riskctrl.onInit(emitter, task_id, trade_symbol, trade_trigger);
+                riskctrl.onInit(emitter, task_id, trade_symbol, trade_ktype);
 
 
 
@@ -156,7 +156,7 @@ class WorkerClass {
                 console.log('[worker] gateway_fullname:', gateway_fullname);
                 //只允许单实例运行
                 var gateway = require(gateway_fullname);
-                gateway.onInit(emitter, task_id, trade_symbol, trade_trigger);
+                gateway.onInit(emitter, task_id, trade_symbol, trade_ktype);
             }
 
             // 数组添加任务
@@ -164,7 +164,7 @@ class WorkerClass {
                 'task_id': task_id,
                 'task_type': task_type,
                 'trade_symbol': trade_symbol,
-                'trade_trigger': trade_trigger,
+                'trade_ktype': trade_ktype,
                 'emitter': emitter,
                 'strategy': instance,
                 'riskctrl': riskctrl,

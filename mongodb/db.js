@@ -118,9 +118,19 @@ db_day.on('close', function() {
 
 //export default db;
 //导出模块
+module.exports = {};
+exports.db = db;
+exports.db_minute5 = db_minute5;
+exports.db_minute15 = db_minute15;
+exports.db_minute30 = db_minute30;
+exports.db_minute60 = db_minute60;
+exports.db_day = db_day;
+module.exports = exports;
+/*
 module.exports = db;
 module.exports = db_minute5;
 module.exports = db_minute15;
 module.exports = db_minute30;
 module.exports = db_minute60;
 module.exports = db_day;
+*/

@@ -22,7 +22,8 @@ router.all('/download/plan/update', HistoryHandle.planupdate);
 
 
 //获取历史数据
-router.all('/history/data', HistoryHandle.history_data);
+router.all('/data', HistoryHandle.history_data);
+router.all('/list', HistoryHandle.history_list);
 
 module.exports = router
 

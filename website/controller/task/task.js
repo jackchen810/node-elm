@@ -45,6 +45,9 @@ class TaskHandle {
             filter = {};
         }
 
+        //添加过滤条件
+        filter['task_type'] = 'trade';
+
         //参数有效性检查
         if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
             var query = await DB.TaskTable.find(filter).sort(sort);
@@ -97,7 +100,7 @@ class TaskHandle {
 
                 //输入
                 'trade_symbol': strategy_list[i]['stock_symbol'],   ///index=0的使用交易symbol
-                'trade_trigger': strategy_list[i]['stock_ktype'],   ///index=0的使用交易symbol
+                'trade_ktype': strategy_list[i]['stock_ktype'],   ///index=0的使用交易symbol
 
 
                 //过程

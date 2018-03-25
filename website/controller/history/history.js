@@ -85,7 +85,7 @@ class HistoryHandle {
         console.log('task plan update end');
     }
 
-    async planrun(){
+    async planrun(req, res, next){
         console.log('task plan run');
 
         var wherestr = {'task_status': 'running', 'crontab_status': 'stop'};
@@ -109,7 +109,7 @@ class HistoryHandle {
     }
 
 
-    async history_data(){
+    async history_data(req, res, next){
         console.log('history_data run');
 
         //获取表单数据，josn
@@ -124,6 +124,91 @@ class HistoryHandle {
         console.log('history_data run end');
     }
 
+    async history_list(req, res, next){
+        console.log('history_list run');
+
+        //获取表单数据，josn
+        var page_size = req.body['page_size'];
+        var current_page = req.body['current_page'];
+        var sort = req.body['sort'];
+        var filter = req.body['filter'];
+        var stock_symbol = req.body['stock_symbol'];
+        var stock_ktype = req.body['stock_ktype']
+
+
+        // 如果没有定义排序规则，添加默认排序
+        if(typeof(sort)==="undefined"){
+            console.log('sort undefined');
+            sort = {"date":1};
+        }
+
+        // 如果没有定义排序规则，添加默认排序
+        if(typeof(filter)==="undefined"){
+            console.log('filter undefined');
+            filter = {'code': stock_symbol};
+        }
+
+
+        if (stock_ktype == '日线'){
+            stock_ktype = 'day';
+        }
+        else if (stock_ktype == '周线'){
+            stock_ktype = 'week';
+        }
+        else if (stock_ktype == '月线'){
+            stock_ktype = 'month';
+        }
+
+        console.log('stock_symbol', stock_symbol);
+        console.log('stock_ktype', stock_ktype);
+        console.log('page_size', page_size);
+        console.log('current_page', current_page);
+
+
+        //参数有效性检查
+        if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
+            var queryList = await DB.KHistory(stock_ktype, stock_symbol).find(filter).sort(sort);
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList});
+        }
+        else if (page_size > 0 && current_page > 0) {
+            var skipnum = (current_page - 1) * page_size;   //跳过数
+            var queryList = await DB.KHistory(stock_ktype, stock_symbol).find(filter).sort(sort).skip(skipnum).limit(page_size);
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList});
+        }
+        else{
+            res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
+        }
+
+        console.log('history_data run end');
+    }
+    async history_list_length(req, res, next){
+        console.log('history_list_length run');
+
+        //获取表单数据，josn
+        var stock_symbol = req.body['stock_symbol'];
+        var stock_ktype = req.body['stock_ktype']
+
+
+
+        if (stock_ktype == '日线'){
+            stock_ktype = 'day';
+        }
+        else if (stock_ktype == '周线'){
+            stock_ktype = 'week';
+        }
+        else if (stock_ktype == '月线'){
+            stock_ktype = 'month';
+        }
+
+        console.log('stock_symbol', stock_symbol);
+        console.log('stock_ktype', stock_ktype);
+
+
+        var query = await DB.KHistory(stock_ktype, stock_symbol).count;
+        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
+
+        console.log('history_list_length run end');
+    }
 }
 
 module.exports = new HistoryHandle()

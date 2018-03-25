@@ -33,7 +33,7 @@ class GatewayClass {
             var task_id = request[i]['task_id'];
             var task_type = request[i]['task_type'];
             var trade_symbol = request[i]['trade_symbol'];
-            var trade_trigger = request[i]['trade_trigger'];
+            var trade_ktype = request[i]['trade_ktype'];
             var market_gateway = request[i]['market_gateway'];
 
             ///导入strategy_list
@@ -42,7 +42,7 @@ class GatewayClass {
             //tradeLog('system', 'start timer', task_id);
 
             //触发者是交易点，不需要器定时器， 只有ktype才需要起定时器
-            if (trade_trigger == 'order_point'){
+            if (trade_ktype == 'order_point'){
                 continue;
             }
 
@@ -59,23 +59,23 @@ class GatewayClass {
             //console.log('[gateway] to_download', market_gateway_fullname);
             //3. 下载数据，进行同步, 根据策略中的标的和ktype 进行同步
             var market_gateway = require(market_gateway_fullname);
-            var barList = await market_gateway.to_download(trade_trigger, 'fq', trade_symbol);
+            var barList = await market_gateway.to_download(trade_ktype, 'fq', trade_symbol);
 
             // 发送已有bar数据
             if (barList.length > 0) {
                 console.log('to_download data:', barList[0]);
-                response.send(barList, 'on_bar_sync', trade_trigger, 'worker');
+                response.send(barList, 'on_bar_sync', trade_ktype, 'worker');
             }
 
             //4. 加载market，启动定时器， 发出on_bar 数据
-            market_gateway.on_start(trade_symbol, trade_trigger);
+            market_gateway.on_start(trade_symbol, trade_ktype);
             //console.log(__filename, 'add task on_start');
 
             var task = {
                 'task_id': task_id,
                 'task_type': task_type,
                 'trade_symbol': trade_symbol,
-                'trade_trigger': trade_trigger,
+                'trade_ktype': trade_ktype,
                 'market_gateway': market_gateway,
             }
 
@@ -99,7 +99,7 @@ class GatewayClass {
         for (var i = 0; i < request.length; i++){
             var task_id = request[i]['task_id'];
             var trade_symbol = request[i]['trade_symbol'];
-            var trade_trigger = request[i]['trade_trigger'];
+            var trade_ktype = request[i]['trade_ktype'];
             var market_gateway = request[i]['market_gateway'];
 
             ///导入strategy_list
@@ -107,7 +107,7 @@ class GatewayClass {
             //tradeLog('system', 'stop timer', task_id);
 
             //触发者是交易点，不需要器定时器， 只有ktype才需要起定时器
-            if (trade_trigger == 'order_point'){
+            if (trade_ktype == 'order_point'){
                 continue;
             }
 
@@ -123,7 +123,7 @@ class GatewayClass {
 
             //1. 加载market
             var market_gateway_class = require(market_gateway_fullname);
-            market_gateway_class.on_stop(trade_symbol, trade_trigger);
+            market_gateway_class.on_stop(trade_symbol, trade_ktype);
             //console.log(__filename, 'del task on_stop');
         }
 

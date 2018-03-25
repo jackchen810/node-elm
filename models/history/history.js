@@ -1,11 +1,8 @@
 'use strict';
 
 const mongoose = require('mongoose');
-const db_minute5 = require('../../mongodb/db.js');
-const db_minute15 = require('../../mongodb/db.js');
-const db_minute30 = require('../../mongodb/db.js');
-const db_minute60 = require('../../mongodb/db.js');
-const db_day = require('../../mongodb/db.js');
+const db = require('../../mongodb/db.js');
+
 
 //tushare 中数据库字段兼容
 const historySchema = new mongoose.Schema({
@@ -27,18 +24,18 @@ const historySchema = new mongoose.Schema({
 
 module.exports = function KTable(ktype, table) {
     if (ktype == '5') {
-        return db_minute5.model(table, historySchema);
+        return db.db_minute5.model(table, historySchema);
     }
     else if (ktype == '15') {
-        return db_minute15.model(table, historySchema);
+        return db.db_minute15.model(table, historySchema);
     }
     else if (ktype == '30') {
-        return db_minute30.model(table, historySchema);
+        return db.db_minute30.model(table, historySchema);
     }
     else if (ktype == '60') {
-        return db_minute60.model(table, historySchema);
+        return db.db_minute60.model(table, historySchema);
     }
     else if (ktype == 'day') {
-        return db_day.model(table, historySchema);
+        return db.db_day.model(table, historySchema);
     }
 }
