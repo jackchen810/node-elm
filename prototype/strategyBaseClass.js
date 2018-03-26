@@ -1,16 +1,16 @@
 'use strict';
-const WorkerRxTx = require("../trader/worker/worker_rxtx.js");
+const WorkerTx = require("../trader/worker/worker_tx.js");
 const talib = require('talib/build/Release/talib');
 
 module.exports = class BaseStrategy {
     constructor(){
         //记录任务id
         this.task_id = '';
+        this.task_type = '';  //trade, order_point,
         this.emitter = '';
         this.symbol = '';
         this.ktype = '';
         this.history_bar = [];   // 历史数据，初次启动需要同步一次历史数据，防止指标计算错误
-        this.main_strategy = false;
 
         //绑定，this
         this.on_tick = this.on_tick.bind(this);
@@ -21,6 +21,7 @@ module.exports = class BaseStrategy {
     }
 
     //onInit  ----不需要用户修改
+    //task_type:
     async onInit(emitter, task_id, task_type, symbol, ktype){
         this.task_id = task_id;
         this.task_type = task_type;
@@ -34,23 +35,15 @@ module.exports = class BaseStrategy {
         this.emitter.on('on_buy_point', this.on_buy_point);
         this.emitter.on('on_sell_point', this.on_sell_point);
 
-        if (task_type == 'order'){
-            this.main_strategy = true;
-        }
         //console.log('111111', ktype);
         return;
     }
 
-    //onInit  ----不需要用户修改
-    async onInitBar(bar) {
-        this.history_bar = bar;
-        console.log('history_bar', this.history_bar[0]);
-    }
 
     //on_tick 收到tick行情数据时回调
     async log(log_type, log_level, msgstr){
         //console.log('tardeLog:', log_type);
-        WorkerRxTx.send(msgstr, log_type, log_level, 'website');
+        WorkerTx.send(msgstr, 'log', log_type, 'website');
         return;
     }
 
@@ -82,18 +75,21 @@ module.exports = class BaseStrategy {
 
     //to_buy  发送买单
     async to_buy(ktype, msgObj){
-        console.log('to_buy');
+        console.log('to_buy', this.task_type);
         //1. 发送event:on_buy 事件， riskctrl使用
-        if (this.main_strategy) {
+        if (this.task_type == 'trade') {
             this.emitter.emit('on_buy', ktype, msgObj);
+            //记录到买卖点数据库
+            WorkerTx.send(msgObj, 'trade_record', 'to_buy', 'website');
         }
-        else {
+        else if (this.task_type == 'order_point') {
             this.emitter.emit('on_buy_point', ktype, msgObj);
+            //记录到买卖点数据库
+            WorkerTx.send(msgObj, 'trade_record', 'to_buy_point', 'website');
         }
 
-        //记录到买卖点数据库
-        WorkerRxTx.send(msgObj, 'buy_point', 'db', 'website');
-        WorkerRxTx.send(msgObj, 'buy_point', 'log', 'website');
+        //记录到log数据库
+        //WorkerTx.send(msgObj, 'log', 'to_buy', 'website');
         return;
     }
 
@@ -101,16 +97,18 @@ module.exports = class BaseStrategy {
     async to_sell(ktype, msgObj){
         console.log('to_sell');
         //1. 发送event:on_sell 事件， riskctrl使用
-        if (this.main_strategy) {
+        if (this.task_type == 'trade') {
             this.emitter.emit('on_sell', ktype, msgObj);
+            WorkerTx.send(msgObj, 'trade_record', 'to_sell', 'website');
         }
-        else {
+        else if (this.task_type == 'order_point') {
             this.emitter.emit('on_sell_point', ktype, msgObj);
+            //记录到买卖点数据库
+            WorkerTx.send(msgObj, 'trade_record', 'to_sell_point', 'website');
         }
 
-        //记录到买卖点数据库
-        WorkerRxTx.send(msgObj, 'sell_point', 'db', 'website');
-        WorkerRxTx.send(msgObj, 'buy_point', 'log', 'website');
+        //记录到log数据库
+        //WorkerTx.send(msgObj, 'log', 'to_sell', 'website');
         return;
     }
 

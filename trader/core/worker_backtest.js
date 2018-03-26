@@ -3,7 +3,7 @@ const config = require("config-lite");
 const fs = require("fs");
 const path = require("path");
 const events = require("events");
-
+const WorkerTx = require('../worker/worker_tx.js');
 
 class WorkerBacktestClass {
     constructor(){
@@ -12,14 +12,14 @@ class WorkerBacktestClass {
 
         //this.on_tick = this.on_tick.bind(this);
         //this.on_bar = this.on_bar.bind(this);
+        this.on_backtest_buy = this.on_backtest_buy.bind(this);
+        this.on_backtest_buy_point = this.on_backtest_buy_point.bind(this);
+        this.on_backtest_sell = this.on_backtest_sell.bind(this);
+        this.on_backtest_sell_point = this.on_backtest_sell_point.bind(this);
     }
 
 
 
-    async bar_sync(ktype, barObj){
-        console.log('[worker backtest] on_bar_sync', ktype, barObj['code'], barObj['date']);
-
-    }
 
     //接收到外部bar事件，进行调度处理
     async backtest_bar(ktype, barObj){
@@ -36,7 +36,7 @@ class WorkerBacktestClass {
             for (var i = 0; i < taskList.length; i++) {
                 if (barObj['code'] == taskList[i]['trade_symbol'] &&
                     ktype == taskList[i]['trade_ktype']) {
-                    console.log('[worker backtest] strategy instance:', taskList[i]['strategy']);
+                    console.log('[worker backtest] strategy instance:', taskList[i]['strategy_name']);
                     taskList[i]['strategy'].on_bar(ktype, barObj);
                 }
             }
@@ -44,9 +44,83 @@ class WorkerBacktestClass {
     }
 
 
+    //这个是 on_buy 事件的回调函数
+    async on_backtest_buy(ktype, msgObj){
+        console.log('[worker backtest], on_backtest_buy:', msgObj);
+
+        // 添加买卖点到回测结果， 发送消息
+        var msgObj = {
+            //'task_id': msgObj['task_id'],
+            //'task_type': msgObj['task_type'],
+            'trade_symbol': msgObj['code'],
+            'trade_ktype': ktype,
+            'date': msgObj['date'],
+            //'strategy_name': msgObj['strategy_name'],
+        }
+
+        console.log('WorkerTx', WorkerTx);
+        WorkerTx.send(msgObj, 'backtest_record', 'on_backtest_buy', 'website');
+        return;
+    }
+
+    //这个是 on_buy 事件的回调函数
+    async on_backtest_buy_point(ktype, msgObj){
+        console.log('[worker backtest], on_backtest_buy_point:', msgObj);
+
+        // 添加买卖点到回测结果， 发送消息
+        var msgObj = {
+            //'task_id': msgObj['task_id'],
+            //'task_type': msgObj['task_type'],
+            'trade_symbol': msgObj['code'],
+            'trade_ktype': ktype,
+            'date': msgObj['date'],
+            //'strategy_name': msgObj['strategy_name'],
+        }
+
+        WorkerTx.send(msgObj, 'backtest_record', 'on_backtest_buy_point', 'website');
+        return;
+    }
+
+    //这个是 on_sell 事件的回调函数
+    async on_backtest_sell(ktype, msgObj){
+        console.log('[worker backtest], on_backtest_sell:', msgObj);
+
+        // 添加买卖点到回测结果， 发送消息
+        var msgObj = {
+            //'task_id': msgObj['task_id'],
+            //'task_type': msgObj['task_type'],
+            'trade_symbol': msgObj['code'],
+            'trade_ktype': ktype,
+            'date': msgObj['date'],
+           //'strategy_name': msgObj['strategy_name'],
+        }
+
+        WorkerTx.send(msgObj, 'backtest_record', 'on_backtest_sell', 'website');
+        return;
+    }
 
 
-    async backtest_addTask(request, response) {
+    //这个是 on_sell 事件的回调函数
+    async on_backtest_sell_point(ktype, msgObj){
+        console.log('[worker backtest], on_backtest_sell_point:', msgObj);
+
+        // 添加买卖点到回测结果， 发送消息
+        var msgObj = {
+            //'task_id': msgObj['task_id'],
+            //'task_type': msgObj['task_type'],
+            'trade_symbol': msgObj['code'],
+            'trade_ktype': ktype,
+            'date': msgObj['date'],
+            //'strategy_name': msgObj['strategy_name'],
+        }
+
+        WorkerTx.send(msgObj, 'backtest_record', 'on_backtest_sell_point', 'website');
+        return;
+    }
+
+
+
+    async backtest_task_add(request, response) {
         console.log('[worker backtest] backtest add task');
 
 
@@ -63,11 +137,6 @@ class WorkerBacktestClass {
 
             var strategy_name = request[i]['strategy_name'];
 
-            if (task_type == 'order_point'){
-                response.send({ret_code: 0, ret_msg: 'SUCCESS', extra: task_id});
-                return;
-            }
-
 
             var strategy_fullname = path.join(__dirname, '../../', config.strategy_dir, strategy_name);
             console.log('[worker backtest] strategy_fullname:', strategy_fullname);
@@ -77,18 +146,27 @@ class WorkerBacktestClass {
                 return;
             }
 
-            // 创建实例
+            // 创建策略实例
             var strategy_class = require(strategy_fullname);
             var instance = new strategy_class();
             instance.onInit(emitter, task_id, task_type, trade_symbol, trade_ktype);
 
-            // 数组添加任务
+
+            // 监听策略发出的事件
+            console.log('[worker backtest] lister:');
+            emitter.on('on_buy', this.on_backtest_buy);
+            emitter.on('on_buy_point', this.on_backtest_buy_point);
+            emitter.on('on_buy', this.on_backtest_sell);
+            emitter.on('on_buy_point', this.on_backtest_sell_point);
+
+            // task map添加任务
             var task = {
                 'task_id': task_id,
                 'task_type': task_type,
                 'trade_symbol': trade_symbol,
                 'trade_ktype': trade_ktype,
                 'emitter': emitter,
+                'strategy_name': strategy_name,
                 'strategy': instance,
             }
 
@@ -108,7 +186,7 @@ class WorkerBacktestClass {
         console.log('[worker backtest] backtest add task ok');
     }
 
-    async backtest_delTask(request, response){
+    async backtest_task_del(request, response){
         console.log('[worker backtest] backtest del task');
         var task_id = request[0]['task_id'];
 

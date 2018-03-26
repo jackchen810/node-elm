@@ -1,6 +1,6 @@
 'use strict';
 const DB = require('../../../models/models.js');
-const WebsiteRxTx = require('../../../website/website_rxtx.js');
+const WebsiteRxTx = require('../../website_rxtx.js');
 const dtime = require('time-formater');
 const fs = require("fs");
 const path = require('path');

@@ -14,10 +14,10 @@ website.on('message', process_message_reactor);
 console.log('create website_entry');
 
 //创建一个工作进程, 这个是主进程
-const GatewayRxTx = require("./trader/gateway/gateway_rxtx");
+const GatewayRxTx = require("./gateway/gateway/gateway_rxtx");
 //初始化 gateway的发送函数；
 GatewayRxTx.onInit(process_message_reactor);
-const  GatewayHandle = require("./trader/gateway/gateway_main");
+const  GatewayHandle = require("./gateway/core/gateway_market");
 //GatewayRxTx.onInit(process_message_reactor);
 
 /*

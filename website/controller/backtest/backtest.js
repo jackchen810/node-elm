@@ -5,7 +5,7 @@ const path = require('path');
 const schedule = require('node-schedule');
 const dtime = require('time-formater');
 const DB = require('../../../models/models');
-const WebsiteRxTx = require('../../../website/website_rxtx.js');
+const WebsiteRxTx = require('../../website_rxtx.js');
 
 class BacktestHandle {
     constructor(){
@@ -94,7 +94,7 @@ class BacktestHandle {
 
             var updatestr = {
                 'task_id': task_id,
-                'task_type': 'backtest',  //任务结果
+                'task_type': (i==0 ? 'trade':'order_point'),  //任务结果
                 'task_status': 'stop',   // 运行状态
 
                 //输入
@@ -118,7 +118,7 @@ class BacktestHandle {
                 return;
             }
 
-            console.log('strategy_list:', strategy_list);
+            //console.log('strategy_list:', strategy_list);
             message.push(updatestr);
         }
 

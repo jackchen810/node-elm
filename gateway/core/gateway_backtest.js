@@ -3,7 +3,6 @@ const config = require("config-lite");
 const fs = require("fs");
 const path = require("path");
 const DB = require('../../models/models');
-//const response = require("./gateway_rxtx");
 
 class GatewayBacktestClass {
     constructor(){
@@ -22,8 +21,8 @@ class GatewayBacktestClass {
     *
     * */
 
-    async backtest_addTask(request, response) {
-        console.log('[gateway] add task');
+    async backtest_task_add(request, response) {
+        console.log('[gateway backtest] add task');
 
         var task_group = [];
 
@@ -51,13 +50,11 @@ class GatewayBacktestClass {
             }
 
             var wherestr = {
-                'trade_ktype': trade_ktype,
-                'trade_symbol': trade_symbol,
-                'start_time': { $gt: start_time},
-                'end_time': { $lte: end_time}
+                'code': trade_symbol,
+                'date': { $gt: start_time, $lte: end_time},
             };
             var queryList = await DB.KHistory(trade_ktype, trade_symbol).find(wherestr).exec();
-            console.log('[gateway]  DB.KHistory list', queryList);
+            console.log('[gateway backtest]  DB.KHistory list', queryList.length);
 
             // 发送已有bar数据
             if (queryList.length > 0) {
@@ -81,21 +78,21 @@ class GatewayBacktestClass {
         //console.log('add task ok:', task);
         var msgObj = {ret_code: 0, ret_msg: 'SUCCESS', extra: task_id};
         response.send(msgObj);
-        console.log('[gateway] add task ok');
+        console.log('[gateway backtest] add task ok');
     }
 
 
-    async backtest_delTask(request, response){
-        console.log('[gateway] del task');
+    async backtest_task_del(request, response){
+        console.log('[gateway backtest] del task');
 
         var task_id = request[0]['task_id'];
-        console.log('[gateway] delete taskMap');
+        console.log('[gateway backtest] delete taskMap');
 
         //删除实例
         this.taskMap.delete(task_id);
         var msgObj = {ret_code: 0, ret_msg: 'SUCCESS', extra: task_id};
         response.send(msgObj);
-        console.log('[gateway] del task ok');
+        console.log('[gateway backtest] del task ok');
     }
 
 

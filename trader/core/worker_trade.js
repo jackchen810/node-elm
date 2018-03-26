@@ -3,7 +3,7 @@ const config = require("config-lite");
 const fs = require("fs");
 const path = require("path");
 const events = require("events");
-
+const WorkerRxTx = require('../worker/worker_rx.js');
 
 class WorkerClass {
     constructor(){
@@ -88,7 +88,7 @@ class WorkerClass {
 
 
 
-    async addTask(request, response) {
+    async task_add(request, response) {
         console.log('[worker] add task');
 
 
@@ -99,6 +99,7 @@ class WorkerClass {
         ///路径有效性检查
         for (var i = 0; i < request.length; i++) {
             var task_id = request[i]['task_id'];
+            var task_group = request[i]['task_group'];
             var task_type = request[i]['task_type'];
             var trade_symbol = request[i]['trade_symbol'];
             var trade_ktype = request[i]['trade_ktype'];
@@ -106,11 +107,6 @@ class WorkerClass {
             var strategy_name = request[i]['strategy_name'];
             var riskctrl_name = request[i]['riskctrl_name'];
             var order_gateway = request[i]['order_gateway'];
-
-            if (task_type == 'order_point'){
-                response.send({ret_code: 0, ret_msg: 'SUCCESS', extra: task_id});
-                return;
-            }
 
 
             var strategy_fullname = path.join(__dirname, '../../', config.strategy_dir, strategy_name);
@@ -188,7 +184,7 @@ class WorkerClass {
         console.log('[worker] add task ok');
     }
 
-    async delTask(request, response){
+    async task_del(request, response){
         console.log('[worker] del task');
         var task_id = request[0]['task_id'];
 

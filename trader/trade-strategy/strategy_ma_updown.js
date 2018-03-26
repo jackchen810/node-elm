@@ -16,8 +16,8 @@ module.exports = class StrategyMAClass extends BaseStrategy {
     }
 
     async on_tick(tickObj) {
-        console.log('Strategy MA on_tick, task_id:', this.task_id);
-        console.log('Strategy MA on_tick, msg:', tickObj);
+        console.log('Strategy MA on_tick, task_id:', this.task_id, tickObj);
+        //console.log('Strategy MA on_tick, msg:', tickObj);
 
         var buyObj = {
             'code': tickObj['code'],
@@ -32,8 +32,8 @@ module.exports = class StrategyMAClass extends BaseStrategy {
 
 
     async on_bar(ktype, barObj) {
-        console.log('Strategy MA on_bar, task_id:', this.task_id);
-        console.log('Strategy MA on_bar, msg:', JSON.stringify(barObj));
+        console.log('Strategy MA on_bar, task_id:', this.task_id, JSON.stringify(barObj));
+        //console.log('Strategy MA on_bar, msg:', JSON.stringify(barObj));
 
         this.mybar.push(barObj);
 

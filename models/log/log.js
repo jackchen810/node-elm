@@ -20,20 +20,3 @@ const logSchema = new mongoose.Schema({
 const LogTable = mongoose.model('LogTable', logSchema);
 module.exports = LogTable;
 
-
-/*
-WorkerHnd.addLoopListener('log', function(action, body) {
-    //console.log('log->db, body', body);
-    var mytime = new Date();
-
-    var updatestr = {
-        'log_type': body['log_type'],
-        'log_level': body['log_level'],
-        'comment': body['comment'],
-        'create_at':dtime(mytime).format('YYYY-MM-DD HH:mm:ss'),
-        'sort_time':mytime.getTime()
-    };
-
-    LogTable.create(updatestr);
-});
-*/

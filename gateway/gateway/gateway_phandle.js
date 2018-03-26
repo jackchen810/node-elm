@@ -13,7 +13,7 @@ const  emitter = new events.EventEmitter();
 class GatewayProcessHandle {
     constructor() {
         //创建一个工作进程
-        this.gateway = fork('./trader/gateway/gateway_entry.js');
+        this.gateway = fork('./gateway/gateway/gateway_entry.js');
         this.gateway.on('message', this.onMessage);
         console.log('create GatewayProcessHandle');
 

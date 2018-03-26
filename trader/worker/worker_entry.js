@@ -1,5 +1,7 @@
-require("./worker_main");
-require("./worker_rxtx");
+require("../core/worker_trade");
+require("../core/worker_backtest");
+require("./worker_rx");
+require("./worker_tx");
 
 
 process.on('SIGHUP', function() {

@@ -10,8 +10,8 @@ module.exports = class RisckctrlClass extends BaseRiskctrl {
 
     //这个是 on_buy 事件的回调函数
     async on_buy(ktype, msgObj){
-        console.log('RisckctrlClass, on_buy:', this.task_id);
-        console.log('RisckctrlClass, on_buy:', msgObj);
+        console.log('RisckctrlClass, task_id:', this.task_id, 'on_buy:', msgObj);
+        //console.log('RisckctrlClass, on_buy:', msgObj);
 
         var buyObj = {
             'symbol': msgObj['symbol'],

@@ -3,8 +3,8 @@ const config = require("config-lite");
 const fs = require("fs");
 const path = require("path");
 const events = require("events");
-const  GatewayClassHandle = require("./gateway_main");
-const  GatewayBacktestClassHandle = require("./gateway_backtest");
+const  GatewayTradeHandle = require("../core/gateway_market");
+const  GatewayBacktestHandle = require("../core/gateway_backtest");
 const db = require('../../mongodb/db.js');
 
 /*
@@ -78,19 +78,19 @@ class GatewayRxTx{
         if(head.type == 'task') {
             //var response = new GatewayRxTx(head.type, head.action, head.source);
             if (head.action == 'add') {
-                GatewayClassHandle.addTask(body, this);
+                GatewayTradeHandle.addTask(body, this);
             }
             else if (head.action == 'del') {
-                GatewayClassHandle.delTask(body, this);
+                GatewayTradeHandle.delTask(body, this);
             }
         }
         else if(head.type == 'backtest'){
             //var response = new GatewayRxTx(head.type, head.action, head.source);
             if (head.action == 'add') {
-                GatewayBacktestClassHandle.backtest_addTask(body, this);
+                GatewayBacktestHandle.backtest_task_add(body, this);
             }
             else if(head.action == 'del') {
-                GatewayBacktestClassHandle.backtest_delTask(body, this);
+                GatewayBacktestHandle.backtest_task_del(body, this);
             }
         }
     }

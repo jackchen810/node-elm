@@ -1,4 +1,4 @@
-var cp = require('child_process');
+'use strict';
 const config = require("config-lite");
 const fs = require("fs");
 const path = require("path");

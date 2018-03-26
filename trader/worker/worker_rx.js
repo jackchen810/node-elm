@@ -1,6 +1,8 @@
+'use strict';
 const config = require("config-lite");
-const  WorkerClassHandle = require("../core/worker_trade");
-const  WorkerBacktestClassHandle = require("../core/worker_backtest");
+const  WorkerTradeHandle = require("../core/worker_trade");
+const  WorkerBacktestHandle = require("../core/worker_backtest");
+const  WorkerTxHandle = require("./worker_tx");
 
 /*
 * request 格式：{'head': {'type': this.type, 'action': this.action}, body:message}
@@ -8,7 +10,7 @@ const  WorkerBacktestClassHandle = require("../core/worker_backtest");
 * */
 
 
-class WorkerRxTx{
+class WorkerRx{
     constructor(){
         //记录任务id
         this.type = null;
@@ -16,7 +18,6 @@ class WorkerRxTx{
         this.head = null;
 
         //bind
-        this.send = this.send.bind(this);
         this.onMessage = this.onMessage.bind(this);
 
         //监听进程消息
@@ -39,81 +40,54 @@ class WorkerRxTx{
         //type, action, data
         var head = msg['head'];
         var body = msg['body'];
-        this.head = head;
+        WorkerTxHandle.init(head);
 
         //接收主进程发送过来的消息
         if(head.type == 'task'){
             if (head.action == 'add') {
-                WorkerClassHandle.task_add(body, this);
+                WorkerTradeHandle.task_add(body, WorkerTxHandle);
             }
             else if(head.action == 'del') {
-                WorkerClassHandle.task_del(body, this);
+                WorkerTradeHandle.task_del(body, WorkerTxHandle);
             }
         }
         else if (head.type == 'on_tick'){
-            WorkerClassHandle.on_tick(body);
+            WorkerTradeHandle.on_tick(body);
         }
         else if (head.type == 'on_bar'){
-            WorkerClassHandle.on_bar(head.action, body);
+            WorkerTradeHandle.on_bar(head.action, body);
         }
         else if (head.type == 'on_tick_sync'){
             //数组处理， 多个标的的数据以数组方式传递
             for (var i = 0; i < body.length; i++) {
-                WorkerClassHandle.on_tick(body[i]);
+                WorkerTradeHandle.on_tick(body[i]);
             }
         }
         else if (head.type == 'on_bar_sync'){
             //数组处理， 多个标的的数据以数组方式传递
             for (var i = 0; i < body.length; i++) {
-                WorkerClassHandle.on_bar_sync(head.action, body[i]);
+                WorkerTradeHandle.on_bar_sync(head.action, body[i]);
             }
-            //var response = new WorkerRxTx(head.type, head.action);
-            //WorkerClassHandle.dataSync(msg['body'], msg['data'], response);
+            //var response = new WorkerRx(head.type, head.action);
+            //WorkerTradeHandle.dataSync(msg['body'], msg['data'], response);
         }
         else if(head.type == 'backtest') {
             if (head.action == 'add') {
-                WorkerBacktestClassHandle.backtest_task_add(body, this);
+                WorkerBacktestHandle.backtest_task_add(body, WorkerTxHandle);
             }
             else if (head.action == 'del') {
-                WorkerBacktestClassHandle.backtest_task_del(body, this);
+                WorkerBacktestHandle.backtest_task_del(body, WorkerTxHandle);
             }
         }
         else if(head.type == 'backtest_bar'){
             //数组处理， 多个标的的数据以数组方式传递
             for (var i = 0; i < body.length; i++) {
-                WorkerBacktestClassHandle.backtest_bar(head.action, body[i]);
+                WorkerBacktestHandle.backtest_bar(head.action, body[i]);
             }
         }
 
-    }
-
-    //onInit  ----不需要用户修改
-    async send(message, type, action, dest){
-        //参数为1，使用默认参数
-        if (arguments.length == 1){
-            var res = {
-                'head': {
-                    'type': this.head.type,
-                    'action': this.head.action,
-                    'source': 'worker',
-                    'dest': this.head.source
-                },
-                'body': message,
-            }
-        }
-        else{
-            var res = {
-                'head': {'type': type, 'action': action, 'source': 'worker', 'dest': dest},
-                'body': message,
-            }
-        }
-
-        //console.log('[worker] send:', JSON.stringify(res));
-        //console.log('worker--->main');
-        process.send(res);
-        return;
     }
 }
 
-module.exports = new WorkerRxTx();
+module.exports = new WorkerRx();
 

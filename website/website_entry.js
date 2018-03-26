@@ -1,7 +1,10 @@
-
+'use strict';
 //加载主模块
 require("./website_main");
 require("./website_rxtx");
+require("./recorder/backtest_record");
+require("./recorder/logs_record");
+require("./recorder/trade_record");
 
 
 

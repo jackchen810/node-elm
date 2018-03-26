@@ -3,6 +3,8 @@ const BaseStrategy = require("../../prototype/strategyBaseClass");
 // load the module and display its version
 const talib = require('talib/build/Release/talib');
 
+var async = require('async');
+
 
 //策略要继承基类
 module.exports = class StrategyMacdClass extends BaseStrategy {
@@ -11,11 +13,12 @@ module.exports = class StrategyMacdClass extends BaseStrategy {
         this.decimal = this.decimal.bind(this);
         this.on_bar = this.on_bar.bind(this);
         this.mybar = [];
+        this.old_order = 'sell';
         console.log('StrategyMacdClass constructor');
     }
 
     async on_tick(tickObj) {
-        console.log('StrategyMacdClass on_tick, task_id:', this.task_id);
+        console.log('StrategyMacdClass on_tick, task_id:', this.task_id, tickObj);
         console.log('StrategyMacdClass on_tick, msg:', tickObj);
 
         var buyObj = {
@@ -30,15 +33,8 @@ module.exports = class StrategyMacdClass extends BaseStrategy {
     }
 
     async on_bar(ktype, barObj) {
-        console.log('StrategyMacdClass on_bar, task_id:', this.task_id);
-        console.log('StrategyMacdClass on_bar, msg:', JSON.stringify(barObj));
-
-        var buyObj = {
-            'code': barObj['code'],
-            'ktype': ktype,
-            'price': barObj['price'],
-            'volume': barObj['volume'],
-        }
+        console.log('StrategyMacdClass on_bar, task_id:', this.task_id, JSON.stringify(barObj));
+        //console.log('StrategyMacdClass on_bar, msg:', JSON.stringify(barObj));
 
         this.mybar.push(barObj);
 
@@ -81,7 +77,28 @@ module.exports = class StrategyMacdClass extends BaseStrategy {
 
         console.log("Results, dif:", dif, 'dea:', dea, 'macd:', macd);
 
-        this.to_buy(ktype, buyObj);
+        if (macd > 0 && dif > 0 && dea > 0 && this.old_order == 'buy') {
+
+            var sellObj = {
+                'code': barObj['code'],
+                'ktype': ktype,
+                'price': barObj['price'],
+                'volume': barObj['volume'],
+            }
+            this.to_sell(ktype, sellObj);
+            this.old_order = 'sell';
+        }
+        else if(macd < 0 && dif < 0 && dea < 0 && this.old_order == 'sell') {
+
+            var buyObj = {
+                'code': barObj['code'],
+                'ktype': ktype,
+                'price': barObj['price'],
+                'volume': barObj['volume'],
+            }
+            this.to_buy(ktype, buyObj);
+            this.old_order = 'buy';
+        }
 
     }
 

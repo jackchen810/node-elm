@@ -4,8 +4,8 @@ module.exports = {
 	firmware_dir:'./public/firmware',
     strategy_dir:'./trader/trade-strategy',
     riskctrl_dir:'./trader/trade-riskctrl',
-    order_gateway_dir:'./trader/gateway-order',
-    market_gateway_dir:'./trader/gateway-market',
+    order_gateway_dir:'./gateway/gateway-order',
+    market_gateway_dir:'./gateway/gateway-market',
     history_dl_dir:'./trader/history-dl',
 
 	device_dir:'./public/device',

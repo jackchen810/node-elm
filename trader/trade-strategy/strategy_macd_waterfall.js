@@ -1,22 +1,39 @@
 'use strict';
 const BaseStrategy = require("../../prototype/strategyBaseClass");
+// load the module and display its version
+const talib = require('talib/build/Release/talib');
+
+var async = require('async');
+
 
 //策略要继承基类
 module.exports = class StrategyMacdClass extends BaseStrategy {
     constructor(){
         super();
-        console.log('constructor');
+        this.decimal = this.decimal.bind(this);
+        this.on_bar = this.on_bar.bind(this);
+        this.mybar = [];
+        console.log('StrategyMacdClass constructor');
     }
 
-    async on_tick(msgObj) {
-        console.log('StrategyMacdClass onTick, task_id:', this.task_id);
-        console.log('StrategyMacdClass onTick, msg:', msgObj);
+    async on_tick(tickObj) {
+        console.log('StrategyMacdClass on_tick, task_id:', this.task_id, tickObj);
+        console.log('StrategyMacdClass on_tick, msg:', tickObj);
+
+        var buyObj = {
+            'code': tickObj['code'],
+            'ktype': tickObj['ktype'],
+            'price': '12.8',
+            'volume': '24',
+        }
+
+        this.to_buy('tick', buyObj);
 
     }
 
     async on_bar(ktype, barObj) {
-        console.log('StrategyMacdClass on_bar, task_id:', this.task_id);
-        console.log('StrategyMacdClass on_bar, msg:', JSON.stringify(barObj));
+        console.log('StrategyMacdClass on_bar, task_id:', this.task_id, JSON.stringify(barObj));
+        //console.log('StrategyMacdClass on_bar, msg:', JSON.stringify(barObj));
 
         var buyObj = {
             'code': barObj['code'],
@@ -35,6 +52,7 @@ module.exports = class StrategyMacdClass extends BaseStrategy {
         //var open, high, low, close = this.mybar.map((obj) => {return obj['open'], obj['high'], obj['low'], obj['close']});
         var close = this.mybar.map((obj) => {return obj['close']});
         console.log(close.length);
+
 
         talib.execute({
             name: "MACD",
@@ -66,9 +84,9 @@ module.exports = class StrategyMacdClass extends BaseStrategy {
             console.log("Results, dif:", dif, 'dea:', dea, 'macd:', macd);
         });
 
-
-
-        this.to_buy(ktype, buyObj);
+        if (macd == 0 && dif > 0 && dea > 0) {
+            this.to_buy(ktype, buyObj);
+        }
 
     }
 
