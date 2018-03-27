@@ -4,7 +4,7 @@ const BaseStrategy = require("../../prototype/strategyBaseClass");
 const talib = require('talib/build/Release/talib');
 
 var async = require('async');
-
+const tt = require("../../test");
 
 //策略要继承基类
 module.exports = class StrategyMacdClass extends BaseStrategy {
@@ -40,7 +40,13 @@ module.exports = class StrategyMacdClass extends BaseStrategy {
         //var open, high, low, close = this.mybar.map((obj) => {return obj['open'], obj['high'], obj['low'], obj['close']});
         var close = this.mybar.map((obj) => {return obj['close']});
         console.log(close.length);
-/*
+
+        await tt.cook();
+        await tt.eat();
+        await tt.wash();
+        console.log('aaaaaa');
+        return;
+
         var result = await this.talibSync({
             name: "MACD",
             startIdx: 0,
@@ -51,7 +57,7 @@ module.exports = class StrategyMacdClass extends BaseStrategy {
             optInSignalPeriod : 9,
         });
 
-        //console.log("result Function err:", err);
+        console.log("result Function:");
         //macd, macdsignal, macdhist
         //dif, dea, macd = ta.MACD
         //MACD(蓝线): 计算12天平均和26天平均的差
@@ -74,18 +80,18 @@ module.exports = class StrategyMacdClass extends BaseStrategy {
         if (macd > 0 && dif > 0 && dea > 0 && this.old_order == 'buy') {
 
             var tradeObj = this.get_trade_obj('sell', barObj['close'], 100);
-            this.to_sell(ktype, tradeObj);
+            await this.to_sell(ktype, tradeObj);
             this.old_order = 'sell';
         }
         else if(macd < 0 && dif < 0 && dea < 0 && this.old_order == 'sell') {
 
             var tradeObj = this.get_trade_obj('buy', barObj['close'], 100);
-            this.to_buy(ktype, tradeObj);
+            await this.to_buy(ktype, tradeObj);
             this.old_order = 'buy';
         }
 
-        */
 
+/*
         talib.execute({
             name: "MACD",
             startIdx: 0,
@@ -127,7 +133,7 @@ module.exports = class StrategyMacdClass extends BaseStrategy {
                 this.old_order = 'buy';
             }
         });
-
+*/
 
     }
 

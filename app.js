@@ -74,3 +74,11 @@ process.on('unhandledRejection', (reason, p) => {
     // application specific logging, throwing an error, or other logic here
 });
 
+const tt = require("./test");
+//tt.test();
+function t1() {
+    tt.cook();
+    tt.eat();
+    tt.wash();
+    console.log ('')
+}

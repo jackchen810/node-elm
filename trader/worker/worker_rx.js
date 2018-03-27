@@ -82,7 +82,7 @@ class WorkerRx{
         else if(head.type == 'backtest_bar'){
             //数组处理， 多个标的的数据以数组方式传递
             for (var i = 0; i < body.length; i++) {
-                WorkerBacktestHandle.backtest_bar(head.action, body[i]);
+                await WorkerBacktestHandle.backtest_bar(head.action, body[i]);
             }
         }
 

@@ -30,7 +30,7 @@ class WorkerBacktestClass {
         //console.log('taskMap.size:', this.taskMap.size);
 
         //收到bar数据， 循环调用对应的策略模块进行处理
-        this.taskMap.forEach(function (value, key, map) {
+        await this.taskMap.forEach(async function (value, key, map) {
             //console.log('taskMap key value:', key, value);
             var taskList = value;
 
@@ -39,12 +39,12 @@ class WorkerBacktestClass {
                 if (barObj['code'] == taskList[i]['trade_symbol'] &&
                     ktype == taskList[i]['trade_ktype']) {
                     console.log('[worker backtest] strategy instance:', taskList[i]['strategy_name']);
-                    taskList[i]['strategy'].set_bar(barObj);  //缓存
-                    taskList[i]['strategy'].set_record_flag(false, false);   //不记录交易日志
-                    taskList[i]['strategy'].on_bar(ktype, barObj);
+                    //taskList[i]['strategy'].set_bar(barObj);  //缓存
+                    await taskList[i]['strategy'].on_bar(ktype, barObj);
                 }
             }
         });
+        console.log('[worker backtest] backtest_bar end');
     }
 
 
@@ -172,6 +172,7 @@ class WorkerBacktestClass {
             var instance = new strategy_class(strategy_name);
             instance.on_init(emitter, task_id, task_type, trade_symbol, trade_ktype);
             instance.set_name(strategy_name);
+            instance.set_record_flag(false, false);   //不记录交易日志
 
 
             // 监听策略发出的事件,
@@ -200,7 +201,7 @@ class WorkerBacktestClass {
         this.taskMap.set(task_id, task_group); // 添加新的key-value
 
         this.task_id = task_id;
-        console.log('[worker backtest] add taskMap', this.taskMap);
+        console.log('[worker backtest] add taskMap', this.taskMap.size);
 
         //console.log('add task ok:', task);
         var msgObj = {ret_code: 0, ret_msg: 'SUCCESS', extra: task_id};

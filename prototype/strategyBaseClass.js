@@ -26,6 +26,7 @@ module.exports = class BaseStrategy {
 
         this.get_trade_obj = this.get_trade_obj.bind(this);
         this.decimal = this.decimal.bind(this);
+        this.talibSync = this.talibSync.bind(this);
     }
 
     //__init  ----不需要用户修改
@@ -172,7 +173,7 @@ module.exports = class BaseStrategy {
     //talib 同步代码
     async talibSync(talibObj) {
         //console.log('talibSync:', talibObj);
-        var pms =  new Promise((resolve, reject) => {
+        var promise =  new Promise((resolve, reject) => {
             talib.execute(talibObj, function (err, result) {
                 //console.log("result Function err:", err);
                 //console.log("Results, result:", result);
@@ -180,8 +181,9 @@ module.exports = class BaseStrategy {
             });
         });
 
-        return pms;
+        console.log('talibSync:------');
+        return promise;
     }
+
+
 }
-
-

@@ -8,9 +8,9 @@ const talib = require('talib/build/Release/talib');
 module.exports = class StrategyMAClass extends BaseStrategy {
     constructor(strategy_name){
         super();
-        this.on_bar = this.on_bar.bind(this);
-        this.decimal = this.decimal.bind(this);
-        this.talibSync = this.talibSync.bind(this);
+        //this.on_bar = this.on_bar.bind(this);
+        //this.decimal = this.decimal.bind(this);
+        //this.talibSync = this.talibSync.bind(this);
         this.mybar = [];
         console.log('StrategyMacdClass constructor');
     }

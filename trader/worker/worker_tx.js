@@ -1,6 +1,4 @@
 const config = require("config-lite");
-const  WorkerClassHandle = require("../core/worker_trade");
-const  WorkerBacktestClassHandle = require("../core/worker_backtest");
 
 /*
 * request 格式：{'head': {'type': this.type, 'action': this.action}, body:message}
