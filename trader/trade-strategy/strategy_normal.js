@@ -4,8 +4,8 @@ const BaseStrategy = require("../../prototype/strategyBaseClass");
 
 //策略要继承基类
 module.exports = class StrategyClass extends BaseStrategy {
-    constructor(){
-        super();
+    constructor(strategy_name){
+        super(strategy_name);
     }
 
     async on_tick(msgObj) {

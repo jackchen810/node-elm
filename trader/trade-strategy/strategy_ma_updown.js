@@ -6,7 +6,7 @@ const talib = require('talib/build/Release/talib');
 
 //策略要继承基类
 module.exports = class StrategyMAClass extends BaseStrategy {
-    constructor(){
+    constructor(strategy_name){
         super();
         this.on_bar = this.on_bar.bind(this);
         this.decimal = this.decimal.bind(this);
@@ -19,14 +19,8 @@ module.exports = class StrategyMAClass extends BaseStrategy {
         console.log('Strategy MA on_tick, task_id:', this.task_id, tickObj);
         //console.log('Strategy MA on_tick, msg:', tickObj);
 
-        var buyObj = {
-            'code': tickObj['code'],
-            'ktype': tickObj['ktype'],
-            'price': '12.8',
-            'volume': '24',
-        }
-
-        this.to_buy('tick', buyObj);
+        var tradeObj = this.get_trade_obj('buy', tickObj['price'], 100);
+        this.to_buy('tick', tradeObj);
 
     }
 
@@ -129,14 +123,8 @@ module.exports = class StrategyMAClass extends BaseStrategy {
 
             console.log("Results, diff:", diff5_10, diff10_20, diff20_30, diff30_60);
 
-            var buyObj = {
-                'code': barObj['code'],
-                'ktype': ktype,
-                'price': ma60,
-                'volume': barObj['volume'],
-            }
-
-            self.to_buy(ktype, buyObj);
+            var tradeObj = this.get_trade_obj('buy', barObj['price'], 100);
+            self.to_buy(ktype, tradeObj);
         });
     }
 

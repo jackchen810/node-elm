@@ -13,7 +13,7 @@ const db = require('../../mongodb/db.js');
 * */
 
 
-class GatewayRxTx{
+class GatewayTx{
     constructor(){
         //记录任务id
         this.type = null;
@@ -21,15 +21,18 @@ class GatewayRxTx{
         this.head = null;
         this.send_function = null;
 
-        //bind
-        this.send = this.send.bind(this);
-        this.onMessage = this.onMessage.bind(this);
     }
 
     //onInit  ----不需要用户修改
-    async onInit(send_function){
-        this.send_function = send_function;
+    async init(head){
+        this.head = head;
     }
+
+    //on  ----不需要用户修改
+    async on(event, callback){
+        this.send_function = callback;
+    }
+
 
     //onInit  ----不需要用户修改
     async send(message, type, action, dest){
@@ -57,47 +60,9 @@ class GatewayRxTx{
         this.send_function(res);
     }
 
-
-    async onMessage(msg){
-
-        if (typeof msg != 'object'){
-            console.log('msg is error');
-            this.send({ret_code: 1002, ret_msg: 'FAILED', extra:'type error'});
-            return;
-        }
-
-        console.log('[gateway entry] recv request:', JSON.stringify(msg));
-        //tradeLog('system', '1', msg);
-
-        //type, action, data
-        var head = msg['head'];
-        var body = msg['body'];
-        this.head = head;
-
-        //接收主进程发送过来的消息
-        if(head.type == 'task') {
-            //var response = new GatewayRxTx(head.type, head.action, head.source);
-            if (head.action == 'add') {
-                GatewayTradeHandle.addTask(body, this);
-            }
-            else if (head.action == 'del') {
-                GatewayTradeHandle.delTask(body, this);
-            }
-        }
-        else if(head.type == 'backtest'){
-            //var response = new GatewayRxTx(head.type, head.action, head.source);
-            if (head.action == 'add') {
-                GatewayBacktestHandle.backtest_task_add(body, this);
-            }
-            else if(head.action == 'del') {
-                GatewayBacktestHandle.backtest_task_del(body, this);
-            }
-        }
-    }
-
 }
 
 
-module.exports = new GatewayRxTx();
+module.exports = new GatewayTx();
 
 console.log('create gateway process, pid:', process.pid);

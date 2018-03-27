@@ -13,8 +13,8 @@ module.exports = class BaseRiskctrl {
         this.on_sell = this.on_sell.bind(this);
     }
 
-    //onInit  ----不需要用户修改
-    async onInit(emitter, task_id, symbol, ktype){
+    //on_init  ----不需要用户修改
+    async on_init(emitter, task_id, symbol, ktype){
         this.task_id = task_id;
         this.emitter = emitter;
         this.symbol = symbol;

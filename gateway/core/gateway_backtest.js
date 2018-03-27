@@ -6,20 +6,8 @@ const DB = require('../../models/models');
 
 class GatewayBacktestClass {
     constructor(){
-
         this.taskMap = new Map(); // 空Map
     }
-
-
-
-    /*
-    *            'task_id': task_id,
-                'trade_symbol': trade_symbol,
-                'strategy_list': strategy_list,   //策略名称
-                'riskctrl_name': riskctrl_name,   //风控名称
-                'gateway_name': gateway_name,   //交易网关名称
-    *
-    * */
 
     async backtest_task_add(request, response) {
         console.log('[gateway backtest] add task');

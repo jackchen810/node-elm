@@ -8,10 +8,12 @@ const WorkerTx = require('../worker/worker_tx.js');
 class WorkerBacktestClass {
     constructor(){
         this.task_id = '';
+        this.barObj = {'date': 'default'};
         this.taskMap = new Map(); // 空Map
 
         //this.on_tick = this.on_tick.bind(this);
         //this.on_bar = this.on_bar.bind(this);
+        this.backtest_bar = this.backtest_bar.bind(this);
         this.on_backtest_buy = this.on_backtest_buy.bind(this);
         this.on_backtest_buy_point = this.on_backtest_buy_point.bind(this);
         this.on_backtest_sell = this.on_backtest_sell.bind(this);
@@ -23,7 +25,7 @@ class WorkerBacktestClass {
 
     //接收到外部bar事件，进行调度处理
     async backtest_bar(ktype, barObj){
-        console.log('[worker backtest] on_bar', ktype, barObj['code'], barObj['date']);
+        console.log('[worker backtest] backtest_bar', ktype, barObj['code'], barObj['date']);
         //emitter.emit(msgObj[''], msgObj['code'], msgObj['ktype'], msgObj);
         //console.log('taskMap.size:', this.taskMap.size);
 
@@ -37,6 +39,8 @@ class WorkerBacktestClass {
                 if (barObj['code'] == taskList[i]['trade_symbol'] &&
                     ktype == taskList[i]['trade_ktype']) {
                     console.log('[worker backtest] strategy instance:', taskList[i]['strategy_name']);
+                    taskList[i]['strategy'].set_bar(barObj);  //缓存
+                    taskList[i]['strategy'].set_record_flag(false, false);   //不记录交易日志
                     taskList[i]['strategy'].on_bar(ktype, barObj);
                 }
             }
@@ -47,34 +51,42 @@ class WorkerBacktestClass {
     //这个是 on_buy 事件的回调函数
     async on_backtest_buy(ktype, msgObj){
         console.log('[worker backtest], on_backtest_buy:', msgObj);
+        var taskObj = this.taskMap.get(msgObj['task_id']);
 
         // 添加买卖点到回测结果， 发送消息
-        var msgObj = {
-            //'task_id': msgObj['task_id'],
-            //'task_type': msgObj['task_type'],
-            'trade_symbol': msgObj['code'],
-            'trade_ktype': ktype,
-            'date': msgObj['date'],
-            //'strategy_name': msgObj['strategy_name'],
+        var recordObj = {
+            'task_id': msgObj['task_id'],
+            'trade_symbol': msgObj['trade_symbol'],
+            'symbol_name': taskObj['symbol_name'],
+            'trade_ktype': msgObj['trade_ktype'],
+            'order_position': msgObj['order_position'],
+            'price': msgObj['price'],
+            'amount': msgObj['amount'],
+            'order_point_at': msgObj['bar_date'],
+            'strategy_name': msgObj['strategy_name'],
         }
 
-        console.log('WorkerTx', WorkerTx);
-        WorkerTx.send(msgObj, 'backtest_record', 'on_backtest_buy', 'website');
+        //console.log('WorkerTx', WorkerTx);
+        WorkerTx.send(recordObj, 'backtest_record', 'on_backtest_buy', 'website');
         return;
     }
 
     //这个是 on_buy 事件的回调函数
     async on_backtest_buy_point(ktype, msgObj){
         console.log('[worker backtest], on_backtest_buy_point:', msgObj);
+        var taskObj = this.taskMap.get(msgObj['task_id']);
 
         // 添加买卖点到回测结果， 发送消息
-        var msgObj = {
-            //'task_id': msgObj['task_id'],
-            //'task_type': msgObj['task_type'],
-            'trade_symbol': msgObj['code'],
-            'trade_ktype': ktype,
-            'date': msgObj['date'],
-            //'strategy_name': msgObj['strategy_name'],
+        var recordObj = {
+            'task_id': msgObj['task_id'],
+            'trade_symbol': msgObj['trade_symbol'],
+            'symbol_name': taskObj['symbol_name'],
+            'trade_ktype': msgObj['trade_ktype'],
+            'order_position': msgObj['order_position'],
+            'price': msgObj['price'],
+            'amount': msgObj['amount'],
+            'order_point_at': msgObj['bar_date'],
+            'strategy_name': msgObj['strategy_name'],
         }
 
         WorkerTx.send(msgObj, 'backtest_record', 'on_backtest_buy_point', 'website');
@@ -84,18 +96,23 @@ class WorkerBacktestClass {
     //这个是 on_sell 事件的回调函数
     async on_backtest_sell(ktype, msgObj){
         console.log('[worker backtest], on_backtest_sell:', msgObj);
+        var taskObj = this.taskMap.get(msgObj['task_id']);
 
         // 添加买卖点到回测结果， 发送消息
-        var msgObj = {
-            //'task_id': msgObj['task_id'],
-            //'task_type': msgObj['task_type'],
-            'trade_symbol': msgObj['code'],
-            'trade_ktype': ktype,
-            'date': msgObj['date'],
-           //'strategy_name': msgObj['strategy_name'],
+        var recordObj = {
+            'task_id': msgObj['task_id'],
+            'trade_symbol': msgObj['trade_symbol'],
+            'symbol_name': taskObj['symbol_name'],
+            'trade_ktype': msgObj['trade_ktype'],
+            'order_position': msgObj['order_position'],
+            'price': msgObj['price'],
+            'amount': msgObj['amount'],
+            'order_point_at': msgObj['bar_date'],
+            'strategy_name': msgObj['strategy_name'],
         }
 
-        WorkerTx.send(msgObj, 'backtest_record', 'on_backtest_sell', 'website');
+        WorkerTx.send(recordObj, 'backtest_record', 'on_backtest_sell', 'website');
+        var taskObj = this.taskMap.get(msgObj['task_id']);
         return;
     }
 
@@ -103,18 +120,22 @@ class WorkerBacktestClass {
     //这个是 on_sell 事件的回调函数
     async on_backtest_sell_point(ktype, msgObj){
         console.log('[worker backtest], on_backtest_sell_point:', msgObj);
+        var taskObj = this.taskMap.get(msgObj['task_id']);
 
         // 添加买卖点到回测结果， 发送消息
-        var msgObj = {
-            //'task_id': msgObj['task_id'],
-            //'task_type': msgObj['task_type'],
-            'trade_symbol': msgObj['code'],
-            'trade_ktype': ktype,
-            'date': msgObj['date'],
-            //'strategy_name': msgObj['strategy_name'],
+        var recordObj = {
+            'task_id': msgObj['task_id'],
+            'trade_symbol': msgObj['trade_symbol'],
+            'symbol_name': taskObj['symbol_name'],
+            'trade_ktype': msgObj['trade_ktype'],
+            'order_position': msgObj['order_position'],
+            'price': msgObj['price'],
+            'amount': msgObj['amount'],
+            'order_point_at': msgObj['bar_date'],
+            'strategy_name': msgObj['strategy_name'],
         }
 
-        WorkerTx.send(msgObj, 'backtest_record', 'on_backtest_sell_point', 'website');
+        WorkerTx.send(recordObj, 'backtest_record', 'on_backtest_sell_point', 'website');
         return;
     }
 
@@ -134,7 +155,7 @@ class WorkerBacktestClass {
             var task_type = request[i]['task_type'];
             var trade_symbol = request[i]['trade_symbol'];
             var trade_ktype = request[i]['trade_ktype'];
-
+            var symbol_name = request[i]['symbol_name'];
             var strategy_name = request[i]['strategy_name'];
 
 
@@ -148,11 +169,12 @@ class WorkerBacktestClass {
 
             // 创建策略实例
             var strategy_class = require(strategy_fullname);
-            var instance = new strategy_class();
-            instance.onInit(emitter, task_id, task_type, trade_symbol, trade_ktype);
+            var instance = new strategy_class(strategy_name);
+            instance.on_init(emitter, task_id, task_type, trade_symbol, trade_ktype);
+            instance.set_name(strategy_name);
 
 
-            // 监听策略发出的事件
+            // 监听策略发出的事件,
             console.log('[worker backtest] lister:');
             emitter.on('on_buy', this.on_backtest_buy);
             emitter.on('on_buy_point', this.on_backtest_buy_point);
@@ -164,6 +186,7 @@ class WorkerBacktestClass {
                 'task_id': task_id,
                 'task_type': task_type,
                 'trade_symbol': trade_symbol,
+                'symbol_name': symbol_name,
                 'trade_ktype': trade_ktype,
                 'emitter': emitter,
                 'strategy_name': strategy_name,
@@ -177,7 +200,7 @@ class WorkerBacktestClass {
         this.taskMap.set(task_id, task_group); // 添加新的key-value
 
         this.task_id = task_id;
-        console.log('[worker backtest] add taskMap', this.taskMap.size);
+        console.log('[worker backtest] add taskMap', this.taskMap);
 
         //console.log('add task ok:', task);
         var msgObj = {ret_code: 0, ret_msg: 'SUCCESS', extra: task_id};

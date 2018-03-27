@@ -14,11 +14,10 @@ website.on('message', process_message_reactor);
 console.log('create website_entry');
 
 //创建一个工作进程, 这个是主进程
-const GatewayRxTx = require("./gateway/gateway/gateway_rxtx");
+const GatewayTx = require("./gateway/gateway/gateway_tx");
 //初始化 gateway的发送函数；
-GatewayRxTx.onInit(process_message_reactor);
-const  GatewayHandle = require("./gateway/core/gateway_market");
-//GatewayRxTx.onInit(process_message_reactor);
+GatewayTx.on('message', process_message_reactor);
+const GatewayRx = require("./gateway/gateway/gateway_rx");
 
 /*
 //初始化phandle
@@ -61,7 +60,7 @@ function process_message_reactor(message) {
         }
         else if (dest_list[i] == 'gateway') {
             //父进程，直接调用
-            GatewayRxTx.onMessage(message);
+            GatewayRx.onMessage(message);
         }
     }
 

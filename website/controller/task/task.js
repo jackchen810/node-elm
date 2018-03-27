@@ -101,6 +101,7 @@ class TaskHandle {
                 //输入
                 'trade_symbol': strategy_list[i]['stock_symbol'],   ///index=0的使用交易symbol
                 'trade_ktype': strategy_list[i]['stock_ktype'],   ///index=0的使用交易symbol
+                'symbol_name': strategy_list[i]['stock_name'],   ///index=0的使用交易symbol
 
 
                 //过程

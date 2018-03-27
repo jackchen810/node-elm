@@ -100,6 +100,7 @@ class BacktestHandle {
                 //输入
                 'trade_symbol': strategy_list[i]['stock_symbol'],   ///index=0的使用交易symbol
                 'trade_ktype': strategy_list[i]['stock_ktype'],   ///index=0的使用交易symbol
+                'symbol_name': strategy_list[i]['stock_name'],   ///index=0的使用交易symbol
 
 
                 //过程
@@ -237,6 +238,45 @@ class BacktestHandle {
                 res.send(response);
             }
         }, 3000);
+    }
+
+
+    async result_list(req, res, next){
+        console.log('[website] backtest result list');
+        //console.log(req.body);
+
+        //获取表单数据，josn
+        var page_size = req.body['page_size'];
+        var current_page = req.body['current_page'];
+        var sort = req.body['sort'];
+        var filter = req.body['filter'];
+
+        // 如果没有定义排序规则，添加默认排序
+        if(typeof(sort)==="undefined"){
+            sort = {"sort_time":-1};
+        }
+
+        // 如果没有定义排序规则，添加默认排序
+        if(typeof(filter)==="undefined"){
+            filter = {};
+        }
+        console.log(filter);
+        //参数有效性检查
+        if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
+            var query = await DB.BacktestResultTable.find(filter).sort(sort);
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
+            //console.log(query);
+        }
+        else if (page_size > 0 && current_page > 0) {
+            var skipnum = (current_page - 1) * page_size;   //跳过数
+            var query = await DB.BacktestResultTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
+        }
+        else{
+            res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
+        }
+
+        console.log('[website] backtest result list end');
     }
 
 

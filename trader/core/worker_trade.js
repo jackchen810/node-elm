@@ -67,7 +67,6 @@ class WorkerClass {
     //接收到外部bar事件，进行调度处理
     async on_bar(ktype, barObj){
         console.log('[worker] on_bar', ktype, barObj['code'], barObj['date']);
-        //emitter.emit(msgObj[''], msgObj['code'], msgObj['ktype'], msgObj);
         //console.log('taskMap.size:', this.taskMap.size);
 
         //收到bar数据， 循环调用对应的策略模块进行处理
@@ -103,6 +102,7 @@ class WorkerClass {
             var task_type = request[i]['task_type'];
             var trade_symbol = request[i]['trade_symbol'];
             var trade_ktype = request[i]['trade_ktype'];
+            var symbol_name = request[i]['symbol_name'];
 
             var strategy_name = request[i]['strategy_name'];
             var riskctrl_name = request[i]['riskctrl_name'];
@@ -119,8 +119,8 @@ class WorkerClass {
 
             // 创建实例
             var strategy_class = require(strategy_fullname);
-            var instance = new strategy_class();
-            instance.onInit(emitter, task_id, task_type, trade_symbol, trade_ktype);
+            var instance = new strategy_class(strategy_name);
+            instance.on_init(emitter, task_id, task_type, trade_symbol, trade_ktype);
 
             ///路径有效性检查 riskctrl
             if (task_type == 'trade'){
@@ -136,7 +136,7 @@ class WorkerClass {
                 console.log('[worker] riskctrl_fullname:', riskctrl_fullname);
                 var riskctrl_class = require(riskctrl_fullname);
                 var riskctrl = new riskctrl_class();
-                riskctrl.onInit(emitter, task_id, trade_symbol, trade_ktype);
+                riskctrl.on_init(emitter, task_id, trade_symbol, trade_ktype);
 
 
 
@@ -152,7 +152,7 @@ class WorkerClass {
                 console.log('[worker] gateway_fullname:', gateway_fullname);
                 //只允许单实例运行
                 var gateway = require(gateway_fullname);
-                gateway.onInit(emitter, task_id, trade_symbol, trade_ktype);
+                gateway.on_init(emitter, task_id, trade_symbol, trade_ktype);
             }
 
             // 数组添加任务
@@ -160,6 +160,7 @@ class WorkerClass {
                 'task_id': task_id,
                 'task_type': task_type,
                 'trade_symbol': trade_symbol,
+                'symbol_name': symbol_name,
                 'trade_ktype': trade_ktype,
                 'emitter': emitter,
                 'strategy': instance,
@@ -180,7 +181,7 @@ class WorkerClass {
         //console.log('add task ok:', task);
         var msgObj = {ret_code: 0, ret_msg: 'SUCCESS', extra: task_id};
         response.send(msgObj);
-        //response.send(msgObj, 'log', 'log', 'website');
+        //response.send(msgObj, 'log_record', 'log', 'website');
         console.log('[worker] add task ok');
     }
 
@@ -194,7 +195,7 @@ class WorkerClass {
         this.taskMap.delete(task_id);
         var msgObj = {ret_code: 0, ret_msg: 'SUCCESS', extra: task_id};
         response.send(msgObj);
-        //response.send(msgObj, 'log', 'log', 'website');
+        //response.send(msgObj, 'log_record', 'log', 'website');
     }
 
 

@@ -2,7 +2,7 @@
 const config = require("config-lite");
 const fs = require("fs");
 const path = require("path");
-//const response = require("./gateway_rxtx");
+const  GatewayTxHandle = require("../gateway/gateway_tx");
 
 class GatewayClass {
     constructor(){
@@ -11,17 +11,7 @@ class GatewayClass {
     }
 
 
-
-    /*
-    *            'task_id': task_id,
-                'trade_symbol': trade_symbol,
-                'strategy_list': strategy_list,   //策略名称
-                'riskctrl_name': riskctrl_name,   //风控名称
-                'gateway_name': gateway_name,   //交易网关名称
-    *
-    * */
-
-    async addTask(request, response) {
+    async task_add(request, response) {
         console.log('[gateway] add task');
 
         var task_group = [];
@@ -92,7 +82,7 @@ class GatewayClass {
     }
 
 
-    async delTask(request, response){
+    async task_del(request, response){
         console.log('[gateway] del task');
 
         // 启动任务，行情

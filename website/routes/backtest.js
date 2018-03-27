@@ -24,4 +24,7 @@ router.all('/start', BacktestHandle.start);
 //停止任务
 router.all('/stop', BacktestHandle.stop);
 
+//停止任务
+router.all('/result', BacktestHandle.result_list);
+
 module.exports = router

@@ -9,12 +9,18 @@ WebsiteRxTx.addLoopListener('backtest_record', function(action, body) {
     var mytime = new Date();
 
     var updatestr = {
-        'trade_symbol': body['code'],
-        'trade_ktype': body['ktype'],
+        'task_id': body['task_id'],
+        'trade_symbol': body['trade_symbol'],
+        'symbol_name': body['symbol_name'],
+        'trade_ktype': body['trade_ktype'],
+        'order_position': body['order_position'],
         'order_type': action,
-        //'symbol_name': body['comment'],
-        'order_point_at': dtime(mytime).format('YYYY-MM-DD HH:mm:ss'),
-        'order_point_time': mytime.getTime(),
+        'order_point_at': body['order_point_at'],
+        'strategy_name': body['strategy_name'],
+
+        'trade_price': body['price'],
+        'trade_amount': body['amount'],
+
         'create_at':dtime(mytime).format('YYYY-MM-DD HH:mm:ss'),
         'sort_time':mytime.getTime()
     };

@@ -16,13 +16,13 @@ class WorkerTx{
 
     }
 
-    //onInit  ----不需要用户修改
+    //on_init  ----不需要用户修改
     async init(head){
         this.head = head;
     }
 
 
-    //onInit  ----不需要用户修改
+    //on_init  ----不需要用户修改
     async send(message, type, action, dest){
         //参数为1，使用默认参数
         if (arguments.length == 1){

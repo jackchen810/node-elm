@@ -92,13 +92,13 @@ module.exports = class BaseMarket {
         throw new Error('timer_handle_min60 需要用户实现');
     }
 
-    //onInit  ----不需要用户修改
-    async onInit(emitter, task_id, symbol, ktype){
+    //on_init  ----不需要用户修改
+    async on_init(emitter, task_id, symbol, ktype){
         this.task_id = task_id;
         this.emitter = emitter;
         this.symbol = symbol;
         this.ktype = ktype;
-        //console.log('BaseStrategyComponent onInit');
+        //console.log('BaseStrategyComponent on_init');
         return;
     }
 

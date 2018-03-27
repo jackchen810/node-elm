@@ -25,7 +25,7 @@ class WorkerRx{
     }
 
 
-    //onInit  ----数据接收
+    //on_init  ----数据接收
     async onMessage(msg) {
         if (typeof msg != 'object'){
             console.log('msg is error');

@@ -3,7 +3,7 @@ const DB = require('../../models/models.js');
 const WebsiteRxTx = require('../website_rxtx.js');
 const dtime = require('time-formater');
 
-WebsiteRxTx.addLoopListener('log', function(action, body) {
+WebsiteRxTx.addLoopListener('log_record', function(action, body) {
     console.log('website->log, body', body);
     var mytime = new Date();
 
