@@ -1,7 +1,7 @@
 
 
 const TaskTable = require('../models/task/task.js');
-const OrderPointTable = require('../models/task/order_point.js');
+const TradePointTable = require('./task/trade_point.js');
 const StrategyTable = require('../models/strategy/strategy.js');
 const RiskctrlTable = require('../models/riskctrl/riskctrl.js');
 const LogTable = require('../models/log/log.js');
@@ -22,7 +22,7 @@ const AdminModel = require('../models/admin/admin');
 function DB() {
     //this.RomTable = RomTable;
     this.TaskTable = TaskTable;
-    this.OrderPointTable = OrderPointTable;
+    this.TradePointTable = TradePointTable;
     //this.SysinfoTable = SysinfoTable;
     this.StrategyTable = StrategyTable;
     this.RiskctrlTable = RiskctrlTable;

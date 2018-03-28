@@ -26,25 +26,44 @@ class WorkerBacktestClass {
     //接收到外部bar事件，进行调度处理
     async backtest_bar(ktype, barObj){
         console.log('[worker backtest] backtest_bar', ktype, barObj['code'], barObj['date']);
-        //emitter.emit(msgObj[''], msgObj['code'], msgObj['ktype'], msgObj);
         //console.log('taskMap.size:', this.taskMap.size);
 
         //收到bar数据， 循环调用对应的策略模块进行处理
-        await this.taskMap.forEach(async function (value, key, map) {
-            //console.log('taskMap key value:', key, value);
-            var taskList = value;
+        for (var [key, taskList] of this.taskMap) { // 遍历Map
 
             //查找匹配的标的，发送bar数据
             for (var i = 0; i < taskList.length; i++) {
                 if (barObj['code'] == taskList[i]['trade_symbol'] &&
                     ktype == taskList[i]['trade_ktype']) {
                     console.log('[worker backtest] strategy instance:', taskList[i]['strategy_name']);
-                    //taskList[i]['strategy'].set_bar(barObj);  //缓存
+                    await taskList[i]['strategy'].set_bar(barObj);  //缓存
                     await taskList[i]['strategy'].on_bar(ktype, barObj);
                 }
             }
-        });
+        }
         console.log('[worker backtest] backtest_bar end');
+    }
+
+
+
+    //接收到外部bar事件，进行调度处理
+    async backtest_finish(ktype, barObj){
+        console.log('[worker backtest] backtest_finish', ktype, barObj['code'], barObj['date']);
+        //console.log('taskMap.size:', this.taskMap.size);
+
+        //收到bar数据， 循环调用对应的策略模块进行处理
+        for (var [key, taskList] of this.taskMap) { // 遍历Map
+
+            //查找匹配的标的，发送bar数据
+            for (var i = 0; i < taskList.length; i++) {
+                if (barObj['code'] == taskList[i]['trade_symbol'] &&
+                    ktype == taskList[i]['trade_ktype']) {
+                    console.log('[worker backtest] finish:', taskList[i]['task_id']);
+                    WorkerTx.send({task_id : taskList[i]['task_id']}, 'backtest_record', 'finish', 'website');
+                }
+            }
+        }
+        console.log('[worker backtest] backtest_finish end');
     }
 
 
@@ -172,15 +191,15 @@ class WorkerBacktestClass {
             var instance = new strategy_class(strategy_name);
             instance.on_init(emitter, task_id, task_type, trade_symbol, trade_ktype);
             instance.set_name(strategy_name);
-            instance.set_record_flag(false, false);   //不记录交易日志
+            instance.set_record_flag(true, true);   //不记录交易日志
 
 
             // 监听策略发出的事件,
-            console.log('[worker backtest] lister:');
+            console.log('[worker backtest] event lister:');
             emitter.on('on_buy', this.on_backtest_buy);
             emitter.on('on_buy_point', this.on_backtest_buy_point);
-            emitter.on('on_buy', this.on_backtest_sell);
-            emitter.on('on_buy_point', this.on_backtest_sell_point);
+            emitter.on('on_sell', this.on_backtest_sell);
+            emitter.on('on_sell_point', this.on_backtest_sell_point);
 
             // task map添加任务
             var task = {

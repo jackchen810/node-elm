@@ -65,9 +65,8 @@ class WorkerRx{
         }
         else if (head.type == 'on_bar_sync'){
             //数组处理， 多个标的的数据以数组方式传递
-            for (var i = 0; i < body.length; i++) {
-                WorkerTradeHandle.on_bar_sync(head.action, body[i]);
-            }
+            WorkerTradeHandle.on_bar_sync(head.action, body);
+
             //var response = new WorkerRx(head.type, head.action);
             //WorkerTradeHandle.dataSync(msg['body'], msg['data'], response);
         }
@@ -82,8 +81,12 @@ class WorkerRx{
         else if(head.type == 'backtest_bar'){
             //数组处理， 多个标的的数据以数组方式传递
             for (var i = 0; i < body.length; i++) {
+                console.log(i);
                 await WorkerBacktestHandle.backtest_bar(head.action, body[i]);
             }
+
+            // finish
+            await WorkerBacktestHandle.backtest_finish(head.action, body[0])
         }
 
     }

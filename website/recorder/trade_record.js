@@ -26,5 +26,5 @@ WebsiteRxTx.addLoopListener('trade_record', function (action, body) {
         'sort_time':mytime.getTime()
     };
 
-    DB.OrderPointTable.create(updatestr);
+    DB.TradePointTable.create(updatestr);
 });

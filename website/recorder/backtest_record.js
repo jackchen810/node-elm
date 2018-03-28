@@ -6,6 +6,16 @@ const dtime = require('time-formater');
 
 WebsiteRxTx.addLoopListener('backtest_record', function(action, body) {
     console.log('website->backtest_record, body', body);
+
+    if (action == 'finish'){
+
+        var wherestr = {'task_id': body['task_id']};
+        var updatestr = {'task_status': 'finish'};
+        DB.BacktestTaskTable.update(wherestr, updatestr).exec();
+        return;
+    }
+
+
     var mytime = new Date();
 
     var updatestr = {

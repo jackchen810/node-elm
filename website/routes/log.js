@@ -12,6 +12,7 @@ console.log("enter route of log");
 
 
 //获取任务列表
-router.all('/list', LogHandle.list);
+router.all('/list', LogHandle.log_list);
+router.all('/list/length', LogHandle.log_list_length);
 
 module.exports = router

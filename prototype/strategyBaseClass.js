@@ -95,26 +95,9 @@ module.exports = class BaseStrategy {
         return;
     }
 
-    //get_trade_obj  获取交易对象
-    //order_position:'sell','buy'
-    get_trade_obj(order_position, price, amount){
-        var trade_obj = {
-            'task_id': this.task_id,
-            'trade_symbol': this.symbol,
-            'trade_ktype': this.ktype,
-            'strategy_name': this.strategy_name,
-            'order_position': order_position,
-            'price': price,
-            'amount': amount,
-            'order_point_at': dtime().format('YYYY-MM-DD HH:mm:ss'),   //时间
-            'bar_date': this.barObj['date'],   //时间
-        }
-        return trade_obj;
-    }
-
     //to_buy  发送买单
     async to_buy(ktype, msgObj){
-        console.log('to_buy', this.task_type);
+        //console.log('to_buy', this.task_type);
         //1. 发送event:on_buy 事件， riskctrl使用
         if (this.task_type == 'trade') {
             var event = 'on_buy';
@@ -140,7 +123,7 @@ module.exports = class BaseStrategy {
 
     //to_sell  发送卖单
     async to_sell(ktype, msgObj){
-        console.log('to_sell');
+        //console.log('to_sell');
         //1. 发送event:on_sell 事件， riskctrl使用
         if (this.task_type == 'trade') {
             var event = 'on_sell';
@@ -164,6 +147,23 @@ module.exports = class BaseStrategy {
         return;
     }
 
+    //get_trade_obj  获取交易对象
+    //order_position:'sell','buy'
+    get_trade_obj(order_position, price, amount){
+        var trade_obj = {
+            'task_id': this.task_id,
+            'trade_symbol': this.symbol,
+            'trade_ktype': this.ktype,
+            'strategy_name': this.strategy_name,
+            'order_position': order_position,
+            'price': price,
+            'amount': amount,
+            'order_point_at': dtime().format('YYYY-MM-DD HH:mm:ss'),   //时间
+            'bar_date': this.barObj['date'],   //时间
+        }
+        return trade_obj;
+    }
+
     //num表示要四舍五入的数,v表示要保留的小数位数。
     decimal(num,v){
         var vv = Math.pow(10,v);
@@ -180,8 +180,6 @@ module.exports = class BaseStrategy {
                 resolve(result);
             });
         });
-
-        console.log('talibSync:------');
         return promise;
     }
 

@@ -10,6 +10,8 @@ const market_router = require('./market_gateway.js');
 const log_router = require('./log.js');
 const history_router = require('./history.js');
 const backtest_router = require('./backtest.js');
+const trade_point_router = require('./trade_point.js');
+const download_plan_router = require('./download_plan.js');
 
 
 
@@ -41,7 +43,11 @@ function web_router(app) {
     //回测接口管理功能
     app.use('/backtest', backtest_router);
 
+    //交易点管理
+    app.use('/trade/point', trade_point_router);
 
+    //下载计划路由
+    app.use('/download/plan', download_plan_router);
 }
 
 

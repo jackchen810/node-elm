@@ -187,10 +187,16 @@ class BacktestHandle {
             return;
         }
 
-        //更新到设备数据库， 设备上线，下线
+        //更新到设备数据库， 已经完成的任务不重新开始
+        //var wherestr = {'task_id': task_id, 'task_status': 'stop'};
         var wherestr = {'task_id': task_id};
         var queryList = await DB.BacktestTaskTable.find(wherestr).exec();
+        if (queryList.length == 0){
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: task_id});
+            return;
+        }
 
+        await DB.BacktestResultTable.remove(wherestr).exec();
         WebsiteRxTx.send(queryList, 'backtest', 'add', ['worker', 'gateway']);
         WebsiteRxTx.addOnceListener(task_id, async function(type, action, response) {
             //console.log('start task, response', response);
@@ -221,8 +227,13 @@ class BacktestHandle {
         }
 
         //更新到设备数据库， stop
+        //var wherestr = {'task_id': task_id, 'task_status': 'running'};
         var wherestr = {'task_id': task_id};
         var queryList = await DB.BacktestTaskTable.find(wherestr).exec();
+        if (queryList.length == 0){
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: task_id});
+            return;
+        }
 
         WebsiteRxTx.send(queryList, 'backtest', 'del', ['worker', 'gateway']);
         WebsiteRxTx.addOnceListener(task_id, async function(type, action, response) {
@@ -253,7 +264,7 @@ class BacktestHandle {
 
         // 如果没有定义排序规则，添加默认排序
         if(typeof(sort)==="undefined"){
-            sort = {"sort_time":-1};
+            sort = {"sort_time":1};
         }
 
         // 如果没有定义排序规则，添加默认排序
@@ -278,6 +289,32 @@ class BacktestHandle {
 
         console.log('[website] backtest result list end');
     }
+
+
+    async result_list_length(req, res, next){
+        console.log('[website] result_list_length');
+
+        var query = await DB.BacktestResultTable.count().exec();
+        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
+
+        console.log('[website] result_list_length end');
+    }
+
+    async task_status(req, res, next){
+        console.log('[website] backtest task_status');
+        //console.log(req.body);
+
+        //获取表单数据，josn
+        var task_id = req.body['task_id'];
+
+        //更新到设备数据库， stop
+        //var wherestr = {'task_id': task_id, 'task_status': 'running'};
+        var wherestr = {'task_id': task_id};
+        var queryList = await DB.BacktestTaskTable.find(wherestr).exec();
+        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: queryList});
+        console.log('[website] backtest task_status end');
+    }
+
 
 
 }

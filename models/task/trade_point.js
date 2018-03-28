@@ -1,7 +1,7 @@
 'use strict';
 
 const mongoose = require('mongoose');
-const orderPointSchema = new mongoose.Schema({
+const tradePointSchema = new mongoose.Schema({
     task_id: String,  //任务id
     trade_symbol: String,  //股票代码
     trade_ktype: String,  //股票ktype
@@ -25,5 +25,5 @@ const orderPointSchema = new mongoose.Schema({
 
 
 
-const OrderPointTable = mongoose.model('OrderPointTable', orderPointSchema);
-module.exports = OrderPointTable;
+const TradePointTable = mongoose.model('TradePointTable', tradePointSchema);
+module.exports = TradePointTable;

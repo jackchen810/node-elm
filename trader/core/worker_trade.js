@@ -59,8 +59,8 @@ class WorkerClass {
 
 
 
-    async on_bar_sync(ktype, barObj){
-        console.log('[worker] on_bar_sync', ktype, barObj['code'], barObj['date']);
+    async on_bar_sync(ktype, barObjList){
+        console.log('[worker] on_bar_sync', ktype, barObjList.length);
 
     }
 
@@ -70,19 +70,17 @@ class WorkerClass {
         //console.log('taskMap.size:', this.taskMap.size);
 
         //收到bar数据， 循环调用对应的策略模块进行处理
-        this.taskMap.forEach(function (value, key, map) {
-            //console.log('taskMap key value:', key, value);
-            var taskList = value;
+        for (var [key, taskList] of this.taskMap) { // 遍历Map
 
             //查找匹配的标的，发送bar数据
             for (var i = 0; i < taskList.length; i++) {
                 if (barObj['code'] == taskList[i]['trade_symbol'] &&
                     ktype == taskList[i]['trade_ktype']) {
                     console.log('strategy instance:', taskList[i]['strategy']);
-                    taskList[i]['strategy'].on_bar(ktype, barObj);
+                    await taskList[i]['strategy'].on_bar(ktype, barObj);
                 }
             }
-        });
+        }
     }
 
 

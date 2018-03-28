@@ -1,17 +1,16 @@
 'use strict';
 const DB = require('../../../models/models.js');
-const config = require('config-lite');
-const fs = require("fs");
-const path = require('path');
 
-
-class LogHandle {
+class TradePointHandle {
     constructor(){
 
     }
-    async log_list(req, res, next){
-        console.log('task log list');
 
+
+
+    async trade_point_list(req, res, next){
+        console.log('[website] trade_point_list');
+        //console.log(req.body);
 
         //获取表单数据，josn
         var page_size = req.body['page_size'];
@@ -21,46 +20,44 @@ class LogHandle {
 
         // 如果没有定义排序规则，添加默认排序
         if(typeof(sort)==="undefined"){
-            console.log('sort undefined');
-            sort = {"sort_time":-1};
+            sort = {"sort_time":1};
         }
 
         // 如果没有定义排序规则，添加默认排序
         if(typeof(filter)==="undefined"){
-            console.log('filter undefined');
             filter = {};
         }
 
         //参数有效性检查
         if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
-            var query = await DB.LogTable.find(filter).sort(sort);
+            var query = await DB.TradePointTable.find(filter).sort(sort);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
+            //console.log(query);
         }
         else if (page_size > 0 && current_page > 0) {
-            //var ret = await DB.RomTable.findByPage(filter, page_size, current_page, sort);
             var skipnum = (current_page - 1) * page_size;   //跳过数
-            var query = await DB.LogTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
+            var query = await DB.TradePointTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
         }
         else{
             res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
         }
-        console.log('task log list end');
+
+        console.log('[website] trade_point_list end');
     }
 
-    async log_list_length(req, res, next){
-        console.log('log_list_length run');
 
-        var query = await DB.LogTable.count().exec();
+    async trade_point_list_length(req, res, next){
+        console.log('[website] trade_point_list_length');
+
+        var query = await DB.TradePointTable.count().exec();
         res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
 
-        console.log('log_list_length run end');
+        console.log('[website] trade_point_list_length end');
     }
-
-
 }
 
-module.exports = new LogHandle()
+module.exports = new TradePointHandle()
 
 
 
