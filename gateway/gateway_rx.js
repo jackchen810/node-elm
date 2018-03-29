@@ -3,10 +3,10 @@ const config = require("config-lite");
 const fs = require("fs");
 const path = require("path");
 const events = require("events");
-const  GatewayTradeHandle = require("../core/gateway_market");
-const  GatewayBacktestHandle = require("../core/gateway_backtest");
+const  GatewayTradeHandle = require("./core/gateway_market");
+const  GatewayBacktestHandle = require("./core/gateway_backtest");
 const  GatewayTxHandle = require("./gateway_tx");
-const db = require('../../mongodb/db.js');
+const db = require('../mongodb/db.js');
 
 /*
 * request 格式：{'head': {'type': this.type, 'action': this.action}, body:message}

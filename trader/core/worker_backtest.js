@@ -3,7 +3,7 @@ const config = require("config-lite");
 const fs = require("fs");
 const path = require("path");
 const events = require("events");
-const WorkerTx = require('../worker/worker_tx.js');
+const WorkerTx = require('../worker_tx.js');
 
 class WorkerBacktestClass {
     constructor(){
@@ -191,7 +191,7 @@ class WorkerBacktestClass {
             var instance = new strategy_class(strategy_name);
             instance.on_init(emitter, task_id, task_type, trade_symbol, trade_ktype);
             instance.set_name(strategy_name);
-            instance.set_record_flag(true, true);   //不记录交易日志
+            instance.set_record_flag(false, false);   //不记录交易日志
 
 
             // 监听策略发出的事件,

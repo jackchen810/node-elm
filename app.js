@@ -4,9 +4,14 @@ const fork = require('child_process').fork;
 
 
 //创建一个工作进程
-const worker = fork('./trader/worker/worker_entry.js');
+const worker = fork('./trader/worker_entry.js');
 worker.on('message', process_message_reactor);
 console.log('create worker_entry');
+
+//创建一个工作进程
+const picker = fork('./picker/picker_entry.js');
+picker.on('message', process_message_reactor);
+console.log('create picker_entry');
 
 //创建一个工作进程
 const website = fork('./website/website_entry.js');
@@ -14,10 +19,10 @@ website.on('message', process_message_reactor);
 console.log('create website_entry');
 
 //创建一个工作进程, 这个是主进程
-const GatewayTx = require("./gateway/gateway/gateway_tx");
+const GatewayTx = require("./gateway/gateway_tx");
 //初始化 gateway的发送函数；
 GatewayTx.on('message', process_message_reactor);
-const GatewayRx = require("./gateway/gateway/gateway_rx");
+const GatewayRx = require("./gateway/gateway_rx");
 
 /*
 //初始化phandle
@@ -54,6 +59,9 @@ function process_message_reactor(message) {
         head['dest'] = dest_list[i];   //dest替换
         if (dest_list[i] == 'worker') {
             worker.send(message);
+        }
+        else if (dest_list[i] == 'picker') {
+            picker.send(message);
         }
         else if (dest_list[i] == 'website') {
             website.send(message);

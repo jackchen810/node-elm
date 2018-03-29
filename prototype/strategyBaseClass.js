@@ -1,5 +1,5 @@
 'use strict';
-const WorkerTx = require("../trader/worker/worker_tx.js");
+const WorkerTx = require("../trader/worker_tx.js");
 const dtime = require('time-formater');
 const talib = require('talib/build/Release/talib');
 

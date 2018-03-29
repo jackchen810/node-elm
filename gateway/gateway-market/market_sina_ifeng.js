@@ -1,5 +1,5 @@
 'use strict';
-const GatewayRxTx = require("../gateway/gateway_rx");
+const GatewayRxTx = require("../gateway_rx");
 const BaseMarket = require("../../prototype/marketBaseClass");
 const BaseObj = require("../../prototype/objectBaseClass");
 

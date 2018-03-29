@@ -1,6 +1,7 @@
 'use strict';
 const DB = require('../../../models/models.js');
-const WebsiteRxTx = require('../../website_rxtx.js');
+const WebsiteRx = require('../../website_rx.js');
+const WebsiteTx = require('../../website_tx.js');
 const dtime = require('time-formater');
 const fs = require("fs");
 const path = require('path');
@@ -126,8 +127,8 @@ class TaskHandle {
         }
 
         //发送任务
-        WebsiteRxTx.send(message, 'task', 'add', ['worker', 'gateway']);
-        WebsiteRxTx.addOnceListener(task_id, async function(type, action, response) {
+        WebsiteTx.send(message, 'task', 'add', ['worker', 'gateway']);
+        WebsiteRx.addOnceListener(task_id, async function(type, action, response) {
             //console.log('add task, response', response);
             if (response['ret_code'] == 0) {
                 res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:task_id});
@@ -160,8 +161,8 @@ class TaskHandle {
         var queryList = await DB.TaskTable.find(wherestr).exec();
 
         //发送任务,worker 删除任务
-        WebsiteRxTx.send(queryList, 'task', 'del', ['worker', 'gateway']);
-        WebsiteRxTx.addOnceListener(task_id, async function(type, action, response) {
+        WebsiteTx.send(queryList, 'task', 'del', ['worker', 'gateway']);
+        WebsiteRx.addOnceListener(task_id, async function(type, action, response) {
             //console.log('del task, response', response);
             if (response['ret_code'] == 0) {
                 await DB.TaskTable.remove(wherestr).exec();
@@ -191,8 +192,8 @@ class TaskHandle {
         var wherestr = {'task_id': task_id};
         var queryList = await DB.TaskTable.find(wherestr).exec();
 
-        WebsiteRxTx.send(queryList, 'task', 'add', ['worker', 'gateway']);
-        WebsiteRxTx.addOnceListener(task_id, async function(type, action, response) {
+        WebsiteTx.send(queryList, 'task', 'add', ['worker', 'gateway']);
+        WebsiteRx.addOnceListener(task_id, async function(type, action, response) {
             //console.log('start task, response', response);
             if (response['ret_code'] == 0) {
                 var updatestr = {'task_status': 'running'};
@@ -224,8 +225,8 @@ class TaskHandle {
         var wherestr = {'task_id': task_id};
         var queryList = await DB.TaskTable.find(wherestr).exec();
 
-        WebsiteRxTx.send(queryList, 'task', 'del', ['worker', 'gateway']);
-        WebsiteRxTx.addOnceListener(task_id, async function(type, action, response) {
+        WebsiteTx.send(queryList, 'task', 'del', ['worker', 'gateway']);
+        WebsiteRx.addOnceListener(task_id, async function(type, action, response) {
             //console.log('stop task, response', response);
             if (response['ret_code'] == 0) {
                 var updatestr = {'task_status': 'stop'};

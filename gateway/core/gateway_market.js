@@ -2,7 +2,7 @@
 const config = require("config-lite");
 const fs = require("fs");
 const path = require("path");
-const  GatewayTxHandle = require("../gateway/gateway_tx");
+const  GatewayTxHandle = require("../gateway_tx");
 
 class GatewayClass {
     constructor(){

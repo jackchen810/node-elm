@@ -1,7 +1,7 @@
 'use strict';
 const config = require("config-lite");
-const  WorkerTradeHandle = require("../core/worker_trade");
-const  WorkerBacktestHandle = require("../core/worker_backtest");
+const  WorkerTradeHandle = require("./core/worker_trade");
+const  WorkerBacktestHandle = require("./core/worker_backtest");
 const  WorkerTxHandle = require("./worker_tx");
 
 /*

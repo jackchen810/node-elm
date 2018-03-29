@@ -3,7 +3,7 @@
 const mongoose = require('mongoose');
 const BacktestTaskSchema = new mongoose.Schema({
     task_id: String,
-    task_type: String,  //任务类型，trade:交易型任务, order_point：买卖点任务，backtest:回测任务， select：选股任务
+    task_type: String,  //任务类型，trade:交易型任务, order_point：买卖点任务，backtest:回测任务， pickstock：选股任务
     task_status:String,  // 运行状态
 
     //输入

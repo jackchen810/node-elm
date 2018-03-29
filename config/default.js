@@ -2,6 +2,7 @@
 
 module.exports = {
 	firmware_dir:'./public/firmware',
+    pick_strategy_dir:'./picker/pick-strategy',
     strategy_dir:'./trader/trade-strategy',
     riskctrl_dir:'./trader/trade-riskctrl',
     order_gateway_dir:'./gateway/gateway-order',

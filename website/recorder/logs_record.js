@@ -1,6 +1,6 @@
 'use strict';
 const DB = require('../../models/models.js');
-const WebsiteRxTx = require('../website_rxtx.js');
+const WebsiteRxTx = require('../website_rx.js');
 const dtime = require('time-formater');
 
 WebsiteRxTx.addLoopListener('log_record', function(action, body) {

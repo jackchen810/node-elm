@@ -3,7 +3,7 @@ const config = require("config-lite");
 const fs = require("fs");
 const path = require("path");
 const events = require("events");
-const WorkerTx = require('../worker/worker_tx.js');
+const WorkerTx = require('../worker_tx.js');
 
 class WorkerClass {
     constructor(){

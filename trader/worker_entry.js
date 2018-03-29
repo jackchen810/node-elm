@@ -1,5 +1,5 @@
-require("../core/worker_trade");
-require("../core/worker_backtest");
+require("./core/worker_trade");
+require("./core/worker_backtest");
 require("./worker_rx");
 require("./worker_tx");
 
