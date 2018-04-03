@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const PickStrategyHandle = require('../controller/pickstock/pick_strategy.js');
+const PickStockHandle = require('../controller/pickstock/pick_stock.js');
 
 
 const router = express.Router();
@@ -11,7 +11,23 @@ console.log("enter route of pick stock");
 
 
 //交易点统计列表
-router.all('/list', PickStrategyHandle.list);
+router.all('/strategy/list', PickStockHandle.strategy_list);
+
+router.all('/task/list', PickStockHandle.task_list);
+router.all('/task/status', PickStockHandle.task_status);
+
+router.all('/add', PickStockHandle.add);
+
+router.all('/del', PickStockHandle.del);
+
+router.all('/start', PickStockHandle.start);
+
+router.all('/stop', PickStockHandle.stop);
+
+//选股结果
+router.all('/result', PickStockHandle.result_list);
+router.all('/result/length', PickStockHandle.result_list_length);
+
 //router.all('/list/length', PickStockHandle.trade_point_list_length);
 
 

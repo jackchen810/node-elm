@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const HistoryHandle = require('../controller/history/history.js');
+const HistoryHandle = require('../controller/history/history_data.js');
 
 
 const router = express.Router();

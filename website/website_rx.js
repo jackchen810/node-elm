@@ -52,7 +52,7 @@ class WebsiteRxTx{
         var type = head['type'];
         var action = head['action'];
         emitter.emit(type, action, body);
-        if (type == 'task' || type == 'backtest') {
+        if (type == 'trade.task' || type == 'backtest.task' || type == 'pickstock.task') {
             emitter.emit(body['extra'], type, action, body);
         }
     }

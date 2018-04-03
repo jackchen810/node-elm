@@ -30,5 +30,5 @@ const basicsSchema = new mongoose.Schema({
 });
 
 //module.exports = mongoose.model('BasicsTable', basicsSchema);
-const BasicsTable = mongoose.model('BasicsTable', basicsSchema);
+const BasicsTable = mongoose.model('BasicsTable', basicsSchema, 'BasicsTable');
 module.exports = BasicsTable;

@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const TaskHandle = require('../controller/task/task.js');
+const TaskHandle = require('../controller/task/trade_task.js');
 const TradePointHandle = require('../controller/task/trade_point.js');
 
 

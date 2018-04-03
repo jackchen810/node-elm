@@ -59,7 +59,7 @@ class WorkerBacktestClass {
                 if (barObj['code'] == taskList[i]['trade_symbol'] &&
                     ktype == taskList[i]['trade_ktype']) {
                     console.log('[worker backtest] finish:', taskList[i]['task_id']);
-                    WorkerTx.send({task_id : taskList[i]['task_id']}, 'backtest_record', 'finish', 'website');
+                    WorkerTx.send({task_id : taskList[i]['task_id']}, 'backtest.status', 'finish', 'website');
                 }
             }
         }
@@ -86,7 +86,7 @@ class WorkerBacktestClass {
         }
 
         //console.log('WorkerTx', WorkerTx);
-        WorkerTx.send(recordObj, 'backtest_record', 'on_backtest_buy', 'website');
+        WorkerTx.send(recordObj, 'backtest.record', 'on_backtest_buy', 'website');
         return;
     }
 
@@ -108,7 +108,7 @@ class WorkerBacktestClass {
             'strategy_name': msgObj['strategy_name'],
         }
 
-        WorkerTx.send(msgObj, 'backtest_record', 'on_backtest_buy_point', 'website');
+        WorkerTx.send(msgObj, 'backtest.record', 'on_backtest_buy_point', 'website');
         return;
     }
 
@@ -130,7 +130,7 @@ class WorkerBacktestClass {
             'strategy_name': msgObj['strategy_name'],
         }
 
-        WorkerTx.send(recordObj, 'backtest_record', 'on_backtest_sell', 'website');
+        WorkerTx.send(recordObj, 'backtest.record', 'on_backtest_sell', 'website');
         var taskObj = this.taskMap.get(msgObj['task_id']);
         return;
     }
@@ -154,7 +154,7 @@ class WorkerBacktestClass {
             'strategy_name': msgObj['strategy_name'],
         }
 
-        WorkerTx.send(recordObj, 'backtest_record', 'on_backtest_sell_point', 'website');
+        WorkerTx.send(recordObj, 'backtest.record', 'on_backtest_sell_point', 'website');
         return;
     }
 

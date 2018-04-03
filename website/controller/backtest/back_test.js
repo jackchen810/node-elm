@@ -5,7 +5,8 @@ const path = require('path');
 const schedule = require('node-schedule');
 const dtime = require('time-formater');
 const DB = require('../../../models/models');
-const WebsiteRxTx = require('../../website_rx.js');
+const WebsiteRx = require('../../website_rx.js');
+const WebsiteTx = require('../../website_tx.js');
 
 class BacktestHandle {
     constructor(){
@@ -49,13 +50,13 @@ class BacktestHandle {
 
         //参数有效性检查
         if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
-            var query = await DB.BacktestTaskTable.find(filter).sort(sort);
-            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
+            var queryList = await DB.BacktestTaskTable.find(filter).sort(sort);
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList});
         }
         else if (page_size > 0 && current_page > 0) {
             var skipnum = (current_page - 1) * page_size;   //跳过数
-            var query = await DB.BacktestTaskTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
-            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
+            var queryList = await DB.BacktestTaskTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList});
         }
         else{
             res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
@@ -124,8 +125,8 @@ class BacktestHandle {
         }
 
         //发送任务
-        WebsiteRxTx.send(message, 'backtest', 'add', ['worker', 'gateway']);
-        WebsiteRxTx.addOnceListener(task_id, async function(type, action, response) {
+        WebsiteTx.send(message, 'backtest.task', 'add', ['worker', 'gateway']);
+        WebsiteRx.addOnceListener(task_id, async function(type, action, response) {
             //console.log('add task, response', response);
             if (response['ret_code'] == 0) {
                 res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:task_id});
@@ -158,8 +159,8 @@ class BacktestHandle {
         var queryList = await DB.BacktestTaskTable.find(wherestr).exec();
 
         //发送任务,worker 删除任务
-        WebsiteRxTx.send(queryList, 'backtest', 'del', ['worker', 'gateway']);
-        WebsiteRxTx.addOnceListener(task_id, async function(type, action, response) {
+        WebsiteTx.send(queryList, 'backtest.task', 'del', ['worker', 'gateway']);
+        WebsiteRx.addOnceListener(task_id, async function(type, action, response) {
             //console.log('del task, response', response);
             if (response['ret_code'] == 0) {
                 await DB.BacktestTaskTable.remove(wherestr).exec();
@@ -197,8 +198,8 @@ class BacktestHandle {
         }
 
         await DB.BacktestResultTable.remove(wherestr).exec();
-        WebsiteRxTx.send(queryList, 'backtest', 'add', ['worker', 'gateway']);
-        WebsiteRxTx.addOnceListener(task_id, async function(type, action, response) {
+        WebsiteTx.send(queryList, 'backtest.task', 'add', ['worker', 'gateway']);
+        WebsiteRx.addOnceListener(task_id, async function(type, action, response) {
             //console.log('start task, response', response);
             if (response['ret_code'] == 0) {
                 var updatestr = {'task_status': 'running'};
@@ -235,8 +236,8 @@ class BacktestHandle {
             return;
         }
 
-        WebsiteRxTx.send(queryList, 'backtest', 'del', ['worker', 'gateway']);
-        WebsiteRxTx.addOnceListener(task_id, async function(type, action, response) {
+        WebsiteTx.send(queryList, 'backtest.task', 'del', ['worker', 'gateway']);
+        WebsiteRx.addOnceListener(task_id, async function(type, action, response) {
             //console.log('stop task, response', response);
             if (response['ret_code'] == 0) {
                 var updatestr = {'task_status': 'stop'};

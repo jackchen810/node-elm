@@ -1,11 +1,11 @@
 'use strict';
-import DB from "../../models/models.js";
-import dtime from "time-formater";
+const DB = require('../../models/models.js');
+const dtime = require('time-formater');
 
 const HistoryDataBaseClass_ifeng = require("../../prototype/historyDataBaseClass_ifeng");
 
 //DAY_PRICE_COLS = ['date', 'open', 'high', 'close', 'low', 'volume',    'chg', '%chg', 'ma5', 'ma10', 'ma20',      'vma5', 'vma10', 'vma20', 'turnover']
-const ktype = '5';
+const ktype = '30';
 
 async function updateDatabase(data_s, symbol) {
 

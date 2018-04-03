@@ -27,7 +27,7 @@ module.exports = class HistoryDataBaseClass_ifeng {
     //http://api.finance.ifeng.com/akdaily/?code=sh601989&type=last
     //http://api.finance.ifeng.com/akmin/?scode=sh601989&type=5
     //http://api.finance.ifeng.com/akmin/?scode=sz002500&type=5
-    async download(ktype, autype, symbol) {
+    async to_download(ktype, autype, symbol, callbackfn) {
         var self = this;
         var url = self.price_url(ktype, autype, symbol);
 
@@ -49,6 +49,8 @@ module.exports = class HistoryDataBaseClass_ifeng {
                 }
 
                 //console.log('http data:', jsonObj);
+                //回调函数
+                callbackfn(jsonObj);
                 return jsonObj;
             });
 

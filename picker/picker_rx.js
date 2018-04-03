@@ -1,6 +1,6 @@
 'use strict';
 const config = require("config-lite");
-const  PickerTradeHandle = require("./core/picker_trade");
+const  PickerTradeHandle = require("./core/picker_task");
 const  PickerTxHandle = require("./picker_tx");
 
 /*
@@ -42,12 +42,12 @@ class PickerRx{
         PickerTxHandle.init(head);
 
         //接收主进程发送过来的消息
-        if(head.type == 'task'){
+        if(head.type == 'pickstock.task'){
             if (head.action == 'add') {
-                //PickerTradeHandle.task_add(body, PickerTxHandle);
+                PickerTradeHandle.pickstock_task_add(body, PickerTxHandle);
             }
             else if(head.action == 'del') {
-                //PickerTradeHandle.task_del(body, PickerTxHandle);
+                PickerTradeHandle.pickstock_task_del(body, PickerTxHandle);
             }
         }
 
