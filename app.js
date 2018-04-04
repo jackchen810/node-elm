@@ -18,6 +18,12 @@ const website = fork('./website/website_entry.js');
 website.on('message', process_message_reactor);
 console.log('create website_entry');
 
+
+//创建一个工作进程
+const downloader = fork('./downloader/downloader_entry.js');
+downloader.on('message', process_message_reactor);
+console.log('create downloader_entry');
+
 //创建一个工作进程, 这个是主进程
 const GatewayTx = require("./gateway/gateway_tx");
 //初始化 gateway的发送函数；
@@ -65,6 +71,9 @@ function process_message_reactor(message) {
         }
         else if (dest_list[i] == 'website') {
             website.send(message);
+        }
+        else if (dest_list[i] == 'downloader') {
+            downloader.send(message);
         }
         else if (dest_list[i] == 'gateway') {
             //父进程，直接调用

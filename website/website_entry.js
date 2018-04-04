@@ -1,4 +1,5 @@
 'use strict';
+
 //加载主模块
 require("./website_main");
 require("./website_rx");

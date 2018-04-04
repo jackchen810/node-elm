@@ -18,7 +18,7 @@ router.all('/list', DownloadPlanHandle.plan_list);
 
 
 //计划任务更新
-router.all('/update', DownloadPlanHandle.plan_update);
+router.all('/update', DownloadPlanHandle.add);
 
 router.all('/add', DownloadPlanHandle.add);
 

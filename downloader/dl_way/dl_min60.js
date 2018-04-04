@@ -5,7 +5,7 @@ const dtime = require('time-formater');
 const HistoryDataBaseClass_ifeng = require("../dl_strategy/historyDataBaseClass_ifeng.js");
 
 //DAY_PRICE_COLS = ['date', 'open', 'high', 'close', 'low', 'volume',    'chg', '%chg', 'ma5', 'ma10', 'ma20',      'vma5', 'vma10', 'vma20', 'turnover']
-const ktype = '5';
+const ktype = '60';
 
 async function updateDatabase(data_s, symbol) {
 
@@ -17,6 +17,7 @@ async function updateDatabase(data_s, symbol) {
     }
 
     console.log('to %s db', ktype, JSON.stringify(data[0]));
+
     for (var i = 0; i < data.length; i++) {
         var item = data[i];
         var date = item[0].substr(0, 16);

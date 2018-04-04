@@ -28,7 +28,7 @@ class WorkerTx{
                 'head': {
                     'type': this.head.type,
                     'action': this.head.action,
-                    'source': 'worker',
+                    'source': 'downloader',
                     'dest': this.head.source
                 },
                 'body': message,
@@ -36,7 +36,7 @@ class WorkerTx{
         }
         else{
             var res = {
-                'head': {'type': type, 'action': action, 'source': 'worker', 'dest': dest},
+                'head': {'type': type, 'action': action, 'source': 'downloader', 'dest': dest},
                 'body': message,
             }
         }

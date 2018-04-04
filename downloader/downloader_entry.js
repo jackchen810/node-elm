@@ -1,7 +1,8 @@
-require("./core/worker_trade");
-require("./core/worker_backtest");
-require("./worker_rx");
-require("./worker_tx");
+'use strict';
+
+require("./core/downloader_task");
+require("./downloader_rx");
+require("./downloader_tx");
 
 
 process.on('SIGHUP', function() {
@@ -15,4 +16,4 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 
-console.log('create worker process, pid:', process.pid);
+console.log('create download process, pid:', process.pid);

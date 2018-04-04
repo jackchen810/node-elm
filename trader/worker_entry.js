@@ -1,3 +1,5 @@
+'use strict';
+
 require("./core/worker_trade");
 require("./core/worker_backtest");
 require("./worker_rx");

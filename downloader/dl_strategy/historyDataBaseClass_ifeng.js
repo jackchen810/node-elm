@@ -27,39 +27,42 @@ module.exports = class HistoryDataBaseClass_ifeng {
     //http://api.finance.ifeng.com/akdaily/?code=sh601989&type=last
     //http://api.finance.ifeng.com/akmin/?scode=sh601989&type=5
     //http://api.finance.ifeng.com/akmin/?scode=sz002500&type=5
-    async to_download(ktype, autype, symbol, callbackfn) {
+    async to_download(ktype, autype, symbol) {
         var self = this;
-        var url = self.price_url(ktype, autype, symbol);
 
-        console.log('get %s, http url:', ktype, url, new Date());
+        var p = new Promise(function (resolve, reject) {        //做一些异步操作
+            var url = self.price_url(ktype, autype, symbol);
 
-        //get 请求外网
-        http.get(url, function (req, res) {
-            var data_str = '';
-            req.on('data', function (chunk) {
-                data_str += chunk
+            console.log('get %s, http url:', ktype, url, new Date());
+            //get 请求外网
+            http.get(url, function (req, res) {
+                var data_str = '';
+                req.on('data', function (chunk) {
+                    data_str += chunk
+                });
+
+                req.on('end', function () {
+                    try{
+                        var jsonObj = JSON.parse(data_str);
+                    }
+                    catch(err) {
+                        return resolve([]);
+                    }
+
+                    //console.log('http data:', jsonObj);
+                    //回调函数
+                    return resolve(jsonObj);
+                });
+
+                req.on('error', function (e) {
+                    console.log('problem with request: ' + e.message);
+                    return resolve([]);
+                });
+
             });
-
-            req.on('end', function () {
-                try{
-                    var jsonObj = JSON.parse(data_str);
-                }
-                catch(err) {
-                    return [];
-                }
-
-                //console.log('http data:', jsonObj);
-                //回调函数
-                callbackfn(jsonObj);
-                return jsonObj;
-            });
-
-            req.on('error', function (e) {
-                console.log('problem with request: ' + e.message);
-                return [];
-            });
-
         });
+
+        return p;
     }
 
 }
