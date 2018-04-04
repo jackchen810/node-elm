@@ -14,8 +14,8 @@ const BacktestResultTable = require('./backtest/backtest_result.js');
 const BacktestTaskTable = require('./backtest/backtest_task.js');
 
 
-const SelectResultTable = require('./pickstock/select_result.js');
-const PickstockTaskTable = require('./pickstock/select_task.js');
+const PickResultTable = require('./pickstock/select_result.js');
+const PickTaskTable = require('./pickstock/select_task.js');
 
 const AdminModel = require('../models/admin/admin');
 
@@ -33,8 +33,8 @@ function DB() {
     this.BacktestResultTable = BacktestResultTable;
     this.BacktestTaskTable = BacktestTaskTable;
 
-    this.SelectResultTable = SelectResultTable;
-    this.SelectTaskTable = PickstockTaskTable;
+    this.PickResultTable = PickResultTable;
+    this.PickTaskTable = PickTaskTable;
 
     this.TaskPlanTable = TaskPlanTable;
     this.OrderTable = OrderTable;

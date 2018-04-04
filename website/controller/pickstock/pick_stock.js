@@ -68,12 +68,12 @@ class PickStockHandle {
 
         //参数有效性检查
         if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
-            var queryList = await DB.SelectTaskTable.find(filter).sort(sort);
+            var queryList = await DB.PickTaskTable.find(filter).sort(sort);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList});
         }
         else if (page_size > 0 && current_page > 0) {
             var skipnum = (current_page - 1) * page_size;   //跳过数
-            var queryList = await DB.SelectTaskTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
+            var queryList = await DB.PickTaskTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList});
         }
         else{
@@ -99,7 +99,7 @@ class PickStockHandle {
         var wherestr = {'strategy_name': strategy_name, 'stock_ktype': stock_ktype, 'stock_range': stock_range, };
 
         //参数检查
-        var query = await DB.SelectTaskTable.findOne(wherestr).exec();
+        var query = await DB.PickTaskTable.findOne(wherestr).exec();
         if (query != null) {
             res.send({ret_code: -1, ret_msg: 'FAILED', extra:'任务重复'});
             return;
@@ -119,7 +119,7 @@ class PickStockHandle {
             'sort_time': mytime.getTime()
         };
 
-        var task_item = await DB.SelectTaskTable.create(updatestr);
+        var task_item = await DB.PickTaskTable.create(updatestr);
         if (task_item == null) {
             res.send({ret_code: -1, ret_msg: 'FAILED', extra: '任务添加数据库失败'});
             return;
@@ -136,7 +136,7 @@ class PickStockHandle {
                 console.log('worker return error:', response['extra']);
                 res.send(response);
                 var wherestr = {'task_id': task_id};
-                await DB.SelectTaskTable.remove(wherestr).exec();
+                await DB.PickTaskTable.remove(wherestr).exec();
             }
         }, 3000);
     }
@@ -156,13 +156,13 @@ class PickStockHandle {
 
         console.log('task_id:', task_id);
         var wherestr = {'task_id': task_id};
-        var queryList = await DB.SelectTaskTable.find(wherestr).exec();
+        var queryList = await DB.PickTaskTable.find(wherestr).exec();
 
         //发送任务,worker 删除任务
         WebsiteTx.send(queryList, 'pickstock.task', 'del', 'picker');
         WebsiteRx.addOnceListener(task_id, async function(type, action, response) {
             if (response['ret_code'] == 0) {
-                await DB.SelectTaskTable.remove(wherestr).exec();
+                await DB.PickTaskTable.remove(wherestr).exec();
                 res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: task_id});
                 console.log('[website] pickstock task del end');
             }
@@ -190,18 +190,18 @@ class PickStockHandle {
         //更新到设备数据库， 已经完成的任务不重新开始
         //var wherestr = {'task_id': task_id, 'task_status': 'stop'};
         var wherestr = {'task_id': task_id};
-        var queryList = await DB.SelectTaskTable.find(wherestr).exec();
+        var queryList = await DB.PickTaskTable.find(wherestr).exec();
         if (queryList.length == 0){
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: task_id});
             return;
         }
 
-        await DB.SelectResultTable.remove(wherestr).exec();
+        await DB.PickResultTable.remove(wherestr).exec();
         WebsiteTx.send(queryList, 'pickstock.task', 'add', 'picker');
         WebsiteRx.addOnceListener(task_id, async function(type, action, response) {
             if (response['ret_code'] == 0) {
                 var updatestr = {'task_status': 'running'};
-                await DB.SelectTaskTable.update(wherestr, updatestr).exec();
+                await DB.PickTaskTable.update(wherestr, updatestr).exec();
                 res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: task_id});
                 console.log('[website] pickstock task start end');
             }
@@ -228,7 +228,7 @@ class PickStockHandle {
         //更新到设备数据库， stop
         //var wherestr = {'task_id': task_id, 'task_status': 'running'};
         var wherestr = {'task_id': task_id};
-        var queryList = await DB.SelectTaskTable.find(wherestr).exec();
+        var queryList = await DB.PickTaskTable.find(wherestr).exec();
         if (queryList.length == 0){
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: task_id});
             return;
@@ -239,7 +239,7 @@ class PickStockHandle {
             //console.log('stop task, response', response);
             if (response['ret_code'] == 0) {
                 var updatestr = {'task_status': 'stop'};
-                await DB.SelectTaskTable.update(wherestr, updatestr).exec();
+                await DB.PickTaskTable.update(wherestr, updatestr).exec();
                 res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: task_id});
                 console.log('[website] pickstock task stop end');
             }
@@ -270,16 +270,16 @@ class PickStockHandle {
         if(typeof(filter)==="undefined"){
             filter = {};
         }
-        console.log(filter);
+        //console.log(filter);
         //参数有效性检查
         if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
-            var query = await DB.SelectResultTable.find(filter).sort(sort);
+            var query = await DB.PickResultTable.find(filter).sort(sort);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
             //console.log(query);
         }
         else if (page_size > 0 && current_page > 0) {
             var skipnum = (current_page - 1) * page_size;   //跳过数
-            var query = await DB.SelectResultTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
+            var query = await DB.PickResultTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
         }
         else{
@@ -293,7 +293,7 @@ class PickStockHandle {
     async result_list_length(req, res, next){
         console.log('[website] result_list_length');
 
-        var query = await DB.SelectResultTable.count().exec();
+        var query = await DB.PickResultTable.count().exec();
         res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
 
         console.log('[website] result_list_length end');
@@ -309,7 +309,7 @@ class PickStockHandle {
         //更新到设备数据库， stop
         //var wherestr = {'task_id': task_id, 'task_status': 'running'};
         var wherestr = {'task_id': task_id};
-        var queryList = await DB.SelectTaskTable.find(wherestr).exec();
+        var queryList = await DB.PickTaskTable.find(wherestr).exec();
         res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: queryList});
         console.log('[website] pickstock task_status end');
     }

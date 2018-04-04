@@ -17,5 +17,5 @@ const PickstockTaskSchema = new mongoose.Schema({
 
 
 
-const PickstockTaskTable = mongoose.model('PickstockTaskTable', PickstockTaskSchema);
-module.exports = PickstockTaskTable;
+const PickTaskTable = mongoose.model('PickTaskTable', PickstockTaskSchema);
+module.exports = PickTaskTable;

@@ -14,60 +14,65 @@ module.exports = class PickBase3Class extends PickstockBaseStrategy{
     }
 
     /*
-    3倍
+    3倍, weight 倍数
     每股净资产
     每股未分配利润
     每股公积金
     */
     async select_by_basic_policy(close, basic_record, weight) {
 
-        var base = basic_record['bvps'] + basic_record['perundp'] + basic_record['reservedPerShare'];
+        var total = Number(basic_record['bvps']) + Number(basic_record['perundp']) + Number(basic_record['reservedPerShare']);
+
+        //console.log('bvps', basic_record['bvps']);
+        //console.log('perundp', basic_record['perundp']);
+        //console.log('reservedPerShare', basic_record['reservedPerShare']);
+        //console.log('total', total);
+        var base = Math.round(total*100)/100;
+        console.log('code:', basic_record['code'], 'close:', close, 'base:', base);
+
         if (close < (weight * base)) {
             var code = basic_record['code'];
-            console.log(code);
+            //console.log(code);
             var new_records = {
-                "code": code,
+                "task_id": this.task_id,
+                "stock_symbol": code,
+                "symbol_name": basic_record['name'],
+                "stock_ktype": this.ktype,
                 "close": close,
                 "weight": weight,
                 "base": base,
+                "strategy_name": 'base_3.js',
                 "bvps": basic_record['bvps'],
                 "perundp": basic_record['perundp'],
                 "reservedPerShare": basic_record['reservedPerShare']
             };
 
-            await DB.SelectResultTable.create(new_records);
+            console.log('found:', code);
+            await DB.PickResultTable.create(new_records);
         }
 
     }
 
     async select_by_basic(){
 
+        //清除结果
+        await DB.PickResultTable.remove();
+
         // 创建迭代器对象, 遍历列表
         var queryList = await DB.BasicsTable.find().exec();
-        console.log('select_by_basic', queryList.length);
+        console.log('select_by_basic', queryList.length, this.ktype);
 
         for (var i = 0; i < queryList.length; i++) {
-            var code = queryList[i]['code']
+            var code = queryList[i]['code'];
+            //console.log('queryList[%d].code', i, code);
 
-
-            var mytime = new Date();
-            for (var m = 0; m < 5; m++) {
-
-                //往前找有数据的天，最多5天
-                mytime.setDate(mytime.getDate() - m);
-
-                //今天的收盘价
-                var wherestr = {'date': dtime(mytime).format('YYYY-MM-DD')};
-                var today_record = await DB.KHistory(this.ktype, code).findOne(wherestr).exec();
-                if (today_record != null) {
-                    //基本面3倍选股
-                    var close = today_record['close'];
-
-                    console.log(code, close, dtime(mytime).format('YYYY-MM-DD'));
-                    await select_by_basic_policy(close, queryList[i], 1);
-                    break;
-                }
-                //保存数据
+            //今天的收盘价
+            var barList = await DB.KHistory(this.ktype, code).find().sort({'date': -1});
+            if (barList.length > 0) {
+                //基本面3倍选股
+                var close = barList[0]['close'];   //最新收盘价
+                //console.log('barList:', i, code, close, barList[0]['date']);
+                await this.select_by_basic_policy(close, queryList[i], 1);
             }
         }
 

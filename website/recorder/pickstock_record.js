@@ -6,11 +6,11 @@ const dtime = require('time-formater');
 
 
 WebsiteRxTx.addLoopListener('pickstock.status', function(action, body) {
-    console.log('website->backtest.status, body', body);
+    console.log('website->pickstock.status, body', body);
 
     var wherestr = {'task_id': body['task_id']};
     var updatestr = {'task_status': action};
-    DB.SelectTaskTable.update(wherestr, updatestr).exec();
+    DB.PickTaskTable.update(wherestr, updatestr).exec();
     return;
 
 
@@ -31,5 +31,5 @@ WebsiteRxTx.addLoopListener('pickstock.record', function(action, body) {
         'sort_time':mytime.getTime()
     };
 
-    DB.SelectResultTable.create(updatestr);
+    DB.PickResultTable.create(updatestr);
 });

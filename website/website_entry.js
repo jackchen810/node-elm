@@ -4,6 +4,7 @@
 require("./website_main");
 require("./website_rx");
 require("./recorder/backtest_record");
+require("./recorder/pickstock_record");
 require("./recorder/logs_record");
 require("./recorder/trade_record");
 

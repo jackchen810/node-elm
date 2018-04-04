@@ -272,7 +272,7 @@ class BacktestHandle {
         if(typeof(filter)==="undefined"){
             filter = {};
         }
-        console.log(filter);
+        //console.log(filter);
         //参数有效性检查
         if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
             var query = await DB.BacktestResultTable.find(filter).sort(sort);
