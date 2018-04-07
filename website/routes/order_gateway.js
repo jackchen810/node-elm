@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const OrderGatewayHandle = require('../controller/order/order_gateway.js');
+const OrderGatewayHandle = require('../controller/gateway/order_gateway.js');
 
 
 const router = express.Router();

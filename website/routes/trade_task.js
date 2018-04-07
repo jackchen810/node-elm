@@ -13,7 +13,8 @@ console.log("enter route of task");
 
 
 //获取任务列表
-router.all('/list', TaskHandle.list);
+router.all('/list', TaskHandle.task_list);
+router.all('/list/length', TaskHandle.task_list_length);
 
 //新建任务（固件升级，插件升级，脚本执行）
 router.all('/add', TaskHandle.add);
@@ -28,10 +29,6 @@ router.all('/start', TaskHandle.start);
 router.all('/stop', TaskHandle.stop);
 
 
-
-//交易点统计列表
-router.all('/trade/point/list', TradePointHandle.trade_point_list);
-router.all('/trade/point/list/length', TradePointHandle.trade_point_list_length);
 
 
 

@@ -41,7 +41,7 @@ module.exports = class PickBase3Class extends PickstockBaseStrategy{
                 "close": close,
                 "weight": weight,
                 "base": base,
-                "strategy_name": 'base_3.js',
+                "strategy_name": 'pick_strategy_base_3.js',
                 "bvps": basic_record['bvps'],
                 "perundp": basic_record['perundp'],
                 "reservedPerShare": basic_record['reservedPerShare']

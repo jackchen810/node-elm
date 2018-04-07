@@ -17,8 +17,8 @@ const BacktestTaskTable = require('./backtest/backtest_task.js');
 const PickResultTable = require('./pickstock/select_result.js');
 const PickTaskTable = require('./pickstock/select_task.js');
 
-const AdminModel = require('../models/admin/admin');
-
+const AdminModel = require('../models/admin/admin.js');
+const SystemSetupTable = require('../models/config/system_setup.js');
 
 
 //mqtt 命令
@@ -39,6 +39,7 @@ function DB() {
     this.TaskPlanTable = TaskPlanTable;
     this.OrderTable = OrderTable;
     this.MarketTable = MarketTable;
+    this.SystemSetupTable = SystemSetupTable;
 
     this.AdminModel = AdminModel;
     this.BasicsTable = BasicsTable;

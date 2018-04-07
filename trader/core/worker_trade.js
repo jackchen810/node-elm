@@ -96,7 +96,6 @@ class WorkerClass {
         ///路径有效性检查
         for (var i = 0; i < request.length; i++) {
             var task_id = request[i]['task_id'];
-            var task_group = request[i]['task_group'];
             var task_type = request[i]['task_type'];
             var trade_symbol = request[i]['trade_symbol'];
             var trade_ktype = request[i]['trade_ktype'];

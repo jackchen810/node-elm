@@ -24,15 +24,17 @@ class GatewayClass {
             var task_type = request[i]['task_type'];
             var trade_symbol = request[i]['trade_symbol'];
             var trade_ktype = request[i]['trade_ktype'];
-            var market_gateway = request[i]['market_gateway'];
+            var market_gateway = request[i]['market_gateway'];   //行情接口就是主策略的接口
 
             ///导入strategy_list
             console.log('[gateway] trade_symbol:', trade_symbol);
             console.log('[gateway] market_gateway:', market_gateway);
+            console.log('[gateway] trade_ktype:', trade_ktype);
             //tradeLog('system', 'start timer', task_id);
 
-            //触发者是交易点，不需要器定时器， 只有ktype才需要起定时器
-            if (trade_ktype == 'order_point'){
+            //多级别主策略 ktype 没有值
+            //这里获取的是tick数据，3秒一次，按照主策略启动
+            if (trade_ktype == ''){
                 continue;
             }
 
@@ -57,7 +59,7 @@ class GatewayClass {
                 response.send(barList, 'on_bar_sync', trade_ktype, 'worker');
             }
 
-            //4. 加载market，启动定时器， 发出on_bar 数据
+            //4. 加载market，启动定时器， 通过tick数据，发出on_bar 数据
             market_gateway.on_start(trade_symbol, trade_ktype);
             //console.log(__filename, 'add task on_start');
 
@@ -97,7 +99,7 @@ class GatewayClass {
             //tradeLog('system', 'stop timer', task_id);
 
             //触发者是交易点，不需要器定时器， 只有ktype才需要起定时器
-            if (trade_ktype == 'order_point'){
+            if (trade_ktype == ''){
                 continue;
             }
 

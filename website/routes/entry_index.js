@@ -13,6 +13,7 @@ const backtest_router = require('./backtest.js');
 const trade_point_router = require('./trade_point.js');
 const download_plan_router = require('./download_plan.js');
 const pick_strategy_router = require('./pick_stock.js');
+const system_setup_router = require('./system_setup.js');
 
 
 
@@ -53,8 +54,8 @@ function web_router(app) {
     //选股策略路由
     app.use('/pick/stock', pick_strategy_router);
 
-    //选股结果路由
-    //app.use('/pick/stock', pick_strategy_router);
+    //系统设置路由
+    app.use('/system/setup', system_setup_router);
 }
 
 

@@ -50,7 +50,14 @@ class TradePointHandle {
     async trade_point_list_length(req, res, next){
         console.log('[website] trade_point_list_length');
 
-        var query = await DB.TradePointTable.count().exec();
+        var filter = req.body['filter'];
+
+        // 如果没有定义排序规则，添加默认排序
+        if(typeof(filter)==="undefined"){
+            //console.log('filter undefined');
+            filter = {};
+        }
+        var query = await DB.TradePointTable.count(filter).exec();
         res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
 
         console.log('[website] trade_point_list_length end');

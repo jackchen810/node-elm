@@ -10,7 +10,7 @@ const path = require('path');
 class TaskHandle {
     constructor(){
         this.guid = this.guid.bind(this);
-        this.list = this.list.bind(this);
+        this.task_list = this.task_list.bind(this);
         this.add = this.add.bind(this);
         this.del = this.del.bind(this);
         //console.log('TaskHandle constructor');
@@ -24,8 +24,8 @@ class TaskHandle {
         });
     }
 
-    async list(req, res, next){
-        console.log('task list');
+    async task_list(req, res, next){
+        console.log('[website] task_list');
         //console.log(req.body);
 
         //获取表单数据，josn
@@ -46,8 +46,8 @@ class TaskHandle {
             filter = {};
         }
 
-        //添加过滤条件
-        filter['task_type'] = 'trade';
+        //console.log('sort ', sort);
+        //console.log('filter ', filter);
 
         //参数有效性检查
         if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
@@ -63,7 +63,25 @@ class TaskHandle {
             res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
         }
 
-        console.log('task list end');
+        console.log('[website] task_list end');
+    }
+
+
+    async task_list_length(req, res, next){
+        console.log('[website] task_list_length');
+
+        var filter = req.body['filter'];
+
+        // 如果没有定义排序规则，添加默认排序
+        if(typeof(filter)==="undefined"){
+            //console.log('filter undefined');
+            filter = {};
+        }
+
+        var query = await DB.TaskTable.count(filter).exec();
+        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
+
+        console.log('[website] task_list_length end');
     }
 
 
@@ -109,7 +127,7 @@ class TaskHandle {
                 'strategy_type': strategy_type,   //策略类型
                 'strategy_name': strategy_list[i]['strategy_name'],   //策略名称
                 'riskctrl_name': (i==0 ? riskctrl_name: ''),   //风控名称
-                'market_gateway': (i==0 ? market_gateway: ''),   //交易网关名称
+                'market_gateway': market_gateway,   //行情网关名称
                 'order_gateway': (i==0 ? order_gateway: ''),   //交易网关名称
 
                 'create_at': dtime(mytime).format('YYYY-MM-DD HH:mm:ss'),

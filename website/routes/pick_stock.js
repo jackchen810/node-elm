@@ -14,6 +14,7 @@ console.log("enter route of pick stock");
 router.all('/strategy/list', PickStockHandle.strategy_list);
 
 router.all('/task/list', PickStockHandle.task_list);
+router.all('/task/list/length', PickStockHandle.task_list_length);
 router.all('/task/status', PickStockHandle.task_status);
 
 router.all('/add', PickStockHandle.add);

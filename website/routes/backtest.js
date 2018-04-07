@@ -10,7 +10,8 @@ const router = express.Router();
 console.log("enter route of backtest");
 
 //任务列表
-router.all('/list', BacktestHandle.list);
+router.all('/list', BacktestHandle.task_list);
+router.all('/list/length', BacktestHandle.task_list_length);
 
 //新建任务
 router.all('/add', BacktestHandle.add);

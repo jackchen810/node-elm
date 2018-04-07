@@ -1,8 +1,8 @@
 'use strict';
 
 const express = require('express');
-const MarketGatewayHandle = require('../controller/market/market_gateway.js');
-const OrderGatewayHandle = require('../controller/order/order_gateway');
+const MarketGatewayHandle = require('../controller/gateway/market_gateway.js');
+const OrderGatewayHandle = require('../controller/gateway/order_gateway');
 
 
 const router = express.Router();
