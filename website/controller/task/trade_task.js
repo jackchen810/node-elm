@@ -1,4 +1,5 @@
 'use strict';
+const mongoose = require('mongoose');
 const DB = require('../../../models/models.js');
 const WebsiteRx = require('../../website_rx.js');
 const WebsiteTx = require('../../website_tx.js');
@@ -9,7 +10,7 @@ const path = require('path');
 
 class TaskHandle {
     constructor(){
-        this.guid = this.guid.bind(this);
+        //this.guid = this.guid.bind(this);
         this.task_list = this.task_list.bind(this);
         this.add = this.add.bind(this);
         this.del = this.del.bind(this);
@@ -17,12 +18,6 @@ class TaskHandle {
     }
 
 
-    guid() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-            return v.toString(16);
-        });
-    }
 
     async task_list(req, res, next){
         console.log('[website] task_list');
@@ -90,17 +85,18 @@ class TaskHandle {
         console.log('[website] task add');
 
         //获取表单数据，josn
+        var task_type = req.body['task_type'];
         var strategy_type = req.body['strategy_type'];
         var strategy_list = req.body['strategy_list'];        //获取表单数据，josn
         var riskctrl_name = req.body['riskctrl_name'];        //获取表单数据，josn
         var market_gateway = req.body['market_gateway'];
         var order_gateway = req.body['order_gateway'];
-        var task_id = this.guid();
+        var task_id = DB.guid();
         var mytime = new Date();
 
 
         //更新到设备数据库， 交易的标的不能够重复, index=0 是主策略
-        var wherestr = {'task_type': 'trade', 'trade_symbol': strategy_list[0]['stock_symbol']};
+        var wherestr = {'task_type': task_type, 'trade_symbol': strategy_list[0]['stock_symbol']};
 
         //参数检查
         var query = await DB.TaskTable.findOne(wherestr).exec();
@@ -114,7 +110,7 @@ class TaskHandle {
 
             var updatestr = {
                 'task_id': task_id,
-                'task_type': (i==0 ? 'trade':'order_point'),  //任务结果
+                'task_type': (i==0 ? task_type:'order_point'),  //任务结果
                 'task_status': 'stop',   // 运行状态
 
                 //输入
@@ -258,6 +254,35 @@ class TaskHandle {
             }
         }, 3000);
     }
+
+
+    async task_stats(req, res, next){
+        console.log('[website] task_stats');
+
+        var filter = req.body['filter'];
+
+        // 如果没有定义排序规则，添加默认排序
+        if(typeof(filter)==="undefined"){
+            //console.log('filter undefined');
+            filter = {};
+        }
+
+        var total = await DB.TaskTable.count(filter).exec();
+        filter['task_status'] = 'running';
+        var running = await DB.TaskTable.count(filter).exec();
+        filter['task_status'] = 'fail';
+        var fail = await DB.TaskTable.count(filter).exec();
+        var query = {
+            'total_count': total,
+            'running_count': running,
+            'fail_count': fail
+        }
+        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
+
+        console.log('[website] task_stats end');
+    }
+
+
 
 }
 

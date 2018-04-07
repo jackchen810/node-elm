@@ -14,15 +14,7 @@ class HistoryHandle {
         this.start = this.start.bind(this);
         this.stop = this.stop.bind(this);
         this.add = this.add.bind(this);
-        this.guid = this.guid.bind(this);
 
-    }
-
-    guid() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-            return v.toString(16);
-        });
     }
 
     async file_list(req, res, next) {
@@ -60,7 +52,7 @@ class HistoryHandle {
         var task_exce_time = req.body['task_exce_time'];
         var task_plan_script = req.body['task_plan_script'];
         var exectime = new Date(task_exce_time);
-        var task_id = this.guid();
+        var task_id = DB.guid();
         var mytime = new Date();
 
         console.log('task_exce_time', task_exce_time);

@@ -1,5 +1,5 @@
-
-
+'use strict';
+const mongoose = require('mongoose');
 const TaskTable = require('./task/trade_task.js');
 const TradePointTable = require('./task/trade_point.js');
 const StrategyTable = require('../models/strategy/strategy.js');
@@ -45,6 +45,15 @@ function DB() {
     this.BasicsTable = BasicsTable;
     this.KHistory = KTable;
 
+
+    this.guid=function() {
+        return mongoose.Types.ObjectId();
+        /*
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+            return v.toString(16);
+        });*/
+    }
 }
 
 

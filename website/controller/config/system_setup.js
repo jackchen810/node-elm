@@ -50,18 +50,18 @@ class SystemSetupHandle {
         //参数有效性检查
         if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
             var queryList = await DB.SystemSetupTable.find(filter).sort(sort);
-            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList});
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList[0]});
         }
         else if (page_size > 0 && current_page > 0) {
             var skipnum = (current_page - 1) * page_size;   //跳过数
             var queryList = await DB.SystemSetupTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
-            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList});
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList[0]});
         }
         else{
             res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
         }
 
-        console.log('[website] system setup list end', queryList);
+        console.log('[website] system setup list end');
     }
 
 

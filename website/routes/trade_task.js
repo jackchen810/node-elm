@@ -29,7 +29,7 @@ router.all('/start', TaskHandle.start);
 router.all('/stop', TaskHandle.stop);
 
 
-
+router.all('/stats', TaskHandle.task_stats);
 
 
 module.exports = router;

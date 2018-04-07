@@ -11,19 +11,11 @@ const WebsiteTx = require('../../website_tx.js');
 class BacktestHandle {
     constructor(){
         //绑定，this
-        this.guid = this.guid.bind(this);
         this.task_list = this.task_list.bind(this);
         this.task_list_length = this.task_list_length.bind(this);
         this.add = this.add.bind(this);
         this.del = this.del.bind(this);
 
-    }
-
-    guid() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-            return v.toString(16);
-        });
     }
 
 
@@ -93,7 +85,7 @@ class BacktestHandle {
         //获取表单数据，josn
         var strategy_type = req.body['strategy_type'];
         var strategy_list = req.body['strategy_list'];        //获取表单数据，josn
-        var task_id = this.guid();
+        var task_id = DB.guid();
         var mytime = new Date();
         var start_time = req.body['start_time'];        //获取表单数据，josn
         var end_time = req.body['end_time'];        //获取表单数据，josn
