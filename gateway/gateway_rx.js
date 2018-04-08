@@ -68,4 +68,4 @@ class GatewayRxTx{
 
 module.exports = new GatewayRxTx();
 
-console.log('create gateway process, pid:', process.pid);
+//console.log('create gateway process, pid:', process.pid);

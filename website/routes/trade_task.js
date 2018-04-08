@@ -16,8 +16,9 @@ console.log("enter route of task");
 router.all('/list', TaskHandle.task_list);
 router.all('/list/length', TaskHandle.task_list_length);
 
-//新建任务（固件升级，插件升级，脚本执行）
-router.all('/add', TaskHandle.add);
+//新建任务（任务添加，监控任务批量添加）
+router.all('/add', TaskHandle.task_add);
+router.all('/add/monitor', TaskHandle.batch_monitor_task_add);
 
 //删除任务
 router.all('/del', TaskHandle.del);

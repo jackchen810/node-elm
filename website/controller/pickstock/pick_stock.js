@@ -135,7 +135,10 @@ class PickStockHandle {
             return;
         }
 
+        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:task_id});
+
         //发送任务
+        /*
         WebsiteTx.send([updatestr], 'pickstock.task', 'add', 'picker');
         WebsiteRx.addOnceListener(task_id, async function(type, action, response) {
             if (response['ret_code'] == 0) {
@@ -149,6 +152,7 @@ class PickStockHandle {
                 await DB.PickTaskTable.remove(wherestr).exec();
             }
         }, 3000);
+        */
     }
 
 

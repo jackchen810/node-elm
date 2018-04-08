@@ -45,15 +45,14 @@ function DB() {
     this.BasicsTable = BasicsTable;
     this.KHistory = KTable;
 
-
+    this.guid = () => mongoose.Types.ObjectId();
+/*
     this.guid=function() {
-        return mongoose.Types.ObjectId();
-        /*
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
             return v.toString(16);
         });*/
-    }
+
 }
 
 

@@ -15,20 +15,6 @@ const history = require('connect-history-api-fallback');
 const https = require('https');
 const fork = require('child_process').fork;
 const fs = require("fs");
-
-
-//excel导入文件存放位置， 不存在则创建
-fs.exists(config.device_dir, function(exists) {
-    console.log(exists ? "设备excel目录存在" : "设备excel目录不存在", config.device_dir);
-    if (!exists) fs.mkdirSync(config.device_dir);
-});
-
-//脚本存放位置， 不存在则创建
-fs.exists(config.script_dir, function(exists) {
-    console.log(exists ? "脚本目录存在" : "脚本目录不存在", config.script_dir);
-    if (!exists) fs.mkdirSync(config.script_dir);
-});
-
 const app = express();
 
 app.all('*', (req, res, next) => {

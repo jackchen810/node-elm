@@ -12,7 +12,7 @@ class TaskHandle {
     constructor(){
         //this.guid = this.guid.bind(this);
         this.task_list = this.task_list.bind(this);
-        this.add = this.add.bind(this);
+        this.task_add = this.task_add.bind(this);
         this.del = this.del.bind(this);
         //console.log('TaskHandle constructor');
     }
@@ -80,8 +80,69 @@ class TaskHandle {
     }
 
 
+    async batch_monitor_task_add(req, res, next) {
+        console.log('[website] batch_monitor_task_add');
 
-    async add(req, res, next) {
+        //获取表单数据，josn
+        var task_type = req.body['task_type'];  //'monitor'
+        var strategy_type = req.body['strategy_type'];  //1， 简单策略
+        var stock_ktype = req.body['stock_ktype'];
+        var strategy_name = req.body['strategy_name'];
+        var monitor_list = req.body['monitor_list'];        //获取表单数据，josn
+        var task_id = DB.guid();
+        var mytime = new Date();
+
+        console.log('monitor_list:', monitor_list);
+
+        if (task_type != 'monitor' || strategy_type != '1') {
+            res.send({ret_code: -1, ret_msg: 'FAILED', extra:'任务类型错误'});
+            return;
+        }
+
+        for(var i = 0; i< monitor_list.length; i++) {
+
+            var updatestr = {
+                'task_id': task_id,
+                'task_type': task_type,  //任务结果
+                'task_status': 'stop',   // 运行状态
+
+                //输入
+                'trade_symbol': monitor_list[i]['stock_symbol'],   ///index=0的使用交易symbol
+                'trade_ktype': stock_ktype,   ///index=0的使用交易symbol
+                'symbol_name': monitor_list[i]['stock_name'],   ///index=0的使用交易symbol
+
+
+                //过程
+                'strategy_type': strategy_type,   //策略类型, 只支持简单策略类型
+                'strategy_name': strategy_name,   //策略名称
+                'riskctrl_name': '',   //风控名称
+                'market_gateway': '',   //行情网关名称
+                'order_gateway': '',   //交易网关名称
+
+                'create_at': dtime(mytime).format('YYYY-MM-DD HH:mm:ss'),
+                'sort_time': mytime.getTime()
+            };
+
+            //更新到设备数据库， 交易的标的不能够重复
+            var wherestr = {'trade_ktype': stock_ktype, 'trade_symbol': monitor_list[i]};
+
+            //参数检查
+            var query = await DB.TaskTable.findOneAndUpdate(wherestr, updatestr, {upsert : true}).exec();
+            if (query != null) {
+                res.send({ret_code: -1, ret_msg: 'FAILED', extra:'任务添加数据库失败'});
+                return;
+            }
+
+
+        }
+
+        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:task_id});
+        console.log('[website] batch_monitor_task_add end');
+    }
+
+
+
+    async task_add(req, res, next) {
         console.log('[website] task add');
 
         //获取表单数据，josn
