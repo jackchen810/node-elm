@@ -16,7 +16,6 @@ process.on('SIGHUP', function() {
 
 process.on('unhandledRejection', (reason, p) => {
     console.info("Unhandled Rejection:", p);
-    // application specific logging, throwing an error, or other logic here
 });
 
 console.log('create website process, pid:', process.pid);

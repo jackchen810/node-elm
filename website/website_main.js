@@ -74,7 +74,7 @@ app.use(express.static('./public'));
 //app.listen(config.port);
 
 //本地调试, 使用http
-if (process.env.NODE_ENV == 'local') {
+if (process.env.NODE_ENV == 'local' || process.env.NODE_ENV == 'production') {
     app.listen(config.port);
     console.log('Http listening at ' + config.port);
 }
@@ -92,8 +92,4 @@ else{
     https.createServer(options,app).listen(config.ssl.port);
 }
 
-
-process.on('unhandledRejection', (reason, p) => {
-    console.info("Unhandled Rejection:", p);
-});
 
