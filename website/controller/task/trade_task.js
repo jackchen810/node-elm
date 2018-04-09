@@ -88,12 +88,13 @@ class TaskHandle {
         var strategy_type = req.body['strategy_type'];  //1， 简单策略
         var stock_ktype = req.body['stock_ktype'];
         var strategy_name = req.body['strategy_name'];
-        var monitor_list = req.body['monitor_list'];        //获取表单数据，josn
+        var monitor_list = req.body['monitor_obj_list'];        //获取表单数据，josn
         var task_id = DB.guid();
         var mytime = new Date();
 
         console.log('monitor_list:', monitor_list);
 
+        //参数检查
         if (task_type != 'monitor' || strategy_type != '1') {
             res.send({ret_code: -1, ret_msg: 'FAILED', extra:'任务类型错误'});
             return;
@@ -109,7 +110,7 @@ class TaskHandle {
                 //输入
                 'trade_symbol': monitor_list[i]['stock_symbol'],   ///index=0的使用交易symbol
                 'trade_ktype': stock_ktype,   ///index=0的使用交易symbol
-                'symbol_name': monitor_list[i]['stock_name'],   ///index=0的使用交易symbol
+                'symbol_name': monitor_list[i]['symbol_name'],   ///index=0的使用交易symbol
 
 
                 //过程
@@ -124,16 +125,10 @@ class TaskHandle {
             };
 
             //更新到设备数据库， 交易的标的不能够重复
-            var wherestr = {'trade_ktype': stock_ktype, 'trade_symbol': monitor_list[i]};
+            var wherestr = {'trade_ktype': stock_ktype, 'trade_symbol': monitor_list[i]['stock_symbol']};
 
             //参数检查
-            var query = await DB.TaskTable.findOneAndUpdate(wherestr, updatestr, {upsert : true}).exec();
-            if (query != null) {
-                res.send({ret_code: -1, ret_msg: 'FAILED', extra:'任务添加数据库失败'});
-                return;
-            }
-
-
+            await DB.TaskTable.findOneAndUpdate(wherestr, updatestr, {upsert : true}).exec();
         }
 
         res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:task_id});
