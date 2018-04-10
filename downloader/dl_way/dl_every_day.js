@@ -93,10 +93,12 @@ module.exports = async function callback() {
 
     //完成后，直接进行选股操作
     var msgObj = {
-        'task_id': 1,
+        'task_id':  DB.guid(),
         'task_type': 'pickstock',  //任务结果
         'strategy_name': 'pick_strategy_base_3.js',   // 策略名称
 
     };
-    DownloaderTxHandle.send(msgObj, 'pickstock.task', 'add', 'picker');
+
+    //完成后选股
+    DownloaderTxHandle.send([msgObj], 'pickstock.task', 'add', 'picker');
 }

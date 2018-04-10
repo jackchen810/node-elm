@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const DownloadPlanHandle = require('../controller/history/download_plan.js');
+const DownloadPlanHandle = require('../controller/download/download_plan.js');
 
 
 const router = express.Router();

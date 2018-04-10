@@ -18,7 +18,7 @@ class HistoryHandle {
     }
 
     async file_list(req, res, next) {
-        console.log('history dl list');
+        console.log('download dl list');
 
         try {
             var path = config.history_dl_dir;
@@ -31,7 +31,7 @@ class HistoryHandle {
             res.send({ret_code: -1, ret_msg: 'FAIL', extra: e});
             return;
         }
-        console.log('history dl list end');
+        console.log('download dl list end');
     }
 
 

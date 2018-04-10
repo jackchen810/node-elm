@@ -5,11 +5,11 @@ const TradePointTable = require('./task/trade_point.js');
 const StrategyTable = require('../models/strategy/strategy.js');
 const RiskctrlTable = require('../models/riskctrl/riskctrl.js');
 const LogTable = require('../models/log/log.js');
-const TaskPlanTable = require('../models/history/task_plan.js');
+const TaskPlanTable = require('./download/task_plan.js');
 const OrderTable = require('../models/order/order.js');
 const MarketTable = require('../models/market/market.js');
 const BasicsTable = require('../models/basics/basics.js');
-const KTable = require('../models/history/history.js');
+const KTable = require('./download/history.js');
 const BacktestResultTable = require('./backtest/backtest_result.js');
 const BacktestTaskTable = require('./backtest/backtest_task.js');
 
