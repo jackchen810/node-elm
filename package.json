@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "author": "kunteng <kunteng@kunteng.org>",
+  "author": "chenzejun <qq:63900720>",
   "license": "GPL",
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=development supervisor --harmony index.js",
     "local": "cross-env NODE_ENV=local supervisor  --harmony index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "production": "cross-env NODE_ENV=production supervisor --harmony index.js",
     "start": "cross-env NODE_ENV=production pm2 start index.js --node-args='--harmony' --name 'node-backend'",
     "stop": "cross-env NODE_ENV=production pm2 stop index.js --name 'node-backend'",
     "restart": "cross-env NODE_ENV=production pm2 restart index.js --node-args='--harmony' --name 'node-backend'"

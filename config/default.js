@@ -9,9 +9,9 @@ module.exports = {
     market_gateway_dir:'./gateway/gateway-market',
     history_dl_dir:'./downloader/dl_way',
 
-	device_dir:'./public/device',
-	pkg_dir:'./public/packages',
-	script_dir:'./public/scripts',
+
+    port:8000,    //监听端口
+
 	url: 'mongodb://localhost:27017/nodequant',
 	amount_every_task: '500',
 	interval_every_task: '600000',  //单位：ms
