@@ -40,7 +40,7 @@ function web_router(app) {
     app.use('/api/log', log_router);
 
     //行情接口管理功能
-    app.use('/api/download', history_router);
+    app.use('/api/history', history_router);
 
     //回测接口管理功能
     app.use('/api/backtest', backtest_router);

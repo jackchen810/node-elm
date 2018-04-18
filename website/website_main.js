@@ -69,15 +69,20 @@ web_router(app);
 
 app.use(history());
 
-//通过 Express 内置的 express.static 可以方便地托管静态文件，例如图片、CSS、JavaScript 文件等。
-app.use(express.static('./public'));
-//app.listen(config.port);
 
-//本地调试, 使用http
-if (process.env.NODE_ENV == 'local' || process.env.NODE_ENV == 'production') {
+if ( process.env.NODE_ENV == 'production' || process.env.NODE_ENV == 'development') {
+//通过 Express 内置的 express.static 可以方便地托管静态文件，例如图片、CSS、JavaScript 文件等。
+    app.use(express.static('./public'));
+    console.log('express.static');
+}
+
+
+//本地调试, 正式使用，使用http
+if (true) {
     app.listen(config.port);
     console.log('Http listening at ' + config.port);
 }
+// https 流程，暂不使用
 else{
     app.use(express.static(path.join(__dirname,'./public/dist')))
     app.get('*',function(req,res){
