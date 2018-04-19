@@ -57,7 +57,7 @@ npm run dev
 │   └── development.js              开发环境
 ├── controller                      处理中心，负责路由及数据库的具体操作
 │   ├── admin
-│   │   └── admin.js                管理员
+│   │   └── acounts.js                管理员
 │   ├── bos
 │   ├── eus
 │   ├── member
@@ -93,7 +93,7 @@ npm run dev
 │   └── statistic.js                API数据统计
 ├── models                          模型(数据库)
 │   ├── admin
-│   │   └── admin.js                管理员模型
+│   │   └── acounts.js                管理员模型
 │   ├── bos
 │   │   └── order.js                订单模型
 │   ├── eus
@@ -132,7 +132,7 @@ npm run dev
 │   └── baseComponent.js            底层类
 ├── public                          静态资源目录
 ├── routes                          路由配置
-│   ├── admin.js                    管理员
+│   ├── acounts.js                    管理员
 │   ├── bos.js                      订单
 │   ├── eus.js                      用户
 │   ├── index.js                    路由配置主文件

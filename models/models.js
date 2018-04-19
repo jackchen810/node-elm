@@ -17,7 +17,7 @@ const BacktestTaskTable = require('./backtest/backtest_task.js');
 const PickResultTable = require('./pickstock/select_result.js');
 const PickTaskTable = require('./pickstock/select_task.js');
 
-const AdminModel = require('../models/admin/admin.js');
+const AccountTable = require('./admin/account.js');
 const SystemSetupTable = require('../models/config/system_setup.js');
 
 
@@ -41,7 +41,7 @@ function DB() {
     this.MarketTable = MarketTable;
     this.SystemSetupTable = SystemSetupTable;
 
-    this.AdminModel = AdminModel;
+    this.AccountTable = AccountTable;
     this.BasicsTable = BasicsTable;
     this.KHistory = KTable;
 

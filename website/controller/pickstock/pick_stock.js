@@ -59,15 +59,17 @@ class PickStockHandle {
             filter = {};
         }
 
+        var total = await DB.PickTaskTable.count(filter).exec();
+
         //参数有效性检查
         if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
             var queryList = await DB.PickTaskTable.find(filter).sort(sort);
-            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList});
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList, total:total});
         }
         else if (page_size > 0 && current_page > 0) {
             var skipnum = (current_page - 1) * page_size;   //跳过数
             var queryList = await DB.PickTaskTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
-            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList});
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList, total:total});
         }
         else{
             res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
@@ -136,6 +138,7 @@ class PickStockHandle {
         }
 
         res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:task_id});
+        console.log('[website] pickstock task add end');
 
         //发送任务
         /*
@@ -285,16 +288,19 @@ class PickStockHandle {
             filter = {};
         }
 
+
+        var total = await DB.PickResultTable.count(filter).exec();
+
         //参数有效性检查
         if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
-            var query = await DB.PickResultTable.find(filter).sort(sort);
-            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
-            //console.log(query);
+            var queryList = await DB.PickResultTable.find(filter).sort(sort);
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList, total:total});
+            //console.log(queryList);
         }
         else if (page_size > 0 && current_page > 0) {
             var skipnum = (current_page - 1) * page_size;   //跳过数
-            var query = await DB.PickResultTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
-            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
+            var queryList = await DB.PickResultTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList, total:total});
         }
         else{
             res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});

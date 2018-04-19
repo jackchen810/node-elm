@@ -44,9 +44,16 @@ class GatewayBacktestClass {
             var queryList = await DB.KHistory(trade_ktype, trade_symbol).find(wherestr).exec();
             console.log('[gateway backtest]  DB.KHistory list', queryList.length);
 
-            // 发送已有bar数据
+            // 发送已有bar数据, queryList.length为0 也需要发送，方便worker判断回测完成
             if (queryList.length > 0) {
-                response.send(queryList, 'backtest_bar', trade_ktype, 'worker');
+                response.send(queryList, 'backtest.bar', trade_ktype, 'worker');
+            }
+            else{
+                var msg = {
+                    'code': trade_symbol,
+                    'date': end_time,
+                }
+                response.send(msg, 'backtest.finish', trade_ktype, 'worker');
             }
 
 

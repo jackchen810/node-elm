@@ -55,6 +55,11 @@ class HistoryHandle {
         var task_id = DB.guid();
         var mytime = new Date();
 
+        if (task_plan_script == ''){
+            res.send({ret_code: -1, ret_msg: 'FAIL', extra: 'task_plan_script is null'});
+            return;
+        }
+
         console.log('task_exce_time', task_exce_time);
         console.log('task_plan_script', task_plan_script);
         console.log('exectime', exectime.getHours(), exectime.getMinutes(), exectime.getSeconds());
@@ -78,7 +83,10 @@ class HistoryHandle {
 
         //参数检查,
         await DB.TaskPlanTable.findOneAndUpdate(wherestr, updatestr, { upsert : true }).exec();
+        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: task_id});
+        console.log('[website] download task add end');
 
+        /*
         //发送任务
         WebsiteTx.send([updatestr], 'download.task', 'add', 'downloader');
         WebsiteRx.addOnceListener(task_id, async function(type, action, response) {
@@ -93,6 +101,7 @@ class HistoryHandle {
                 await DB.TaskPlanTable.remove(wherestr).exec();
             }
         }, 3000);
+        */
     }
 
 

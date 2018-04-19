@@ -43,16 +43,17 @@ class TaskHandle {
 
         //console.log('sort ', sort);
         //console.log('filter ', filter);
+        var total = await DB.TaskTable.count(filter).exec();
 
         //参数有效性检查
         if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
             var queryList = await DB.TaskTable.find(filter).sort(sort);
-            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList});
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList, total:total});
         }
         else if (page_size > 0 && current_page > 0) {
             var skipnum = (current_page - 1) * page_size;   //跳过数
             var queryList = await DB.TaskTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
-            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList});
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList, total:total});
         }
         else{
             res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
@@ -141,7 +142,7 @@ class TaskHandle {
         console.log('[website] task add');
 
         //获取表单数据，josn
-        var task_type = req.body['task_type'];
+        var task_type = req.body['task_type'];   // 自动交易：'trade'; 机器人盯盘：'monitor'
         var strategy_type = req.body['strategy_type'];
         var strategy_list = req.body['strategy_list'];        //获取表单数据，josn
         var riskctrl_name = req.body['riskctrl_name'];        //获取表单数据，josn
@@ -153,6 +154,7 @@ class TaskHandle {
 
         //更新到设备数据库， 交易的标的不能够重复, index=0 是主策略
         var wherestr = {'task_type': task_type, 'trade_symbol': strategy_list[0]['stock_symbol']};
+        console.log('task:', JSON.stringify(wherestr));
 
         //参数检查
         var query = await DB.TaskTable.findOne(wherestr).exec();
@@ -192,10 +194,13 @@ class TaskHandle {
                 return;
             }
 
-            console.log('strategy_list:', strategy_list);
             message.push(updatestr);
         }
 
+        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:task_id});
+        console.log('[website] task add end');
+
+        /*
         //发送任务
         WebsiteTx.send(message, 'trade.task', 'add', ['worker', 'gateway']);
         WebsiteRx.addOnceListener(task_id, async function(type, action, response) {
@@ -211,6 +216,7 @@ class TaskHandle {
                 await DB.TaskTable.remove(wherestr).exec();
             }
         }, 3000);
+        */
     }
 
 

@@ -29,8 +29,8 @@ class WorkerRx{
     async onMessage(msg) {
         if (typeof msg != 'object'){
             console.log('msg is error');
-            var response = new WebsiteResponse('system', 'error');
-            response.send({ret_code: 1002, ret_msg: 'FAILED', extra:'type error'});
+            var response = {ret_code: 1002, ret_msg: 'FAILED', extra:'type error'};
+            WorkerTxHandle.send(response, 'system', 'error', 'website');
             return;
         }
 
@@ -78,7 +78,7 @@ class WorkerRx{
                 WorkerBacktestHandle.backtest_task_del(body, WorkerTxHandle);
             }
         }
-        else if(head.type == 'backtest_bar'){
+        else if(head.type == 'backtest.bar'){
             //数组处理， 多个标的的数据以数组方式传递
             for (var i = 0; i < body.length; i++) {
                 console.log(i);
@@ -87,6 +87,10 @@ class WorkerRx{
 
             // finish
             await WorkerBacktestHandle.backtest_finish(head.action, body[0])
+        }
+        else if(head.type == 'backtest.finish'){
+            // finish, 对应没有查到数据，直接结束的场景
+            await WorkerBacktestHandle.backtest_finish(head.action, body)
         }
 
     }

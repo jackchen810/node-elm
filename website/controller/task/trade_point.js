@@ -28,16 +28,18 @@ class TradePointHandle {
             filter = {};
         }
 
+        var total = await DB.TradePointTable.count(filter).exec();
+
         //参数有效性检查
         if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
-            var query = await DB.TradePointTable.find(filter).sort(sort);
-            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
-            //console.log(query);
+            var queryList = await DB.TradePointTable.find(filter).sort(sort);
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList, total:total});
+            //console.log(queryList);
         }
         else if (page_size > 0 && current_page > 0) {
             var skipnum = (current_page - 1) * page_size;   //跳过数
-            var query = await DB.TradePointTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
-            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query});
+            var queryList = await DB.TradePointTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList, total:total});
         }
         else{
             res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});

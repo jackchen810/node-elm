@@ -28,8 +28,8 @@ class DownloaderRx{
     async onMessage(msg) {
         if (typeof msg != 'object'){
             console.log('msg is error');
-            var response = new WebsiteResponse('system', 'error');
-            response.send({ret_code: 1002, ret_msg: 'FAILED', extra:'type error'});
+            var response = {ret_code: 1002, ret_msg: 'FAILED', extra:'type error'};
+            DownloaderTxHandle.send(response, 'system', 'error', 'website');
             return;
         }
 
