@@ -14,24 +14,42 @@ class Check {
             return;
         }
 
-        const admin_id = req.session.admin_id;
-		if (!admin_id || !Number(admin_id)) {
-			res.send({ret_code: 1001, ret_msg: 'ERROR_SESSION', extra: '亲，您还没有登录'});
-			return;
-		}else{
-			const admin = await AdminModel.findOne({user_id: admin_id});
-			if (!admin || admin.user_type != 0) {
-				res.send({ret_code: 1010,	ret_msg: 'HAS_NO_ACCESS', extra: '权限不足'});
-				return;
-			}
-		}
+        const user_account = req.session.user_account;
+
+        console.log('user_account:', user_account);
+        const admin = await AdminModel.findOne({user_account: user_account});
+        if (!admin || admin.user_type != 0) {
+            res.send({ret_code: 1010,	ret_msg: '权限不足', extra: ''});
+            return;
+        }
+
 		next()
 	}
 	async checkAdminStatus(req, res, next){
         const user_account = req.session.user_account;
+        //console.log('req.session:', req.session);
+        //console.log('user_account:', req.session.user_account);
+        if (req.baseUrl == '/api/admin/login') {
+            console.log(req.baseUrl,  req.originalUrl);
+            next()
+            return;
+        }
+
+        // session 超时后数据清除，不允许再访问
+        if (!user_account) {
+            res.send({ret_code: 2000, ret_msg: '会话超时', extra: ''});
+            return;
+        }
+
         const admin = await AdminModel.findOne({user_account: user_account});
-        if (!admin || admin.user_status != 0) {
-            res.send({ret_code: 1011, ret_msg: 'ERROR_ADMIN_STATUS', extra: '你已经被冻结'});
+        if (!admin) {
+            res.send({ret_code: 1011, ret_msg: '用户不存在', extra: ''});
+            return;
+        }
+
+
+        if (admin.user_status != 0) {
+            res.send({ret_code: 1012, ret_msg: '你已经被冻结', extra: ''});
             return;
         }
 

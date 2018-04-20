@@ -17,7 +17,6 @@ class Account extends BaseComponent {
 		this.encryption = this.encryption.bind(this);
 		this.getAllAdmin = this.getAllAdmin.bind(this);
 		this.logout = this.logout.bind(this);
-		this.getAdminInfo = this.getAdminInfo.bind(this);
 	//	this.updateAvatar = this.updateAvatar.bind(this);
 
 
@@ -119,7 +118,7 @@ class Account extends BaseComponent {
             const admin = await DB.AccountTable.findOne({user_account});
             if(admin) {
                 console.log('用户已经存在');
-                res.send({ret_code: 1, ret_msg: 'USER_HAS_EXIST', extra: '用户已经存在'});
+                res.send({ret_code: 1, ret_msg: '用户已经存在', extra: ''});
                 return;
             }
 
@@ -141,11 +140,11 @@ class Account extends BaseComponent {
             };
 
             await DB.AccountTable.create(newAdmin);
-            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: '注册成功'})
+            res.send({ret_code: 0, ret_msg: '注册成功', extra: ''})
 
         }catch(err){
             console.log('注册失败', err);
-            res.send({ret_code: 1, ret_msg: 'REGISTER_ADMIN_FAILED', extra: '注册失败'})
+            res.send({ret_code: 1, ret_msg: '注册失败', extra: ''})
         }
 	}
 
@@ -165,15 +164,15 @@ class Account extends BaseComponent {
             const admin = await DB.AccountTable.findOne({user_account});
             if(!admin){
                 console.log('用户不存在');
-                res.send({ret_code: 1,ret_msg: 'USER_NOT_EXIST',extra: '用户不存在'});
+                res.send({ret_code: 1,ret_msg: '用户不存在',extra: ''});
             }else{
                 await DB.AccountTable.findOneAndUpdate({user_id: admin.user_id},{$set: {user_password: password}});
                 console.log('重置密码成功');
-                res.send({ret_code: 0,ret_msg: 'SUCCESS',extra: '重置密码成功'});
+                res.send({ret_code: 0,ret_msg: '重置密码成功',extra: ''});
             }
         }catch(err){
             console.log('重置用户密码失败');
-            res.send({ret_code: 1,ret_msg: 'ERROR_RESET_PASSWORD',extra: '重置用户密码失败'});
+            res.send({ret_code: 1,ret_msg: '重置用户密码失败',extra: ''});
             return;
         }
 	}
@@ -198,19 +197,19 @@ class Account extends BaseComponent {
 			const admin = await DB.AccountTable.findOne({user_account});
 			if(!admin){
 				console.log('用户不存在');
-				res.send({ret_code: 1,ret_msg: 'USER_NOT_EXIST',extra: '用户不存在'});
+				res.send({ret_code: 1,ret_msg: '用户不存在',extra: ''});
 			}else if(password.toString() != admin.user_password.toString()){
 				console.log('密码错误');
-				res.send({ret_code: 1,ret_msg: 'ERROR_PASSWORD',extra: '密码错误'});
+				res.send({ret_code: 1,ret_msg: '密码错误',extra: ''});
 			}else {
 				const changed_password = this.encryption(user_new_password);
 				await DB.AccountTable.findOneAndUpdate({user_id: admin.user_id},{$set: {user_password: changed_password}});
 				console.log('修改密码成功');
-				res.send({ret_code: 0,ret_msg: 'SUCCESS',extra: '修改密码成功'});
+				res.send({ret_code: 0,ret_msg: '修改密码成功',extra: ''});
 			}
 		}catch(err){
 			console.log('修改用户密码失败');
-			res.send({ret_code: 1,ret_msg: 'ERROR_CHANGE_PASSWORD',extra: '修改用户密码失败'});
+			res.send({ret_code: 1,ret_msg: '修改用户密码失败',extra: ''});
 			return;
 		}
 	}
@@ -229,18 +228,18 @@ class Account extends BaseComponent {
 			const admin = await DB.AccountTable.findOne({user_account});
 			if(!admin){
 				console.log('用户不存在');
-                res.send({ret_code: 1,ret_msg: 'USER_NOT_EXIST',extra: '用户不存在'});
+                res.send({ret_code: 1,ret_msg: '用户不存在',extra: ''});
 			}else if(admin.user_type === 0){
 				console.log('管理员不能冻结');
-				res.send({ret_code: 1,ret_msg: 'SUPER_ADMIN_CAN_NOT_REVOKE',extra:'管理员不能冻结'});
+				res.send({ret_code: 1,ret_msg: '管理员不能冻结',extra:''});
 			}else{
 				await DB.AccountTable.findOneAndUpdate({user_id:admin.user_id},{$set:{user_status:1}});
 				console.log('用户已冻结');
-				res.send({ret_code: 0,ret_msg: 'SUCCESS',extra: '用户已冻结',});
+				res.send({ret_code: 0,ret_msg: '用户已冻结',extra: '',});
 			}
 		}catch(err){
 			console.log('冻结用户失败');
-			res.send({ret_code: 1,ret_msg: 'ERROR_USER_REVOKE',extra: '冻结用户失败'});
+			res.send({ret_code: 1,ret_msg: '冻结用户失败',extra: ''});
 		}
 		
 	}
@@ -359,21 +358,6 @@ class Account extends BaseComponent {
 		}catch(err){
 			console.log('获取用户数量失败',err);
             res.send({ret_code: 1, ret_msg: '获取用户数量失败', extra: err});
-		}
-	}
-	async getAdminInfo(req,res, next){
-
-		try {
-			const admin = await DB.AccountTable.findOne({user_account: user_account});
-			if(!admin){
-				throw new Error('未找到当前用户');
-			}else{
-				console.log('获取用户信息成功');
-                res.send({ret_code: 0, ret_msg: '获取用户信息成功', extra: {}});
-			}
-		}catch(err){
-			console.log('获取用户信息失败');
-            res.send({ret_code: 1, ret_msg: '获取用户信息失败', extra: err});
 		}
 	}
 

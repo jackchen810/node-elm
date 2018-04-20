@@ -5,7 +5,7 @@ const Account = require('../controller/admin/acount');
 const Check = require('../middlewares/check');
 const router = express.Router()
 
-console.log("enter route of admin");
+console.log("enter route of account");
 
 router.all('/login', /*Check.checkAdminStatus,*/ Account.login);
 router.all('/register',Check.checkSuperAdmin, Account.register);
@@ -16,7 +16,6 @@ router.all('/revoke',Check.checkSuperAdmin, Account.revoke);
 router.all('/restore',Check.checkSuperAdmin, Account.restore);
 router.all('/list', Check.checkSuperAdmin, Account.getAllAdmin);
 router.all('/query', Check.checkSuperAdmin, Account.getQueryAdmin);
-router.all('/info',Check.checkAdminStatus, Account.getAdminInfo);
 //router.all('/count', Account.getAdminCount);
 //router.all('/update/avatar/:admin_id', Account.updateAvatar);
 

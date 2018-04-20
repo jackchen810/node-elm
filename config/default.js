@@ -26,7 +26,7 @@ module.exports = {
 		cookie: {
 			httpOnly: true,
 			secure:   false,
-			maxAge:   2 * 60 * 60 * 1000,
+			maxAge:   60 * 60 * 1000,   //单位：ms
 		}
 	},
 }

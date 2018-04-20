@@ -57,11 +57,18 @@ app.use(session({
         url: config.url
     })
 }))
+
+
+// use this middleware to reset cookie expiration time
+// when user hit page every time
 app.use(function(req, res, next){
     req.session._garbage = Date();
     req.session.touch();
     next();
 });
+
+
+
 
 //注册路由分发
 web_router(app);

@@ -1,7 +1,7 @@
 'use strict';
 
 
-const admin_router = require('./acounts.js');
+const admin_router = require('./acount.js');
 const task_router = require('./trade_task.js');
 const riskctrl_router = require('./trade_riskctrl.js');
 const strategy_router = require('./trade_strategy.js');
@@ -14,11 +14,18 @@ const trade_point_router = require('./trade_point.js');
 const download_plan_router = require('./download_plan.js');
 const pick_strategy_router = require('./pick_stock.js');
 const system_setup_router = require('./system_setup.js');
-
+const Check = require('../middlewares/check');
+const Account = require('../controller/admin/acount');
 
 
 function web_router(app) {
-     //渠道相关
+
+
+    //公共入口，做页面超时检查
+    app.use('*', Check.checkAdminStatus);
+
+
+    //渠道相关
      app.use('/api/admin', admin_router);
 
      //任务功能
