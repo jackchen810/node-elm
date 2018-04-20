@@ -11,11 +11,9 @@ router.all('/login', /*Check.checkAdminStatus,*/ Account.login);
 router.all('/register',Check.checkSuperAdmin, Account.register);
 router.all('/logout', Check.checkAdminStatus,Account.logout);
 router.all('/change',/* Check.checkSuperAdmin,*/ Account.changePassword);
-router.all('/reset', Check.checkSuperAdmin, Account.resetPassword);
 router.all('/revoke',Check.checkSuperAdmin, Account.revoke);
 router.all('/restore',Check.checkSuperAdmin, Account.restore);
 router.all('/list', Check.checkSuperAdmin, Account.getAllAdmin);
-router.all('/query', Check.checkSuperAdmin, Account.getQueryAdmin);
 //router.all('/count', Account.getAdminCount);
 //router.all('/update/avatar/:admin_id', Account.updateAvatar);
 

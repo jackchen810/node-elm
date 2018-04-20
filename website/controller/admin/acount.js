@@ -5,20 +5,19 @@ const BaseComponent = require('../../../prototype/baseComponent');
 const crypto = require('crypto');
 const dtime = require('time-formater');
 
+
+
 class Account extends BaseComponent {
 	constructor() {
 		super()
 		this.login = this.login.bind(this);
 		this.register = this.register.bind(this);
 		this.changePassword = this.changePassword.bind(this);
-		this.resetPassword = this.resetPassword.bind(this);
 		this.revoke = this.revoke.bind(this);
 		this.restore = this.restore.bind(this);
-		this.encryption = this.encryption.bind(this);
 		this.getAllAdmin = this.getAllAdmin.bind(this);
 		this.logout = this.logout.bind(this);
-	//	this.updateAvatar = this.updateAvatar.bind(this);
-
+	    //	this.updateAvatar = this.updateAvatar.bind(this);
 
 
 		//本地调试, 设置管理员用户及密码
@@ -26,8 +25,13 @@ class Account extends BaseComponent {
             this.addDefaultAccount('admin', '123456')
             console.log('add default account')
         }
-
 	}
+
+    Md5(password) {
+        const md5 = crypto.createHash('md5')
+        return md5.update(password).digest('hex')
+    }
+
 	async login(req, res, next){
 		var user_account = req.body.user_account;
 		var user_password = req.body.user_password;
@@ -82,7 +86,8 @@ class Account extends BaseComponent {
             // update session
             req.session.user_account = query.user_account;
             req.session.user_type = query.user_type;
-            res.send({ret_code: 0, ret_msg: '欢迎你', extra: ""});
+
+            res.send({ret_code: 0, ret_msg: '欢迎你', extra: query.user_type});
 
 		}catch(err) {
 			console.log('登录失败', err);
@@ -148,35 +153,8 @@ class Account extends BaseComponent {
         }
 	}
 
-	async resetPassword(req, res, next){
-		var user_account = req.body.user_account;
-		try{
-			if(!user_account){
-				throw new Error('请输入用户账号');
-			}
-		}catch(err){
-			console.log(err.message, err);
-            res.send({ret_code: 1, ret_msg: 'GET_ERROR_PARAM', extra: err.message});
-            return;
-		}
-        const password = this.encryption(user_account);
-        try{
-            const admin = await DB.AccountTable.findOne({user_account});
-            if(!admin){
-                console.log('用户不存在');
-                res.send({ret_code: 1,ret_msg: '用户不存在',extra: ''});
-            }else{
-                await DB.AccountTable.findOneAndUpdate({user_id: admin.user_id},{$set: {user_password: password}});
-                console.log('重置密码成功');
-                res.send({ret_code: 0,ret_msg: '重置密码成功',extra: ''});
-            }
-        }catch(err){
-            console.log('重置用户密码失败');
-            res.send({ret_code: 1,ret_msg: '重置用户密码失败',extra: ''});
-            return;
-        }
-	}
 	async changePassword(req, res, next){
+        console.log('[website] account changePassword');
 	//	var user_account = req.body.user_account;
 		var user_account = req.session.user_account;
 		var user_password = req.body.user_password;
@@ -192,94 +170,95 @@ class Account extends BaseComponent {
 			res.send({ret_code: 1,ret_msg: 'GET_ERROR_PARAM',extra: err.message});
 			return;
 		}
-		const password = this.encryption(user_password);
+		//const password = this.encryption(user_password);
+
 		try{
-			const admin = await DB.AccountTable.findOne({user_account});
-			if(!admin){
-				console.log('用户不存在');
-				res.send({ret_code: 1,ret_msg: '用户不存在',extra: ''});
-			}else if(password.toString() != admin.user_password.toString()){
+            var wherestr = {'user_account': user_account};
+			const admin = await DB.AccountTable.findOne(wherestr);
+			if(!admin) {
+                console.log('用户不存在');
+                res.send({ret_code: 1, ret_msg: '用户不存在', extra: ''});
+                return;
+            }
+            if(user_password != admin.user_password_md5) {
 				console.log('密码错误');
 				res.send({ret_code: 1,ret_msg: '密码错误',extra: ''});
-			}else {
-				const changed_password = this.encryption(user_new_password);
-				await DB.AccountTable.findOneAndUpdate({user_id: admin.user_id},{$set: {user_password: changed_password}});
-				console.log('修改密码成功');
-				res.send({ret_code: 0,ret_msg: '修改密码成功',extra: ''});
+				return;
 			}
+
+            var updatestr = {
+				'user_password': user_new_password,
+                'user_password_md5': this.Md5(user_new_password),
+			};
+
+            await DB.AccountTable.findByIdAndUpdate(admin['_id'], updatestr);
+            console.log('修改密码成功');
+            res.send({ret_code: 0,ret_msg: '修改密码成功',extra: ''});
+
 		}catch(err){
 			console.log('修改用户密码失败');
 			res.send({ret_code: 1,ret_msg: '修改用户密码失败',extra: ''});
 			return;
 		}
+        console.log('[website] account changePassword end');
 	}
+
 	async revoke(req, res, next){
-		var user_account = req.body.user_account;
+        console.log('[website] account revoke');
 		try{
-			if(!user_account){
-				throw new Error('请输入用户账号');
-			}
-		}catch(err){
-			console.log(err.message, err);
-			res.send({ret_code: 1,ret_msg: 'GET_ERROR_PARAM',extra: err.message,});
-			return;
-		}
-		try{
-			const admin = await DB.AccountTable.findOne({user_account});
+            var wherestr = {'user_account': req.body.user_account};
+			const admin = await DB.AccountTable.findOne(wherestr);
 			if(!admin){
 				console.log('用户不存在');
                 res.send({ret_code: 1,ret_msg: '用户不存在',extra: ''});
-			}else if(admin.user_type === 0){
+                return;
+			}
+
+			if(admin.user_type === 0){
 				console.log('管理员不能冻结');
 				res.send({ret_code: 1,ret_msg: '管理员不能冻结',extra:''});
-			}else{
-				await DB.AccountTable.findOneAndUpdate({user_id:admin.user_id},{$set:{user_status:1}});
-				console.log('用户已冻结');
-				res.send({ret_code: 0,ret_msg: '用户已冻结',extra: '',});
+				return;
 			}
+
+            var updatestr = {'user_status': 1};
+            await DB.AccountTable.findByIdAndUpdate(admin['_id'], updatestr);
+            res.send({ret_code: 0,ret_msg: '用户已冻结',extra: '',});
+            console.log('用户已冻结');
 		}catch(err){
-			console.log('冻结用户失败');
+			console.log('冻结用户失败', err);
 			res.send({ret_code: 1,ret_msg: '冻结用户失败',extra: ''});
 		}
-		
+
+        console.log('[website] account revoke end');
 	}
+
 	async restore(req, res, next){
-		var user_account = req.body.user_account;
+        console.log('[website] account restore');
 		try{
-			if(!user_account){
-				throw new Error('请输入用户账号');
-			}
-		}catch(err){
-			console.log(err.message, err);
-			res.send({ret_code: 1,ret_msg: 'GET_ERROR_PARAM',extra: err.message});
-			return;
-		}
-		try{
-			const admin = await DB.AccountTable.findOne({user_account});
+            var wherestr = {'user_account': req.body.user_account};
+			const admin = await DB.AccountTable.findOne(wherestr);
 			if(!admin){
 				console.log('用户不存在');
 				res.send({ret_code: 1,ret_msg: '用户不存在',extra: ''});
-			}else if(admin.user_type === 0){
+				return;
+			}
+
+			if(admin.user_type === 0){
 				console.log('管理员不需要解冻');
 				res.send({ret_code:1,ret_msg:'管理员不需要解冻',extra:''});
-			}else{
-				await DB.AccountTable.findOneAndUpdate({user_id:admin.user_id},{$set:{user_status:0}});
-				console.log('用户已解冻');
-				res.send({ret_code: 0,ret_msg: '用户已解冻',extra: ''});
+				return;
 			}
+
+            var updatestr = {'user_status': 0};
+            await DB.AccountTable.findByIdAndUpdate(admin['_id'], updatestr);
+            res.send({ret_code: 0,ret_msg: '用户已解冻',extra: ''});
+            console.log('用户已解冻');
 		}catch(err){
 			console.log('解冻用户失败')
 			res.send({ret_code: 1,ret_msg: '解冻用户失败',extra: ''})
 		}
-		
-	}
-	encryption(password){
-		const newpassword = this.Md5(this.Md5(password).substr(2,7) + this.Md5(password));
-		return newpassword
-	}
-	Md5(password) {
-		const md5 = crypto.createHash('md5')
-		return md5.update(password).digest('hex')
+
+        console.log('[website] account restore end');
 	}
 	async logout(req, res, next){
         console.log('[website] account logout');
@@ -293,6 +272,7 @@ class Account extends BaseComponent {
 		}
         console.log('[website] account end');
 	}
+
 	async getAllAdmin(req, res, next) {
         console.log('[website] account list');
         //console.log(req.body);
@@ -322,47 +302,28 @@ class Account extends BaseComponent {
         //参数有效性检查
         if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
             var queryList = await DB.AccountTable.find(filter).sort(sort);
+            console.log('queryList ', queryList);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList, total:total});
         }
         else if (page_size > 0 && current_page > 0) {
             var skipnum = (current_page - 1) * page_size;   //跳过数
             var queryList = await DB.AccountTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
+            console.log('queryList ', queryList);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList, total:total});
         }
         else{
             res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
         }
 
-        console.log('[website] account task list end');
+        console.log('[website] account list end');
 	}
 
-	async getQueryAdmin(req, res, next) {
-		var user = req.body.user;
-		try {
-			const allAdmin = await DB.AccountTable.find({$or:[{user_account: user},{user_email: user}]});
-			console.log('allAdmin='+allAdmin);
-			res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: allAdmin});
-		}catch(err){
-			console.log('查询用户失败', err);
-            res.send({ret_code: 0, ret_msg: '查询用户失败', extra: err});
-		}
-	}
-
-	async getAdminCount(req, res, next){
-		try{
-			const count = await DB.AccountTable.count();
-			res.send({
-				ret_code: 0,
-				data: count
-			});
-		}catch(err){
-			console.log('获取用户数量失败',err);
-            res.send({ret_code: 1, ret_msg: '获取用户数量失败', extra: err});
-		}
-	}
 
 
     async addDefaultAccount(user_account, user_password) {
+
+        //await DB.AccountTable.findOneAndRemove({'user_account': user_account});
+
         try {
             const admin = await DB.AccountTable.findOne({'user_account': user_account});
             if (admin == null) {

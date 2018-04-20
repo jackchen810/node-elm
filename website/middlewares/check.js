@@ -29,7 +29,7 @@ class Check {
         const user_account = req.session.user_account;
         //console.log('req.session:', req.session);
         //console.log('user_account:', req.session.user_account);
-        if (req.baseUrl == '/api/admin/login') {
+        if (req.baseUrl == '/api/admin/login' || req.baseUrl == '/api/admin/register') {
             console.log(req.baseUrl,  req.originalUrl);
             next()
             return;
@@ -53,6 +53,8 @@ class Check {
             return;
         }
 
+        //设置cookie
+        res.setHeader("Set-Cookie", ["user_type="+admin.user_type, "user_account="+admin.user_account]);
 		next()
 	}
 }
