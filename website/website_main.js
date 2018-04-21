@@ -84,6 +84,12 @@ if ( process.env.NODE_ENV == 'production' || process.env.NODE_ENV == 'developmen
 }
 
 
+app.use(express.static(config.pick_strategy_dir + '/../'));
+app.use(express.static(config.strategy_dir + '/../'));
+app.use(express.static(config.riskctrl_dir + '/../'));
+app.use(express.static(config.order_gateway_dir + '/../'));
+app.use(express.static(config.market_gateway_dir + '/../'));
+
 //本地调试, 正式使用，使用http
 if (true) {
     app.listen(config.port);

@@ -45,7 +45,7 @@ class Account extends BaseComponent {
             }
         }catch(err){
             console.log(err.message, err);
-            res.send({ret_code: 1, ret_msg: 'GET_ERROR_PARAM', extra: err.message});
+            res.send({ret_code: 1, ret_msg: err.message, extra: ''});
             return;
         }
 
