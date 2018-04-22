@@ -16,6 +16,7 @@ const pick_strategy_router = require('./pick_stock.js');
 const system_setup_router = require('./system_setup.js');
 const Check = require('../middlewares/check');
 const Account = require('../controller/admin/acount');
+const script_file_router = require('./script_file.js');
 
 
 function web_router(app) {
@@ -59,7 +60,8 @@ function web_router(app) {
     app.use('/api/download/plan', download_plan_router);
 
     //选股策略路由
-    app.use('/api/pick/stock', pick_strategy_router);
+    //app.use('/api/pick/stock', pick_strategy_router);
+    app.use('/api/script', script_file_router);
 
     //系统设置路由
     app.use('/api/system/setup', system_setup_router);

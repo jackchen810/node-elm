@@ -1,13 +1,20 @@
 'use strict';
 const DB = require('../../../models/models.js');
 const config = require('config-lite');
+const dtime = require('time-formater');
 const fs = require("fs");
 const path = require('path');
+const multiparty = require('multiparty');
+const formidable = require('formidable');
 
 
 class StrategyHandle {
     constructor(){
-
+        //绑定，this
+        this.list = this.list.bind(this);
+        this.del = this.del.bind(this);
+        this.upload = this.upload.bind(this);
+        this.download = this.download.bind(this);
     }
     async list(req, res, next){
         console.log('strategy list');
@@ -29,8 +36,27 @@ class StrategyHandle {
     }
 
 
-    async download(req, res) {
-        console.log('rom download');
+    async del(req, res, next) {
+        console.log('strategy del');
+        //获取表单数据，josn
+        var file_name = req.body['file_name'];
+
+        // 如果没有定义排序规则，添加默认排序
+        if(!file_name){
+            //console.log('sort undefined');
+        }
+
+        console.log('file_name:', file_name);
+        var wherestr = {'file_name': file_name};
+        await DB.StrategyTable.remove(wherestr).exec();
+
+        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:file_name});
+        console.log('strategy del end');
+    }
+
+
+    async download(req, res, next) {
+        console.log('[website] strategy download');
 
         //获取表单数据，josn
         var id = req.body['_id'];
@@ -38,7 +64,7 @@ class StrategyHandle {
 
         //参数有效性检查
         if (typeof(id) === "undefined" || typeof(file_name) === "undefined") {
-            res.send({ret_code: 1002, ret_msg: 'FAILED', extra: 'josn para invalid'});
+            res.send({ret_code: 1002, ret_msg: '参数错误', extra: 'josn para invalid'});
             return;
         }
 
@@ -46,9 +72,15 @@ class StrategyHandle {
         //检查上下架状态
         try {
             var query = await DB.StrategyTable.findById(id).exec();
-            console.log('query rom_status:', query['rom_status'] );
-            if (query['rom_status'] == 'revoke') {  //下架状态
-                res.send({ret_code: 1003, ret_msg: 'FAILED', extra: 'rom is revoked'});
+            console.log('query file_status:', query['file_status'] );
+            if (query['file_status'] == 'revoke') {  //下架状态
+                res.send({ret_code: 1003, ret_msg: '策略已下架', extra: file_name});
+                return;
+            }
+
+            // 实现文件下载
+            if (query['file_name'] != file_name){
+                res.send({ret_code: 1016, ret_msg: 'FAILED', extra: '文件名称错误'});
                 return;
             }
         }
@@ -57,17 +89,11 @@ class StrategyHandle {
             return;
         }
 
-        // 实现文件下载
-        var filePath = path.join(config.strategy_dir, file_name);
-        res.download(filePath, file_name, function(err){
-            if(err){
-                //处理错误，可能只有部分内容被传输，所以检查一下res.headerSent
-                res.send({ret_code: -1, ret_msg: 'FAILED', extra:err});
-            }else{
-                //减少下载的积分值之类的。
-                //res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: 'download ok'});
-            }
-        });
+        //直接返回路径，通过访问文件进行下载
+        var access_path = '/pick-strategy/' + file_name;
+        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:{'access_path':access_path}});
+
+        console.log('[website] strategy download end');
     }
 
     //1.fs.writeFile(filename,data,[options],callback); 创建并写入文件
@@ -88,7 +114,7 @@ class StrategyHandle {
      */
     async upload(req, res){
 
-        console.log('upload');
+        console.log('[website] strategy upload');
         //console.log(req);
 
         //生成multiparty对象，并配置上传目标路径
@@ -116,7 +142,7 @@ class StrategyHandle {
 
         form.on('file', function (field, file) {
             fileName = file.name;
-            uploadedPath = file.path
+            uploadedPath = file.path;
             console.log('upload file: ', fileName, uploadedPath);
         });
 
@@ -124,66 +150,48 @@ class StrategyHandle {
             console.log('begin upload...');
         });
 
-        form.on('end', function () {
+        form.on('end', async function () {
             console.log('upload end: ');
             //console.log(fields);
 
             //参数有效性检查
-            if (typeof(fields.md5_value) === "alias_name" || fields.alias_name == "" ){
-                res.send({ret_code: 1002, ret_msg: 'FAILED', extra: 'josn para invalid'});
+            if (!fields.file_name){
+                res.send({ret_code: 1002, ret_msg: '参数错误', extra: ''});
                 fs.unlinkSync(uploadedPath);
                 return;
             }
 
-            //文件和设备类型检查，读取文件前64字节
-            var readable  = fs.createReadStream(uploadedPath, { start: 0, end: 80 });
-            readable.on('data', function(chunk){
-                fileMatch = chunk.indexOf(fields.dev_type.toUpperCase());
-                console.log('read %d, match', chunk.length, fileMatch);
-            });
+            var query = await DB.StrategyTable.findOne({'file_name': fileName}).exec();
+            if (query != null){
+                console.log('the same file already exist');
+                res.send({ret_code: 1008, ret_msg: '失败：同名文件已存在', extra: ''});
+                fs.unlinkSync(uploadedPath);
+                return;
+            }
 
-            readable.on('end', async function(){
-                console.log('read end');
-                if (fileMatch < 0){
-                    console.log('romfile is not match dev_type');
-                    res.send({ret_code: 1008, ret_msg: 'FAILED', extra: '设备类型和文件不匹配'});
-                    fs.unlinkSync(uploadedPath);
-                    return;
+            console.log('file.rename');
+            //重命名为真实文件名
+            var dstPath = path.join(config.strategy_dir, fileName);
+            fs.rename(uploadedPath, dstPath, function(err) {
+                if(err){
+                    res.send({ret_code: -1, ret_msg: 'FAILED', extra: err});
+                } else {
+                    res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: 'upload ok'});
+
+                    var mytime =  new Date();
+                    //写入数据库
+                    var romDocObj = {
+                        "file_name": fileName,
+                        "user_account": fields.user_account,
+                        "comment": fields.comment,
+                        "file_status" : 'normal',  //上架
+                        "create_date": dtime(mytime).format('YYYY-MM-DD HH:mm:ss'),
+                    };
+
+                    //console.log('romDocObj fields: ', romDocObj);
+                    DB.StrategyTable.create(romDocObj);
                 }
-
-                var query = await DB.StrategyTable.findOne({'file_name': fileName}).exec();
-                if (query != null){
-                    console.log('the same file already exist');
-                    res.send({ret_code: 1008, ret_msg: 'FAILED', extra: '同名文件已存在'});
-                    fs.unlinkSync(uploadedPath);
-                    return;
-                }
-
-                console.log('fs.rename');
-                //重命名为真实文件名
-                var dstPath = path.join(config.strategy_dir, fileName);
-                fs.rename(uploadedPath, dstPath, function(err) {
-                    if(err){
-                        res.send({ret_code: -1, ret_msg: 'FAILED', extra: err});
-                    } else {
-                        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: 'upload ok'});
-
-                        var mytime =  new Date();
-                        //写入数据库
-                        var romDocObj = {
-                            "file_name": fileName,
-                            "alias_name" : fields.alias_name,
-                            "rom_status" : 'normal',  //上架
-                            "create_date": dtime(mytime).format('YYYY-MM-DD HH:mm:ss'),
-                            'sort_time':mytime.getTime(),
-                        };
-
-                        //console.log('romDocObj fields: ', romDocObj);
-                        DB.StrategyTable.create(romDocObj);
-                    }
-                });
             });
-
         });
 
         form.on('error', function(err) {
@@ -191,46 +199,14 @@ class StrategyHandle {
         });
 
         form.parse(req);
-        console.log('upload ok');
+        console.log('[website] strategy upload end');
 
     }
 
-    async del(req, res, next) {
-
-        console.log('rom delete');
-        //console.log(req.body);
-
-        //获取表单数据，josn
-        var id = req.body['_id'];
-        var file_name = req.body['file_name'];
-
-        //参数有效性检查
-        if(typeof(id)==="undefined" || typeof(file_name)==="undefined" ){
-            res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
-            return;
-        }
-
-        try{
-            var query = await DB.StrategyTable.findByIdAndRemove (id);
-            var filePath = path.join(config.strategy_dir, file_name);
-            fs.unlink(filePath, function(err) {
-                if (err){
-                    res.send({ret_code: -1, ret_msg: 'FAILED', extra:err});
-                }
-                else{
-                    res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:'delete ok'});
-                }
-            });
-        }catch(err){
-            res.send({ret_code: -1, ret_msg: 'FAILED', extra:err});
-        }
-        console.log('rom delete end');
-
-    }
 
 
     async revoke(req, res, next){
-        console.log('rom revoke');
+        console.log('[website] strategy revoke');
 
         //获取表单数据，josn
         var id = req.body['_id'];
@@ -239,21 +215,22 @@ class StrategyHandle {
 
         //参数有效性检查
         if(typeof(id)==="undefined"){
-            res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
+            res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'用户输入参数无效'});
             return;
         }
 
         //console.log('_id: ', id);
         //设置下架状态
-        var updatestr = {'rom_status': 'revoke'};
+        var updatestr = {'file_status': 'revoke'};
         var query = await DB.StrategyTable.findByIdAndUpdate(id, updatestr);
         res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: query});
+        console.log('[website] strategy revoke end');
 
     }
 
 
     async release(req, res, next) {
-        console.log('rom release');
+        console.log('[website] strategy release');
 
         //获取表单数据，josn
         var id = req.body['_id'];
@@ -261,15 +238,16 @@ class StrategyHandle {
 
         //参数有效性检查
         if(typeof(id)==="undefined" ){
-            res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
+            res.send({ret_code: 1002, ret_msg: '用户输入参数无效', extra:''});
             return;
         }
 
         //console.log('romDocObj fields: ', romDocObj);
         //设置上架状态
-        var updatestr = {'rom_status': 'normal'};
+        var updatestr = {'file_status': 'normal'};
         var query = await DB.StrategyTable.findByIdAndUpdate(id, updatestr);
         res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: query});
+        console.log('[website] strategy release end');
 
     }
 

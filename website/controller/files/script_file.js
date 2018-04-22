@@ -1,12 +1,14 @@
 'use strict';
 const DB = require('../../../models/models.js');
-const config = require('config-lite');
 const dtime = require('time-formater');
+const config = require('config-lite');
+
 const fs = require("fs");
 const path = require('path');
+const multiparty = require('multiparty');
+const formidable = require('formidable');
 
-
-class OrderGatewayHandle {
+class ScriptFileHandle {
     constructor(){
         //绑定，this
         this.list = this.list.bind(this);
@@ -14,27 +16,72 @@ class OrderGatewayHandle {
         this.upload = this.upload.bind(this);
         this.download = this.download.bind(this);
     }
-    async list(req, res, next){
-        console.log('order gateway list');
+
+
+    async strategy_file(req, res, next){
+        console.log('pick strategy list');
+
 
         try {
-            var path = config.order_gateway_dir;
+            var path = config.pick_strategy_dir;
             var files = fs.readdirSync(path);
-            console.log('files', files);
+            //console.log('files', files);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:files});
         }
         catch (e) {
             console.log(e);
-            res.send({ret_code: -1, ret_msg: 'FAIL', extra:e});
+            res.send({ret_code: -1, ret_msg: 'FAILED', extra:e});
             return;
         }
 
-        console.log('order gateway list end');
+        console.log('pick strategy list end');
+    }
+
+
+    async list(req, res, next){
+        console.log('[website] script list');
+        //获取表单数据，josn
+        var page_size = req.body['page_size'];
+        var current_page = req.body['current_page'];
+        var sort = req.body['sort'];
+        var filter = req.body['filter'];
+
+        // 如果没有定义排序规则，添加默认排序
+        if(typeof(sort)==="undefined"){
+            //console.log('sort undefined');
+            sort = {"sort_time":-1};
+        }
+
+        // 如果没有定义排序规则，添加默认排序
+        if(typeof(filter)==="undefined"){
+            //console.log('filter undefined');
+            filter = {};
+        }
+
+        //console.log('sort ', sort);
+        console.log('filter ', filter);
+        var total = await DB.ScriptFileTable.count(filter).exec();
+
+        //参数有效性检查
+        if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
+            var queryList = await DB.ScriptFileTable.find(filter).sort(sort);
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList, total:total});
+        }
+        else if (page_size > 0 && current_page > 0) {
+            var skipnum = (current_page - 1) * page_size;   //跳过数
+            var queryList = await DB.ScriptFileTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList, total:total});
+        }
+        else{
+            res.send({ret_code: 1002, ret_msg: '参数错误', extra:'josn para invalid'});
+        }
+
+        console.log('[website] script list end');
     }
 
 
     async del(req, res, next){
-        console.log('[website] order gateway del');
+        console.log('[website] script del');
         //获取表单数据，josn
         var file_name = req.body['file_name'];
 
@@ -45,15 +92,15 @@ class OrderGatewayHandle {
 
         console.log('file_name:', file_name);
         var wherestr = {'file_name': file_name};
-        await DB.OrderTable.remove(wherestr).exec();
+        await DB.ScriptFileTable.remove(wherestr).exec();
 
         res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:file_name});
-        console.log('[website] order gateway del end');
+        console.log('[website] script del end');
     }
 
 
     async download(req, res, next) {
-        console.log('[website] order gateway download');
+        console.log('[website] script download');
 
         //获取表单数据，josn
         var id = req.body['_id'];
@@ -68,7 +115,7 @@ class OrderGatewayHandle {
         //console.log('request fields: id:', id);
         //检查上下架状态
         try {
-            var query = await DB.OrderTable.findById(id).exec();
+            var query = await DB.ScriptFileTable.findById(id).exec();
             console.log('query file_status:', query['file_status'] );
             if (query['file_status'] == 'revoke') {  //下架状态
                 res.send({ret_code: 1003, ret_msg: '策略已下架', extra: file_name});
@@ -90,7 +137,7 @@ class OrderGatewayHandle {
         var access_path = '/pick-strategy/' + file_name;
         res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:{'access_path':access_path}});
 
-        console.log('[website] order gateway download end');
+        console.log('[website] script download end');
     }
 
     //1.fs.writeFile(filename,data,[options],callback); 创建并写入文件
@@ -111,7 +158,7 @@ class OrderGatewayHandle {
      */
     async upload(req, res){
 
-        console.log('[website] order gateway upload');
+        console.log('[website] script upload');
         //console.log(req);
 
         //生成multiparty对象，并配置上传目标路径
@@ -128,7 +175,7 @@ class OrderGatewayHandle {
             encoding: 'utf-8',
             keepExtensions: true,
             maxFieldsSize: 10 * 1024 * 1024,
-            uploadDir: config.order_gateway_dir
+            uploadDir: config.pick_strategy_dir
         });
 
         var fields = {};   //各个字段值
@@ -158,7 +205,7 @@ class OrderGatewayHandle {
                 return;
             }
 
-            var query = await DB.OrderTable.findOne({'file_name': fileName}).exec();
+            var query = await DB.ScriptFileTable.findOne({'file_name': fileName}).exec();
             if (query != null){
                 console.log('the same file already exist');
                 res.send({ret_code: 1008, ret_msg: '失败：同名文件已存在', extra: ''});
@@ -168,7 +215,7 @@ class OrderGatewayHandle {
 
             console.log('file.rename');
             //重命名为真实文件名
-            var dstPath = path.join(config.order_gateway_dir, fileName);
+            var dstPath = path.join(config.pick_strategy_dir, fileName);
             fs.rename(uploadedPath, dstPath, function(err) {
                 if(err){
                     res.send({ret_code: -1, ret_msg: 'FAILED', extra: err});
@@ -186,7 +233,7 @@ class OrderGatewayHandle {
                     };
 
                     //console.log('romDocObj fields: ', romDocObj);
-                    DB.OrderTable.create(romDocObj);
+                    DB.ScriptFileTable.create(romDocObj);
                 }
             });
         });
@@ -196,12 +243,12 @@ class OrderGatewayHandle {
         });
 
         form.parse(req);
-        console.log('[website] order gateway upload end');
+        console.log('[website] script upload end');
 
     }
 
     async revoke(req, res, next){
-        console.log('[website] order gateway revoke');
+        console.log('[website] script revoke');
 
         //获取表单数据，josn
         var id = req.body['_id'];
@@ -217,15 +264,15 @@ class OrderGatewayHandle {
         //console.log('_id: ', id);
         //设置下架状态
         var updatestr = {'file_status': 'revoke'};
-        var query = await DB.OrderTable.findByIdAndUpdate(id, updatestr);
+        var query = await DB.ScriptFileTable.findByIdAndUpdate(id, updatestr);
         res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: query});
-        console.log('[website] order gateway revoke end');
+        console.log('[website] script revoke end');
 
     }
 
 
     async release(req, res, next) {
-        console.log('[website] order gateway release');
+        console.log('[website] script release');
 
         //获取表单数据，josn
         var id = req.body['_id'];
@@ -233,69 +280,22 @@ class OrderGatewayHandle {
 
         //参数有效性检查
         if(typeof(id)==="undefined" ){
-            res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'用户输入参数无效'});
+            res.send({ret_code: 1002, ret_msg: '用户输入参数无效', extra:''});
             return;
         }
 
         //console.log('romDocObj fields: ', romDocObj);
         //设置上架状态
         var updatestr = {'file_status': 'normal'};
-        var query = await DB.OrderTable.findByIdAndUpdate(id, updatestr);
+        var query = await DB.ScriptFileTable.findByIdAndUpdate(id, updatestr);
         res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: query});
-        console.log('[website] order gateway release end');
+        console.log('[website] script release end');
 
-    }
-
-    async get_bindobj(req, res, next){
-        console.log('[website] order gateway get bindobj');
-
-        //更新到设备数据库， 设备上线，下线
-        var wherestr = {'is_bind': 'true'};
-        var query = await DB.OrderTable.findOne(wherestr).exec();
-        if (query == null) {
-            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:''});
-            return;
-        }
-
-        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:query['file_name']});
-        console.log('[website] order gateway bindobj end');
-    }
-
-    async bind(req, res, next){
-        console.log('[website] order gateway bind');
-
-        //获取表单数据，josn
-        var file_name = req.body['file_name'];
-        var is_bind = req.body['is_bind'];        //绑定的行情接口
-        var mytime = new Date();
-
-        await DB.OrderTable.update({'is_bind': 'false'}).exec();
-
-        //更新到设备数据库， 设备上线，下线
-        var wherestr = {'file_name': file_name};
-        var updatestr = {'is_bind': is_bind};
-        var query = await DB.OrderTable.findOneAndUpdate(wherestr, updatestr).exec();
-        if (query == null) {
-            res.send({ret_code: -1, ret_msg: '文件不存在', extra:''});
-        }
-
-
-        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:'ok'});
-        console.log('[website] order gateway bind end');
-    }
-    async add(req, res, next){
-        console.log('order gateway add');
-
-        //获取表单数据，josn
-        var file_name = req.body['file_name'];
-        var is_bind = req.body['is_bind'];        //绑定的行情接口
-
-        console.log('order gateway add end');
     }
 
 }
 
-module.exports = new OrderGatewayHandle()
+module.exports = new ScriptFileHandle()
 
 
 

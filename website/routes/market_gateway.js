@@ -14,6 +14,11 @@ console.log("enter route of task");
 
 //获取行情列表
 router.all('/list', MarketGatewayHandle.list);
+router.all('/upload', MarketGatewayHandle.upload);
+router.all('/download', MarketGatewayHandle.download);
+router.all('/del', MarketGatewayHandle.del);
+router.all('/release', MarketGatewayHandle.release);
+router.all('/revoke', MarketGatewayHandle.revoke);
 
 //绑定行情列表
 router.all('/bind', MarketGatewayHandle.bind);

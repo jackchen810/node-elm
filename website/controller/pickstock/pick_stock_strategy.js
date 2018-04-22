@@ -282,7 +282,7 @@ class PickStockStrategyHandle {
 
         //参数有效性检查
         if(typeof(id)==="undefined" ){
-            res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'用户输入参数无效'});
+            res.send({ret_code: 1002, ret_msg: '用户输入参数无效', extra:''});
             return;
         }
 

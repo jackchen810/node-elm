@@ -13,7 +13,11 @@ console.log("enter route of task");
 
 //获取策略列表
 router.all('/list', StrategyHandle.list);
-
+router.all('/upload', StrategyHandle.upload);
+router.all('/download', StrategyHandle.download);
+router.all('/del', StrategyHandle.del);
+router.all('/release', StrategyHandle.release);
+router.all('/revoke', StrategyHandle.revoke);
 
 
 //将发行固件上传到平台, form表单需要的中间件处理
