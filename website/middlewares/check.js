@@ -26,6 +26,13 @@ class Check {
 		next()
 	}
 	async checkAdminStatus(req, res, next){
+
+        //本地调试
+        if (process.env.NODE_ENV == 'local') {
+            next();
+            return;
+        }
+
         const user_account = req.session.user_account;
         //console.log('req.session:', req.session);
         //console.log('user_account:', req.session.user_account);

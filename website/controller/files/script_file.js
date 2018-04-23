@@ -17,18 +17,33 @@ class ScriptFileHandle {
         this.download = this.download.bind(this);
         this.sync = this.sync.bind(this);
         this.sync_file = this.sync_file.bind(this);
+        this.all_file = this.all_file.bind(this);
     }
 
 
-    async strategy_file(req, res, next){
+    async all_file(req, res, next){
         console.log('[website] file list');
 
-
         try {
-            var path = config.firmware_dir;
-            var files = fs.readdirSync(path);
+            var path = this.get_dest_fullname('select');
+            var select = fs.readdirSync(path);
+            var path = this.get_dest_fullname('trade');
+            var trade = fs.readdirSync(path);
+            var path = this.get_dest_fullname('riskctrl');
+            var riskctrl = fs.readdirSync(path);
+            var path = this.get_dest_fullname('order');
+            var order = fs.readdirSync(path);
+            var path = this.get_dest_fullname('market');
+            var market = fs.readdirSync(path);
+            var objList ={
+                'select': select,
+                'trade': trade,
+                'riskctrl': riskctrl,
+                'order': order,
+                'market': market,
+            }
             //console.log('files', files);
-            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:files});
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:objList});
         }
         catch (e) {
             console.log(e);
@@ -37,6 +52,20 @@ class ScriptFileHandle {
         }
 
         console.log('[website] file list end');
+    }
+
+    async all_doc(req, res, next){
+        console.log('[website] all doc list');
+
+        try {
+            var queryList = await DB.ScriptFileTable.find();
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList});
+        }
+        catch (e) {
+            res.send({ret_code: -1, ret_msg: 'FAILED', extra:[]});
+            return;
+        }
+        console.log('[website] all doc list end');
     }
 
     async file_list(req, res, next){
@@ -135,6 +164,8 @@ class ScriptFileHandle {
         console.log('[website] script del');
         //获取表单数据，josn
         var file_name = req.body['file_name'];
+        var file_type = req.body['file_type'];
+        var user_account = req.body['user_account'];
 
         // 如果没有定义排序规则，添加默认排序
         if(!file_name){
@@ -142,7 +173,7 @@ class ScriptFileHandle {
         }
 
         console.log('file_name:', file_name);
-        var wherestr = {'file_name': file_name};
+        var wherestr = {'file_name': file_name, 'file_type': file_type, 'user_account': user_account};
         await DB.ScriptFileTable.remove(wherestr).exec();
 
         res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:file_name});
@@ -156,6 +187,7 @@ class ScriptFileHandle {
         //获取表单数据，josn
         var id = req.body['_id'];
         var file_name = req.body['file_name'];
+        //var file_type = req.body['file_type'];
 
         //参数有效性检查
         if (typeof(id) === "undefined" || typeof(file_name) === "undefined") {
@@ -191,7 +223,7 @@ class ScriptFileHandle {
         console.log('[website] script download end');
     }
 
-    get_dest_fullname(file_type, fileName){
+    get_dest_fullname(file_type){
 
         var basePath = '';
         if (file_type == 'select'){
@@ -279,7 +311,12 @@ class ScriptFileHandle {
                 return;
             }
 
-            var query = await DB.ScriptFileTable.findOne({'file_name': fileName}).exec();
+            var wherestr = {
+                'file_name': fileName,
+                'file_type':fields.file_type,
+                'user_account':fields.user_account
+            };
+            var query = await DB.ScriptFileTable.findOne(wherestr).exec();
             if (query != null){
                 console.log('the same file already exist');
                 res.send({ret_code: 1008, ret_msg: '失败：同名文件已存在', extra: ''});
@@ -289,7 +326,7 @@ class ScriptFileHandle {
 
             console.log('file.rename');
             //重命名为真实文件名
-            var dstPath = path.join(self.get_dest_fullname(fields.file_type, fileName), fileName);
+            var dstPath = path.join(self.get_dest_fullname(fields.file_type), fileName);
             //console.log(dstPath);
             fs.rename(uploadedPath, dstPath, function(err) {
                 if(err){
@@ -368,7 +405,7 @@ class ScriptFileHandle {
 
     }
 
-    sync_file(user_account, path) {
+    async sync_file(user_account, path) {
 
         var file_type = '';
         if (path == config.pick_strategy_dir){
@@ -388,8 +425,36 @@ class ScriptFileHandle {
         }
 
 
+        //删除文件目录中不存在的记录
         var files = fs.readdirSync(path);
+        var queryList = await DB.ScriptFileTable.find({file_type: file_type});
+        for (var i = 0; i < queryList.length; i++){
+
+            var file_name = queryList[i].file_name;
+
+            // 判断文件目录下是否有该文件，如果没有就删除数据库记录
+            for(var m = 0; m < files.length; m++){
+                if (file_name == files[i]){  //找到文件
+                    break;
+                }
+            }
+
+            //没有找到， 删除数据库记录
+            if (m == files.length){
+                //console.log('docObj fields: ', docObj);
+                await DB.ScriptFileTable.findByIdAndRemove(queryList[i]._id);
+            }
+        }
+
+        //添加文件目录下的文件到数据库中
         for (var i = 0; i < files.length; i++){
+            //console.log('ready to add file_name: ', files[i]);
+            var wherestr = {'file_name': files[i], file_type: file_type};
+            var query = await DB.ScriptFileTable.findOne(wherestr);
+            if (query != null){
+                continue;
+            }
+
             //写入数据库
             var docObj = {
                 "file_name": files[i],
@@ -401,18 +466,23 @@ class ScriptFileHandle {
             };
 
             //console.log('docObj fields: ', docObj);
-            DB.ScriptFileTable.create(docObj);
+            await DB.ScriptFileTable.create(docObj, function(error){
+                console.log("保存成功", error);
+            });
+            //console.log('add ok file_name: ', docObj);
         }
 
     }
 
     async sync(req, res, next) {
         console.log('[website] script sync');
-        this.sync_file(req.session.user_account, config.pick_strategy_dir);
-        this.sync_file(req.session.user_account, config.strategy_dir);
-        this.sync_file(req.session.user_account, config.riskctrl_dir);
-        this.sync_file(req.session.user_account, config.order_gateway_dir);
-        this.sync_file(req.session.user_account, config.market_gateway_dir);
+        var user_account = req.session.user_account;
+
+        await this.sync_file(user_account, config.pick_strategy_dir);
+        await this.sync_file(user_account, config.strategy_dir);
+        await this.sync_file(user_account, config.riskctrl_dir);
+        await this.sync_file(user_account, config.order_gateway_dir);
+        await this.sync_file(user_account, config.market_gateway_dir);
 
         res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: ''});
         console.log('[website] script sync end');

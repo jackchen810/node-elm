@@ -21,6 +21,8 @@ router.all('/revoke', ScriptFileHandle.revoke);
 
 
 router.all('/sync', ScriptFileHandle.sync);
+router.all('/all/list', ScriptFileHandle.all_file);
+router.all('/all/doc', ScriptFileHandle.all_doc);
 
 
 
