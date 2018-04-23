@@ -15,15 +15,17 @@ class ScriptFileHandle {
         this.del = this.del.bind(this);
         this.upload = this.upload.bind(this);
         this.download = this.download.bind(this);
+        this.sync = this.sync.bind(this);
+        this.sync_file = this.sync_file.bind(this);
     }
 
 
     async strategy_file(req, res, next){
-        console.log('pick strategy list');
+        console.log('[website] file list');
 
 
         try {
-            var path = config.pick_strategy_dir;
+            var path = config.firmware_dir;
             var files = fs.readdirSync(path);
             //console.log('files', files);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:files});
@@ -34,7 +36,56 @@ class ScriptFileHandle {
             return;
         }
 
-        console.log('pick strategy list end');
+        console.log('[website] file list end');
+    }
+
+    async file_list(req, res, next){
+        console.log('[website] file list');
+        //获取表单数据，josn
+        var page_size = req.body['page_size'];
+        var current_page = req.body['current_page'];
+        var sort = req.body['sort'];
+        var filter = req.body['filter'];
+
+        // 如果没有定义排序规则，添加默认排序
+        if(typeof(sort)==="undefined"){
+            //console.log('sort undefined');
+            sort = {"sort_time":-1};
+        }
+
+        // 如果没有定义排序规则，添加默认排序
+        if(typeof(filter)==="undefined"){
+            //console.log('filter undefined');
+            filter = {};
+        }
+
+        //console.log('sort ', sort);
+        console.log('filter ', filter);
+        var total = await DB.ScriptFileTable.count(filter).exec();
+
+        //参数有效性检查
+        if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
+            var queryList = await DB.ScriptFileTable.find(filter).sort(sort);
+            var fileList = [];
+            for (var i = 0; i < queryList.length; i++){
+                fileList.push(queryList[i].file_name);
+            }
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:fileList, total:total});
+        }
+        else if (page_size > 0 && current_page > 0) {
+            var skipnum = (current_page - 1) * page_size;   //跳过数
+            var queryList = await DB.ScriptFileTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
+            var fileList = [];
+            for (var i = 0; i < queryList.length; i++){
+                fileList.push(queryList[i].file_name);
+            }
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:fileList, total:total});
+        }
+        else{
+            res.send({ret_code: 1002, ret_msg: '参数错误', extra:''});
+        }
+
+        console.log('[website] file list end');
     }
 
 
@@ -140,6 +191,28 @@ class ScriptFileHandle {
         console.log('[website] script download end');
     }
 
+    get_dest_fullname(file_type, fileName){
+
+        var basePath = '';
+        if (file_type == 'select'){
+            basePath = config.pick_strategy_dir;
+        }
+        else if(file_type == 'trade'){
+            basePath = config.strategy_dir;
+        }
+        else if(file_type == 'riskctrl'){
+            basePath = config.riskctrl_dir;
+        }
+        else if(file_type == 'order'){
+            basePath = config.order_gateway_dir;
+        }
+        else if(file_type == 'market'){
+            basePath = config.market_gateway_dir;
+        }
+        return basePath;
+    }
+
+
     //1.fs.writeFile(filename,data,[options],callback); 创建并写入文件
     /**
      * filename, 必选参数，文件名
@@ -156,7 +229,7 @@ class ScriptFileHandle {
      * [options],可选参数，可指定flag 默认为‘r’，encoding 默认为null，在读取的时候，需要手动指定
      * callback 读取文件后的回调函数，参数默认第一个err,第二个data 数据
      */
-    async upload(req, res){
+    async upload(req, res, next){
 
         console.log('[website] script upload');
         //console.log(req);
@@ -175,7 +248,7 @@ class ScriptFileHandle {
             encoding: 'utf-8',
             keepExtensions: true,
             maxFieldsSize: 10 * 1024 * 1024,
-            uploadDir: config.pick_strategy_dir
+            uploadDir: config.firmware_dir
         });
 
         var fields = {};   //各个字段值
@@ -194,6 +267,7 @@ class ScriptFileHandle {
             console.log('begin upload...');
         });
 
+        var self = this;
         form.on('end', async function () {
             console.log('upload end: ');
             console.log(fields);
@@ -215,25 +289,26 @@ class ScriptFileHandle {
 
             console.log('file.rename');
             //重命名为真实文件名
-            var dstPath = path.join(config.pick_strategy_dir, fileName);
+            var dstPath = path.join(self.get_dest_fullname(fields.file_type, fileName), fileName);
+            //console.log(dstPath);
             fs.rename(uploadedPath, dstPath, function(err) {
                 if(err){
                     res.send({ret_code: -1, ret_msg: 'FAILED', extra: err});
                 } else {
                     res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: 'upload ok'});
 
-                    var mytime =  new Date();
                     //写入数据库
-                    var romDocObj = {
+                    var docObj = {
                         "file_name": fileName,
+                        "file_type": fields.file_type,
+                        "file_status" : 'normal',  //上架
                         "user_account": fields.user_account,
                         "comment": fields.comment,
-                        "file_status" : 'normal',  //上架
-                        "create_date": dtime(mytime).format('YYYY-MM-DD HH:mm:ss'),
+                        "create_date": dtime().format('YYYY-MM-DD HH:mm:ss'),
                     };
 
-                    //console.log('romDocObj fields: ', romDocObj);
-                    DB.ScriptFileTable.create(romDocObj);
+                    //console.log('docObj fields: ', docObj);
+                    DB.ScriptFileTable.create(docObj);
                 }
             });
         });
@@ -284,7 +359,7 @@ class ScriptFileHandle {
             return;
         }
 
-        //console.log('romDocObj fields: ', romDocObj);
+        //console.log('docObj fields: ', docObj);
         //设置上架状态
         var updatestr = {'file_status': 'normal'};
         var query = await DB.ScriptFileTable.findByIdAndUpdate(id, updatestr);
@@ -293,6 +368,55 @@ class ScriptFileHandle {
 
     }
 
+    sync_file(user_account, path) {
+
+        var file_type = '';
+        if (path == config.pick_strategy_dir){
+            file_type = 'select';
+        }
+        else if(path == config.strategy_dir){
+            file_type = 'trade';
+        }
+        else if(path == config.riskctrl_dir){
+            file_type = 'riskctrl';
+        }
+        else if(path == config.order_gateway_dir){
+            file_type = 'order';
+        }
+        else if(path == config.market_gateway_dir){
+            file_type = 'market';
+        }
+
+
+        var files = fs.readdirSync(path);
+        for (var i = 0; i < files.length; i++){
+            //写入数据库
+            var docObj = {
+                "file_name": files[i],
+                "file_type": file_type,
+                "file_status" : 'normal',  //上架
+                "user_account": user_account,
+                "comment": 'sync',
+                "create_date": dtime().format('YYYY-MM-DD HH:mm:ss'),
+            };
+
+            //console.log('docObj fields: ', docObj);
+            DB.ScriptFileTable.create(docObj);
+        }
+
+    }
+
+    async sync(req, res, next) {
+        console.log('[website] script sync');
+        this.sync_file(req.session.user_account, config.pick_strategy_dir);
+        this.sync_file(req.session.user_account, config.strategy_dir);
+        this.sync_file(req.session.user_account, config.riskctrl_dir);
+        this.sync_file(req.session.user_account, config.order_gateway_dir);
+        this.sync_file(req.session.user_account, config.market_gateway_dir);
+
+        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: ''});
+        console.log('[website] script sync end');
+    }
 }
 
 module.exports = new ScriptFileHandle()

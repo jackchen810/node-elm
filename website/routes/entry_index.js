@@ -60,11 +60,14 @@ function web_router(app) {
     app.use('/api/download/plan', download_plan_router);
 
     //选股策略路由
-    //app.use('/api/pick/stock', pick_strategy_router);
-    app.use('/api/script', script_file_router);
+    app.use('/api/pick/stock', pick_strategy_router);
 
     //系统设置路由
     app.use('/api/system/setup', system_setup_router);
+
+
+    //文件功能设置路由
+    app.use('/api/script', script_file_router);
 }
 
 

@@ -2,12 +2,8 @@
 const mongoose = require('mongoose');
 const TaskTable = require('./task/trade_task.js');
 const TradePointTable = require('./task/trade_point.js');
-const StrategyTable = require('../models/strategy/strategy.js');
-const RiskctrlTable = require('../models/riskctrl/riskctrl.js');
 const LogTable = require('../models/log/log.js');
 const TaskPlanTable = require('./download/task_plan.js');
-const OrderTable = require('./gateway/order.js');
-const MarketTable = require('./gateway/market.js');
 const BasicsTable = require('../models/basics/basics.js');
 const KTable = require('./download/history.js');
 const BacktestResultTable = require('./backtest/backtest_result.js');
@@ -16,7 +12,6 @@ const BacktestTaskTable = require('./backtest/backtest_task.js');
 
 const PickResultTable = require('./pickstock/select_result.js');
 const PickTaskTable = require('./pickstock/select_task.js');
-const PickStrategyTable = require('./pickstock/select_strategy.js');
 
 const AccountTable = require('./admin/account.js');
 const SystemSetupTable = require('../models/config/system_setup.js');
@@ -29,19 +24,15 @@ function DB() {
     this.TaskTable = TaskTable;
     this.TradePointTable = TradePointTable;
     //this.SysinfoTable = SysinfoTable;
-    this.StrategyTable = StrategyTable;
-    this.RiskctrlTable = RiskctrlTable;
+    //this.RiskctrlTable = RiskctrlTable;
     this.LogTable = LogTable;
     this.BacktestResultTable = BacktestResultTable;
     this.BacktestTaskTable = BacktestTaskTable;
 
     this.PickResultTable = PickResultTable;
     this.PickTaskTable = PickTaskTable;
-    this.PickStrategyTable = PickStrategyTable;
 
     this.TaskPlanTable = TaskPlanTable;
-    this.OrderTable = OrderTable;
-    this.MarketTable = MarketTable;
     this.SystemSetupTable = SystemSetupTable;
     this.ScriptFileTable = ScriptFileTable;
 

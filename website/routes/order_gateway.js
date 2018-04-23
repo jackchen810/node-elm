@@ -1,28 +1,17 @@
 'use strict';
 
 const express = require('express');
-const OrderGatewayHandle = require('../controller/gateway/order_gateway.js');
+const ScriptFileHandle = require('../controller/files/script_file.js');
 
 
 const router = express.Router();
 
 
-console.log("enter route of task");
-
+console.log("enter route of order gateway");
 
 
 //获取行情列表
-router.all('/list', OrderGatewayHandle.list);
-router.all('/upload', OrderGatewayHandle.upload);
-router.all('/download', OrderGatewayHandle.download);
-router.all('/del', OrderGatewayHandle.del);
-router.all('/release', OrderGatewayHandle.release);
-router.all('/revoke', OrderGatewayHandle.revoke);
-
-//获取行情列表
-router.all('/add', OrderGatewayHandle.add);
-
-
+router.all('/list', ScriptFileHandle.file_list);
 
 
 module.exports = router

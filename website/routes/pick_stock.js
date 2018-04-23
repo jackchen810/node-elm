@@ -3,7 +3,7 @@
 const express = require('express');
 const PickStockHandle = require('../controller/pickstock/pick_stock.js');
 const PickStockResultHandle = require('../controller/pickstock/pick_stock_result.js');
-const PickStockStrategyHandle = require('../controller/pickstock/pick_stock_strategy.js');
+const ScriptFileHandle = require('../controller/files/script_file.js');
 
 
 const router = express.Router();
@@ -31,14 +31,7 @@ router.all('/result', PickStockResultHandle.result_list);
 router.all('/result/length', PickStockResultHandle.result_list_length);
 
 
-router.all('/strategy/list', PickStockStrategyHandle.strategy_list);
-router.all('/strategy/upload', PickStockStrategyHandle.upload);
-router.all('/strategy/download', PickStockStrategyHandle.download);
-router.all('/strategy/del', PickStockStrategyHandle.del);
-router.all('/strategy/release', PickStockStrategyHandle.release);
-router.all('/strategy/revoke', PickStockStrategyHandle.revoke);
-
-//router.all('/list/length', PickStockHandle.trade_point_list_length);
+router.all('/strategy/list', ScriptFileHandle.file_list);
 
 
 

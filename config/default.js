@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-	firmware_dir:'./public/firmware',
+	firmware_dir:'./public',
     pick_strategy_dir:'./picker/pick-strategy',
     strategy_dir:'./trader/trade-strategy',
     riskctrl_dir:'./trader/trade-riskctrl',
