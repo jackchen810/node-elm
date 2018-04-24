@@ -212,7 +212,17 @@ class HistoryHandle {
         }, 3000);
     }
 
+    async task_recovey(){
+        console.log('[website] download task recovery');
 
+        //遍历数据库，恢复运行的任务
+        var wherestr = {'task_status': 'running'};
+        var queryList = await DB.TaskPlanTable.find(wherestr).exec();
+        WebsiteTx.send(queryList, 'download.task', 'add', 'downloader');
+
+        console.log('[website] download task recovery end');
+
+    }
 }
 
 module.exports = new HistoryHandle()

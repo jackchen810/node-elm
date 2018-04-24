@@ -177,6 +177,11 @@ class WorkerBacktestClass {
             var symbol_name = request[i]['symbol_name'];
             var strategy_name = request[i]['strategy_name'];
 
+            //如果任务存在
+            if (this.taskMap.get(task_id)){
+                continue;
+            }
+
 
             var strategy_fullname = path.join(__dirname, '../../', config.strategy_dir, strategy_name);
             console.log('[worker backtest] strategy_fullname:', strategy_fullname);

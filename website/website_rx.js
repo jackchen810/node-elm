@@ -25,7 +25,7 @@ class WebsiteRxTx{
         this.addLoopListener = this.addLoopListener.bind(this);
         this.onMessage = this.onMessage.bind(this);
 
-        console.log('WebsiteRxTx process on');
+        //console.log('WebsiteRx process on');
 
         //监听进程消息
         process.on('message', this.onMessage);

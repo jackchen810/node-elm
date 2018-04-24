@@ -19,3 +19,11 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 console.log('create website process, pid:', process.pid);
+
+
+const TaskHandle = require('./controller/task/trade_task.js');
+const PickStockHandle = require('./controller/pickstock/pick_stock.js');
+const HistoryHandle = require('./controller/download/download_plan.js');
+TaskHandle.task_recovey();
+PickStockHandle.task_recovey();
+HistoryHandle.task_recovey();

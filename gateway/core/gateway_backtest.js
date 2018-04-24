@@ -25,6 +25,11 @@ class GatewayBacktestClass {
             var start_time = request[i]['start_time'];
             var end_time = request[i]['end_time'];
 
+            //如果任务存在
+            if (this.taskMap.get(task_id)){
+                continue;
+            }
+
             ///导入strategy_list
             console.log('[gateway] trade_symbol:', trade_symbol);
             console.log('[gateway] trade_ktype:', trade_ktype);

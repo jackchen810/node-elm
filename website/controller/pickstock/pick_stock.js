@@ -285,6 +285,16 @@ class PickStockHandle {
     }
 
 
+    async task_recovey(){
+        console.log('[website] pickstock task recovery');
+
+        //遍历数据库，恢复运行的任务
+        var wherestr = {'task_status': 'running'};
+        var queryList = await DB.PickTaskTable.find(wherestr).exec();
+        WebsiteTx.send(queryList, 'pickstock.task', 'add', 'picker');
+
+        console.log('[website] pickstock task recovery end');
+    }
 
 }
 

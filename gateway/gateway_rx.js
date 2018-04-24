@@ -14,7 +14,7 @@ const db = require('../mongodb/db.js');
 * */
 
 
-class GatewayRxTx{
+class GatewayRx{
     constructor(){
         //记录任务id
         this.type = null;
@@ -44,7 +44,7 @@ class GatewayRxTx{
 
         //接收主进程发送过来的消息
         if(head.type == 'trade.task') {
-            //var response = new GatewayRxTx(head.type, head.action, head.source);
+            //var response = new GatewayRx(head.type, head.action, head.source);
             if (head.action == 'add') {
                 GatewayTradeHandle.task_add(body, GatewayTxHandle);
             }
@@ -53,7 +53,7 @@ class GatewayRxTx{
             }
         }
         else if(head.type == 'backtest.task'){
-            //var response = new GatewayRxTx(head.type, head.action, head.source);
+            //var response = new GatewayRx(head.type, head.action, head.source);
             if (head.action == 'add') {
                 GatewayBacktestHandle.backtest_task_add(body, GatewayTxHandle);
             }
@@ -66,6 +66,6 @@ class GatewayRxTx{
 }
 
 
-module.exports = new GatewayRxTx();
+module.exports = new GatewayRx();
 
 //console.log('create gateway process, pid:', process.pid);

@@ -27,6 +27,12 @@ class WorkerClass {
         var task_type = request[0]['task_type'];
         var crontab_string = request[0]['crontab_string'];
 
+        //如果任务存在
+        if (this.taskMap.get(task_id)){
+            var msgObj = {ret_code: 0, ret_msg: 'repeat', extra: task_id};
+            response.send(msgObj);
+            return;
+        }
 
         var script_fullname = path.join(__dirname, '../../', config.history_dl_dir, task_script);
         var script_type = this.get_script_type(task_script);

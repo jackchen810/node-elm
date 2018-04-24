@@ -105,6 +105,10 @@ class WorkerClass {
             var riskctrl_name = request[i]['riskctrl_name'];
             var order_gateway = request[i]['order_gateway'];
 
+            //如果任务存在
+            if (this.taskMap.get(task_id)){
+                continue;
+            }
 
             var strategy_fullname = path.join(__dirname, '../../', config.strategy_dir, strategy_name);
             console.log('[worker] strategy_fullname:', strategy_fullname);

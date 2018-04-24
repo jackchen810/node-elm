@@ -24,6 +24,14 @@ class PickerClass {
         var stock_ktype = request[0]['stock_ktype'];
         var stock_range = request[0]['stock_range'];
 
+        //如果任务存在
+        if (this.taskMap.get(task_id)){
+            var msgObj = {ret_code: 0, ret_msg: 'repeat', extra: task_id};
+            response.send(msgObj);
+            return;
+        }
+
+
         var strategy_fullname = path.join(__dirname, '../../', config.pick_strategy_dir, strategy_name);
         console.log('[pickstock] strategy_fullname:', strategy_fullname);
         if (fs.existsSync(strategy_fullname) == false) {

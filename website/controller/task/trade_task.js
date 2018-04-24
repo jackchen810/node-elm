@@ -345,6 +345,18 @@ class TaskHandle {
     }
 
 
+    async task_recovey(){
+        console.log('[website] task recovery');
+
+        //遍历数据库，恢复运行的任务
+        var wherestr = {'task_status': 'running'};
+        var queryList = await DB.TaskTable.find(wherestr).exec();
+        WebsiteTx.send(queryList, 'trade.task', 'add', ['worker', 'gateway']);
+
+        console.log('[website] task recovery end');
+
+    }
+
 
 }
 

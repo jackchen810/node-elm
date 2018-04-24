@@ -26,6 +26,11 @@ class GatewayClass {
             var trade_ktype = request[i]['trade_ktype'];
             var market_gateway = request[i]['market_gateway'];   //行情接口就是主策略的接口
 
+            //如果任务存在
+            if (this.taskMap.get(task_id)){
+                continue;
+            }
+
             ///导入strategy_list
             console.log('[gateway] trade_symbol:', trade_symbol);
             console.log('[gateway] market_gateway:', market_gateway);
