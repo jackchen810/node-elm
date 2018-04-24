@@ -42,7 +42,7 @@ class PickerRx{
         PickerTxHandle.init(head);
 
         //接收主进程发送过来的消息
-        if(head.type == 'pickstock.task'){
+        if(head.type == 'pickstock.task' && body.length > 0){
             if (head.action == 'add') {
                 PickerTradeHandle.pickstock_task_add(body, PickerTxHandle);
             }

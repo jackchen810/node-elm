@@ -44,7 +44,7 @@ class WorkerRx{
 
         //接收主进程发送过来的消息
         if(head.type == 'trade.task'){
-            if (head.action == 'add') {
+            if (head.action == 'add' && body.length > 0) {
                 WorkerTradeHandle.task_add(body, WorkerTxHandle);
             }
             else if(head.action == 'del') {
@@ -70,7 +70,7 @@ class WorkerRx{
             //var response = new WorkerRx(head.type, head.action);
             //WorkerTradeHandle.dataSync(msg['body'], msg['data'], response);
         }
-        else if(head.type == 'backtest.task') {
+        else if(head.type == 'backtest.task' && body.length > 0) {
             if (head.action == 'add') {
                 WorkerBacktestHandle.backtest_task_add(body, WorkerTxHandle);
             }

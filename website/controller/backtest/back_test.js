@@ -41,6 +41,11 @@ class BacktestHandle {
             filter = {};
         }
 
+        //普通用户进行过滤
+        if(req.session.user_type == '1'){
+            filter['user_account'] = req.session.user_account;
+        }
+
         //console.log('sort ', sort);
         //console.log('filter ', filter);
         var total = await DB.BacktestTaskTable.count(filter).exec();
@@ -84,6 +89,7 @@ class BacktestHandle {
         console.log('[website] backtest task add');
 
         //获取表单数据，josn
+        var user_account = req.body['user_account'];   //
         var strategy_type = req.body['strategy_type'];
         var strategy_list = req.body['strategy_list'];        //获取表单数据，josn
         var task_id = DB.guid();
@@ -91,6 +97,10 @@ class BacktestHandle {
         var start_time = req.body['start_time'];        //获取表单数据，josn
         var end_time = req.body['end_time'];        //获取表单数据，josn
 
+        // 如果没有定义用户，添加session中的用户
+        if(typeof(user_account)==="undefined"){
+            user_account = req.session.user_account;
+        }
 
         //更新到设备数据库， 交易的标的不能够重复, index=0 是主策略
         var wherestr = {'trade_symbol': strategy_list[0]['stock_symbol']};
@@ -109,6 +119,7 @@ class BacktestHandle {
                 'task_id': task_id,
                 'task_type': (i==0 ? 'trade':'order_point'),  //任务结果
                 'task_status': 'stop',   // 运行状态
+                'user_account': user_account,   //
 
                 //输入
                 'trade_symbol': strategy_list[i]['stock_symbol'],   ///index=0的使用交易symbol
@@ -343,7 +354,17 @@ class BacktestHandle {
         console.log('[website] backtest task_status end');
     }
 
+    async task_recovey(){
+        console.log('[website] backtest task recovery');
 
+        //遍历数据库，恢复运行的任务
+        var wherestr = {'task_status': 'running'};
+        var queryList = await DB.BacktestTaskTable.find(wherestr).exec();
+        WebsiteTx.send(queryList, 'backtest.task', 'add', ['worker', 'gateway']);
+
+        console.log('[website] backtest task recovery end');
+
+    }
 
 }
 

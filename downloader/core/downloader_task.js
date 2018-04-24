@@ -72,19 +72,21 @@ class WorkerClass {
     async download_task_del(request, response){
         console.log('[download] del task');
 
-        var task_id = request[0]['task_id'];
-        var task = this.taskMap.get(task_id);
+        for (var i = 0; i < request.length; i++) {
+            var task_id = request[i]['task_id'];
+            var task = this.taskMap.get(task_id);
 
-        if (typeof(task) !== 'undefined'){
-            //console.log('[download] task instance', task_id, task);
-            task['crontab_instance'].cancel();
+            if (typeof(task) !== 'undefined') {
+                //console.log('[download] task instance', task_id, task);
+                task['crontab_instance'].cancel();
 
-            //删除实例
-            this.taskMap.delete(task_id);
+                //删除实例
+                this.taskMap.delete(task_id);
+            }
+
+            var msgObj = {ret_code: 0, ret_msg: 'SUCCESS', extra: task_id};
+            response.send(msgObj);
         }
-
-        var msgObj = {ret_code: 0, ret_msg: 'SUCCESS', extra: task_id};
-        response.send(msgObj);
         console.log('[download] del task ok');
     }
 

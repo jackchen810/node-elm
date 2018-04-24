@@ -42,7 +42,7 @@ class DownloaderRx{
         DownloaderTxHandle.init(head);
 
         //接收主进程发送过来的消息
-        if(head.type == 'download.task'){
+        if(head.type == 'download.task' && body.length > 0){
             if (head.action == 'add') {
                 DownloaderTradeHandle.download_task_add(body, DownloaderTxHandle);
             }

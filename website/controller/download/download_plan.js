@@ -38,9 +38,46 @@ class HistoryHandle {
     async plan_list(req, res, next) {
         console.log('download plan list');
 
-        //var wherestr = {'task_status': 'running'};
-        var queryList = await DB.TaskPlanTable.find().exec();
-        res.send({ret_code: 0, ret_msg: 'SUCCESS', extra: queryList});
+        //获取表单数据，josn
+        var page_size = req.body['page_size'];
+        var current_page = req.body['current_page'];
+        var sort = req.body['sort'];
+        var filter = req.body['filter'];
+
+        // 如果没有定义排序规则，添加默认排序
+        if(typeof(sort)==="undefined"){
+            //console.log('sort undefined');
+            sort = {"sort_time":-1};
+        }
+
+        // 如果没有定义排序规则，添加默认排序
+        if(typeof(filter)==="undefined"){
+            //console.log('filter undefined');
+            filter = {};
+        }
+
+        //普通用户进行过滤
+        if(req.session.user_type == '1'){
+            filter['user_account'] = req.session.user_account;
+        }
+
+        //console.log('sort ', sort);
+        //console.log('filter ', filter);
+        var total = await DB.TaskPlanTable.count(filter).exec();
+
+        //参数有效性检查
+        if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
+            var queryList = await DB.TaskPlanTable.find(filter).sort(sort);
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList, total:total});
+        }
+        else if (page_size > 0 && current_page > 0) {
+            var skipnum = (current_page - 1) * page_size;   //跳过数
+            var queryList = await DB.TaskPlanTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
+            res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList, total:total});
+        }
+        else{
+            res.send({ret_code: 1002, ret_msg: 'FAILED', extra:'josn para invalid'});
+        }
 
         console.log('download plan list end');
     }
@@ -49,11 +86,17 @@ class HistoryHandle {
         console.log('[website] download task add');
 
         //获取表单数据，josn
+        var user_account = req.body['user_account'];   //
         var task_exce_time = req.body['task_exce_time'];
         var task_plan_script = req.body['task_plan_script'];
         var exectime = new Date(task_exce_time);
         var task_id = DB.guid();
         var mytime = new Date();
+
+        // 如果没有定义用户，添加session中的用户
+        if(typeof(user_account)==="undefined"){
+            user_account = req.session.user_account;
+        }
 
         if (task_plan_script == ''){
             res.send({ret_code: -1, ret_msg: 'FAIL', extra: 'task_plan_script is null'});
@@ -71,6 +114,7 @@ class HistoryHandle {
             'task_id': task_id,   // task_id
             'task_type': 'download',   // 名称
             'task_status': 'stop',   // 运行状态
+            'user_account': user_account,   //
 
             'task_script': task_plan_script,
             'task_exce_time': dtime(task_exce_time).format('HH:mm:ss'),   // 运行状态
@@ -229,7 +273,7 @@ module.exports = new HistoryHandle()
 
 
 
-//await DB.TaskTable.findOneAndUpdate(wherestr, updatestr).exec();
+//await DB.TaskPlanTable.findOneAndUpdate(wherestr, updatestr).exec();
 //await 可以不调用.exec() 返回值
 //如果没有转await 则必须调用.exec() 才能返回查询结果,不能通过返回值判断
 //如果采用返回值得形式，必须的await

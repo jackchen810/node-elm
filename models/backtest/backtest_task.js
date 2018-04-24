@@ -5,6 +5,7 @@ const BacktestTaskSchema = new mongoose.Schema({
     task_id: String,
     task_type: String,  //任务类型，trade:交易型任务, order_point：买卖点任务，backtest:回测任务， pickstock：选股任务
     task_status:String,  // 运行状态
+    user_account:String,  // 任务所属用户
 
     //输入
     trade_symbol: String,  // 数据标的

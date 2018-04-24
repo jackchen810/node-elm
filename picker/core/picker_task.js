@@ -69,13 +69,15 @@ class PickerClass {
     async pickstock_task_del(request, response){
         console.log('[pickstock] del task');
 
-        var task_id = request[0]['task_id'];
-        console.log('[pickstock] delete taskMap');
+        for (var i = 0; i < request.length; i++) {
+            var task_id = request[i]['task_id'];
+            console.log('[pickstock] delete taskMap');
 
-        //删除实例
-        this.taskMap.delete(task_id);
-        var msgObj = {ret_code: 0, ret_msg: 'SUCCESS', extra: task_id};
-        response.send(msgObj);
+            //删除实例
+            this.taskMap.delete(task_id);
+            var msgObj = {ret_code: 0, ret_msg: 'SUCCESS', extra: task_id};
+            response.send(msgObj);
+        }
         console.log('[pickstock] del task ok');
     }
 

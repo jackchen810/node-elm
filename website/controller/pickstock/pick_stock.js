@@ -60,6 +60,11 @@ class PickStockHandle {
             filter = {};
         }
 
+        //普通用户进行过滤
+        if(req.session.user_type == '1'){
+            filter['user_account'] = req.session.user_account;
+        }
+
         var total = await DB.PickTaskTable.count(filter).exec();
 
         //参数有效性检查
@@ -102,11 +107,17 @@ class PickStockHandle {
         console.log('[website] pickstock task add');
 
         //获取表单数据，josn
+        var user_account = req.body['user_account'];   //
         var strategy_name = req.body['strategy_name'];
         var stock_ktype = req.body['stock_ktype'];
         var stock_range = req.body['stock_range'];        //获取表单数据，josn
         var task_id =  DB.guid();
         var mytime = new Date();
+
+        // 如果没有定义用户，添加session中的用户
+        if(typeof(user_account)==="undefined"){
+            user_account = req.session.user_account;
+        }
 
         //更新到设备数据库， 交易的标的不能够重复, index=0 是主策略
         var wherestr = {'strategy_name': strategy_name, 'stock_ktype': stock_ktype, 'stock_range': stock_range, };
@@ -122,6 +133,7 @@ class PickStockHandle {
             'task_id': task_id,
             'task_type': 'pickstock',  //任务结果
             'task_status': 'stop',   // 运行状态
+            'user_account': user_account,   //
 
             //过程
             'strategy_name': strategy_name,   //策略名称

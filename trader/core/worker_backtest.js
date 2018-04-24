@@ -236,14 +236,16 @@ class WorkerBacktestClass {
 
     async backtest_task_del(request, response){
         console.log('[worker backtest] backtest del task');
-        var task_id = request[0]['task_id'];
+        for (var i = 0; i < request.length; i++) {
+            var task_id = request[i]['task_id'];
 
-        console.log('[worker backtest] delete taskMap');
+            console.log('[worker backtest] delete taskMap');
 
-        //删除实例
-        this.taskMap.delete(task_id);
-        var msgObj = {ret_code: 0, ret_msg: 'SUCCESS', extra: task_id};
-        response.send(msgObj);
+            //删除实例
+            this.taskMap.delete(task_id);
+            var msgObj = {ret_code: 0, ret_msg: 'SUCCESS', extra: task_id};
+            response.send(msgObj);
+        }
         //response.send(msgObj, 'log', 'log', 'website');
     }
 

@@ -41,6 +41,11 @@ class TaskHandle {
             filter = {};
         }
 
+        //普通用户进行过滤
+        if(req.session.user_type == '1'){
+            filter['user_account'] = req.session.user_account;
+        }
+
         //console.log('sort ', sort);
         //console.log('filter ', filter);
         var total = await DB.TaskTable.count(filter).exec();
@@ -85,6 +90,7 @@ class TaskHandle {
         console.log('[website] batch_monitor_task_add');
 
         //获取表单数据，josn
+        var user_account = req.body['user_account'];   //
         var task_type = req.body['task_type'];  //'monitor'
         var strategy_type = req.body['strategy_type'];  //1， 简单策略
         var stock_ktype = req.body['stock_ktype'];
@@ -92,6 +98,11 @@ class TaskHandle {
         var monitor_list = req.body['monitor_obj_list'];        //获取表单数据，josn
         var task_id = DB.guid();
         var mytime = new Date();
+
+        // 如果没有定义用户，添加session中的用户
+        if(typeof(user_account)==="undefined"){
+            user_account = req.session.user_account;
+        }
 
         console.log('monitor_list:', monitor_list);
 
@@ -107,6 +118,7 @@ class TaskHandle {
                 'task_id': task_id,
                 'task_type': task_type,  //任务结果
                 'task_status': 'stop',   // 运行状态
+                'user_account': user_account,   //
 
                 //输入
                 'trade_symbol': monitor_list[i]['stock_symbol'],   ///index=0的使用交易symbol
@@ -142,6 +154,7 @@ class TaskHandle {
         console.log('[website] task add');
 
         //获取表单数据，josn
+        var user_account = req.body['user_account'];   //
         var task_type = req.body['task_type'];   // 自动交易：'trade'; 机器人盯盘：'monitor'
         var strategy_type = req.body['strategy_type'];
         var strategy_list = req.body['strategy_list'];        //获取表单数据，josn
@@ -151,6 +164,11 @@ class TaskHandle {
         var task_id = DB.guid();
         var mytime = new Date();
 
+
+        // 如果没有定义用户，添加session中的用户
+        if(typeof(user_account)==="undefined"){
+            user_account = req.session.user_account;
+        }
 
         //更新到设备数据库， 交易的标的不能够重复, index=0 是主策略
         var wherestr = {'task_type': task_type, 'trade_symbol': strategy_list[0]['stock_symbol']};
@@ -170,6 +188,7 @@ class TaskHandle {
                 'task_id': task_id,
                 'task_type': (i==0 ? task_type:'order_point'),  //任务结果
                 'task_status': 'stop',   // 运行状态
+                'user_account': user_account,   //
 
                 //输入
                 'trade_symbol': strategy_list[i]['stock_symbol'],   ///index=0的使用交易symbol
