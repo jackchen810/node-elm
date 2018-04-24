@@ -8,7 +8,7 @@ const router = express.Router()
 console.log("enter route of account");
 
 router.all('/login', /*Check.checkAdminStatus,*/ Account.login);
-router.all('/register',Check.checkSuperAdmin, Account.register);
+router.all('/register',/*Check.checkSuperAdmin,*/ Account.register);
 router.all('/logout', Check.checkAdminStatus,Account.logout);
 router.all('/change',/* Check.checkSuperAdmin,*/ Account.changePassword);
 router.all('/revoke',Check.checkSuperAdmin, Account.revoke);
