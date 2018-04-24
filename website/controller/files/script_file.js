@@ -187,7 +187,7 @@ class ScriptFileHandle {
         //获取表单数据，josn
         var id = req.body['_id'];
         var file_name = req.body['file_name'];
-        //var file_type = req.body['file_type'];
+        var file_type = req.body['file_type'];
 
         //参数有效性检查
         if (typeof(id) === "undefined" || typeof(file_name) === "undefined") {
@@ -199,7 +199,7 @@ class ScriptFileHandle {
         //检查上下架状态
         try {
             var query = await DB.ScriptFileTable.findById(id).exec();
-            console.log('query file_status:', query['file_status'] );
+            //console.log('query file_status:', query['file_status']);
             if (query['file_status'] == 'revoke') {  //下架状态
                 res.send({ret_code: 1003, ret_msg: '策略已下架', extra: file_name});
                 return;
@@ -207,7 +207,7 @@ class ScriptFileHandle {
 
             // 实现文件下载
             if (query['file_name'] != file_name){
-                res.send({ret_code: 1016, ret_msg: 'FAILED', extra: '文件名称错误'});
+                res.send({ret_code: 1016, ret_msg: '文件名称错误', extra: file_name});
                 return;
             }
         }
@@ -217,7 +217,12 @@ class ScriptFileHandle {
         }
 
         //直接返回路径，通过访问文件进行下载
-        var access_path = '/pick-strategy/' + file_name;
+        //var access_path = '/pick-strategy/' + file_name;
+        //console.log('query access_path:', access_path);
+        var my_path = this.get_dest_fullname(file_type).split("/");
+        var access_path = '/' + my_path.pop() + '/' + file_name;
+        //console.log('query my_path:', my_path);
+        console.log('query access_path:', access_path);
         res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:{'access_path':access_path}});
 
         console.log('[website] script download end');
