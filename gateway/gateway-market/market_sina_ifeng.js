@@ -1,5 +1,5 @@
 'use strict';
-const GatewayRxTx = require("../gateway_rx");
+const GatewayTx = require("../gateway_tx");
 const BaseMarket = require("../../prototype/marketBaseClass");
 const BaseObj = require("../../prototype/objectBaseClass");
 
@@ -113,13 +113,13 @@ class IfengMarketClass extends BaseMarket {
                    // symbol_array[i];
 
                     //WorkerHnd.onTick(tick_data);
-                    //GatewayRxTx.send(tick_data, 'on_tick', '', 'worker');
+                    //GatewayTx.send(tick_data, 'on_tick', '', 'worker');
                     self.create_bar_min(tick_data, '1', function (barObj) {
-                        GatewayRxTx.send(tick_data, 'on_bar', '1', 'worker');
+                        GatewayTx.send(tick_data, 'on_bar', '1', 'worker');
                         //WorkerHnd.onBar('1', barObj);
                     });
                     self.create_bar_min(tick_data, '5', function (barObj) {
-                        GatewayRxTx.send(tick_data, 'on_bar', '5', 'worker');
+                        GatewayTx.send(tick_data, 'on_bar', '5', 'worker');
                         //WorkerHnd.onBar('5', barObj);
                     });
                 }

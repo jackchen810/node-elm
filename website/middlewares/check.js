@@ -36,8 +36,11 @@ class Check {
         const user_account = req.session.user_account;
         //console.log('req.session:', req.session);
         //console.log('user_account:', req.session.user_account);
-        if (req.baseUrl == '/api/admin/login' || req.baseUrl == '/api/admin/register') {
-            console.log(req.baseUrl,  req.originalUrl);
+        //console.log('baseUrl:',  req.baseUrl);
+        //console.log('originalUrl:', req.originalUrl);
+        if (req.baseUrl == '/api/admin/login' || req.baseUrl == '/api/admin/register'
+            || req.originalUrl == '/') {
+            console.log('login:', req.baseUrl,  req.originalUrl);
             next()
             return;
         }
@@ -62,7 +65,7 @@ class Check {
 
         //设置cookie
         res.setHeader("Set-Cookie", ["user_type="+admin.user_type, "user_account="+admin.user_account]);
-		next()
+        next()
 	}
 }
 
