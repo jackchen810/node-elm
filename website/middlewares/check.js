@@ -34,10 +34,10 @@ class Check {
         }
 
         const user_account = req.session.user_account;
-        console.log('req.session:', req.session);
-        console.log('user_account:', req.session.user_account);
-        console.log('baseUrl:',  req.baseUrl);
-        console.log('originalUrl:', req.originalUrl);
+        //console.log('req.session:', req.session);
+        //console.log('user_account:', req.session.user_account);
+        //console.log('baseUrl:',  req.baseUrl);
+        //console.log('originalUrl:', req.originalUrl);
 
         //一开始从static目录下载的js不需要检查
         if (req.originalUrl.indexOf("static") > 0){
