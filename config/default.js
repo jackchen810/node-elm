@@ -10,11 +10,9 @@ module.exports = {
     history_dl_dir:'./downloader/dl_way',
 
 
-    port:8000,    //监听端口
-
+    port:8101,    //监听端口
 	url: 'mongodb://localhost:27017/nodequant',
-	amount_every_task: '500',
-	interval_every_task: '600000',  //单位：ms
+
 	ssl:{
 		port: 443,
 		key:'./ssl/214497547410545.key',

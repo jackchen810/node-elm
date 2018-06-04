@@ -302,13 +302,13 @@ class Account extends BaseComponent {
         //参数有效性检查
         if(typeof(page_size)==="undefined" && typeof(current_page)==="undefined"){
             var queryList = await DB.AccountTable.find(filter).sort(sort);
-            console.log('queryList ', queryList);
+            //console.log('queryList ', queryList);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList, total:total});
         }
         else if (page_size > 0 && current_page > 0) {
             var skipnum = (current_page - 1) * page_size;   //跳过数
             var queryList = await DB.AccountTable.find(filter).sort(sort).skip(skipnum).limit(page_size);
-            console.log('queryList ', queryList);
+            //console.log('queryList ', queryList);
             res.send({ret_code: 0, ret_msg: 'SUCCESS', extra:queryList, total:total});
         }
         else{

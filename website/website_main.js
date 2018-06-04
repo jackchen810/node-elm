@@ -27,7 +27,7 @@ app.all('*', (req, res, next) => {
     if (req.method == 'OPTIONS') {
         res.send(200);
     } else {
-        //console.log('method:', req.method)
+        //console.log('method:', req.method, 'url:', req.hostname + req.path);
         /*
         req.on('data', function (data) {
             console.log('entry, url:', req.hostname + req.path, ';body data', data.toString());

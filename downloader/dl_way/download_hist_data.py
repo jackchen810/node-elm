@@ -333,8 +333,8 @@ def test_add_datas():
 if __name__ == '__main__':
 
     #test_add_datas()
-    #save_all_data('all')
+    save_all_data('D')
 
-    save_anyday_data('D', d_list=['002500'])
+    #save_anyday_data('D', d_list=['002500'])
     #save_today_data('all')
-    #save_basic_report()
+    save_basic_report()

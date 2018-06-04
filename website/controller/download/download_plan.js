@@ -57,7 +57,7 @@ class HistoryHandle {
         }
 
         //普通用户进行过滤
-        if(req.session.user_type == '1'){
+        if(req.session.user_type == '1' || req.session.user_type == '0'){
             filter['user_account'] = req.session.user_account;
         }
 

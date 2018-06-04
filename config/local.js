@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-    port:8000,    //监听端口
+    port:8101,    //监听端口
     ssl:{
         port: 443,
         key:'./ssl/214497547410545.key',
