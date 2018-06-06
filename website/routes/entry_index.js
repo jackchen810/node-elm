@@ -27,47 +27,47 @@ function web_router(app) {
 
 
     //渠道相关
-     app.use('/admin', admin_router);
+     app.use('/api/admin', admin_router);
 
      //任务功能
-     app.use('/task', task_router);
+     app.use('/api/task', task_router);
 
      //风控管理功能
-     app.use('/riskctrl', riskctrl_router);
+     app.use('/api/riskctrl', riskctrl_router);
 
      //策略管理功能
-     app.use('/strategy', strategy_router);
+     app.use('/api/strategy', strategy_router);
 
      //交易接口管理功能
-     app.use('/order', order_router);
+     app.use('/api/order', order_router);
 
     //行情接口管理功能
-    app.use('/market', market_router);
+    app.use('/api/market', market_router);
 
     //行情接口管理功能
-    app.use('/log', log_router);
+    app.use('/api/log', log_router);
 
     //行情接口管理功能
-    app.use('/history', history_router);
+    app.use('/api/history', history_router);
 
     //回测接口管理功能
-    app.use('/backtest', backtest_router);
+    app.use('/api/backtest', backtest_router);
 
     //交易点管理
-    app.use('/trade/point', trade_point_router);
+    app.use('/api/trade/point', trade_point_router);
 
     //下载计划路由
-    app.use('/download/plan', download_plan_router);
+    app.use('/api/download/plan', download_plan_router);
 
     //选股策略路由
-    app.use('/pick/stock', pick_strategy_router);
+    app.use('/api/pick/stock', pick_strategy_router);
 
     //系统设置路由
-    app.use('/system/setup', system_setup_router);
+    app.use('/api/system/setup', system_setup_router);
 
 
     //文件功能设置路由
-    app.use('/script', script_file_router);
+    app.use('/api/script', script_file_router);
 }
 
 
