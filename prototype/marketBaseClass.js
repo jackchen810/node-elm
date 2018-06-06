@@ -18,6 +18,8 @@ module.exports = class BaseMarket {
         this.ktypeMap.set('60', {'symbol_list' : [], 'bar_obj' : {}});
 
         //console.log('timerMap:', this.timerMap);
+        this.tradeing = false;
+
 
         //标的集合
         //this.symbol_set = new Set();
@@ -34,6 +36,30 @@ module.exports = class BaseMarket {
         //console.log('BaseStrategyComponent on_init');
         return;
     }
+
+    //检查交易标志
+    check_tradeing_flag(am_open_time, am_close_time, pm_open_time, pm_close_time){
+
+        var today = new Date().toLocaleDateString();
+        //console.log('today:', today);
+
+        var t0 = Date.now();
+        var t1 = new Date(today +  ' ' + am_open_time).getTime();
+        var t2 = new Date(today +  ' ' + am_close_time).getTime();
+        var t3 = new Date(today +  ' ' + pm_open_time).getTime();
+        var t4 = new Date(today +  ' ' + pm_close_time).getTime();
+        if ((t0 >= t1 && t0 < t2) || (t0 >= t1 && t0 < t2)) {
+            this.tradeing = true;
+        }
+        else{
+            this.tradeing = false;
+        }
+
+        //console.log('check_tradeing_flag:', this.tradeing, t1, t2, t3, t4);
+        return this.tradeing;
+    }
+
+
 
     //根据tick数据，计算k线数据
     //tickObj tick对象

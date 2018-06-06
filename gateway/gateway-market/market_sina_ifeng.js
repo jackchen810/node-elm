@@ -57,7 +57,12 @@ class IfengMarketClass extends BaseMarket {
     }
 
     async timer_callback() {
-        console.log('[market] get tick:', dtime().format('YYYY-MM-DD HH:mm:ss'), ' tick_url_list:',this.tick_url_list);
+        console.log('[market] tick timeout:', dtime().format('YYYY-MM-DD HH:mm:ss'));
+        var ret = this.check_tradeing_flag('9:30:00', '11:30:00', '13:00:00', '15:00:00');
+        if (!ret){
+            return;
+        }
+        console.log('[market] http get:', 'tick_url_list:',this.tick_url_list);
 
         //get 请求外网
         var self = this;
