@@ -11,7 +11,7 @@ mongoose.Promise = global.Promise;
 
 const db = mongoose.connection;
 
-db.once('open' ,() => {
+db.once('openUri' ,() => {
 	console.log('连接数据库成功, pid:', process.pid);
 })
 
