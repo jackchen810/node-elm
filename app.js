@@ -46,7 +46,7 @@ function process_message_reactor(message) {
     var source = head['source'];
     var dest = head['dest'];
 
-    if (process.env.NODE_ENV == 'local') {
+    if (process.env.NODE_ENV == 'development') {
         console.log('[%s ---> %s] message:',  source, dest, JSON.stringify(message));
     }
 

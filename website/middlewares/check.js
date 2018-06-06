@@ -9,7 +9,7 @@ class Check {
 	async checkSuperAdmin(req, res, next){
 
         //本地调试
-        if (process.env.NODE_ENV == 'local') {
+        if (process.env.NODE_ENV == 'development') {
             next();
             return;
         }
@@ -28,7 +28,7 @@ class Check {
 	async checkAdminStatus(req, res, next){
 
         //本地调试
-        if (process.env.NODE_ENV == 'local') {
+        if (process.env.NODE_ENV == 'development') {
             next();
             return;
         }

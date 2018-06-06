@@ -26,7 +26,7 @@ class GatewayProcessHandle {
 
     //进程消息处理, 接收进程内部消息，通过emitter转换成event发送
     async onMessage(message){
-        if (process.env.NODE_ENV == 'local') {
+        if (process.env.NODE_ENV == 'development') {
             console.log('[gateway agent] recv gateway response:', JSON.stringify(message));
         }
 

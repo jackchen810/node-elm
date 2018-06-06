@@ -21,7 +21,7 @@ class Account extends BaseComponent {
 
 
 		//本地调试, 设置管理员用户及密码
-        //if (process.env.NODE_ENV == 'local') {
+        //if (process.env.NODE_ENV == 'development') {
             this.addDefaultAccount('admin', '123456')
             console.log('add default account')
         //}

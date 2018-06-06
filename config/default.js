@@ -10,7 +10,7 @@ module.exports = {
     history_dl_dir:'./downloader/dl_way',
 
 
-    port:8101,    //监听端口
+    port:8000,    //监听端口
 	url: 'mongodb://localhost:27017/nodequant',
 
 	ssl:{
