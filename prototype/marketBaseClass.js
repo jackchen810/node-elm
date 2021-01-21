@@ -1,4 +1,5 @@
 'use strict';
+const MarketTx = require("../process-market/market_tx.js");
 
 module.exports = class BaseMarket {
     constructor(){
@@ -71,7 +72,7 @@ module.exports = class BaseMarket {
         var tick_minute = Number(time_array[1]);
 
         var ktypeDict = this.ktypeMap.get(ktype);
-        var barObj = ktypeDict['bar_obj']
+        var barObj = ktypeDict['bar_obj'];
 
         //判断是否是空对象
         if (Object.keys(barObj).length == 0){
@@ -122,6 +123,15 @@ module.exports = class BaseMarket {
         throw new Error('to_download 需要用户实现');
     }
 
-}
+    //to_bar  生成买点
+    async to_bar(ktype, msgObj){
+        //console.log('to_buy', this.task_type);
+
+        MarketTx.send(msgObj, 'on_bar',ktype, 'trader');
+        return;
+    }
+
+
+};
 
 

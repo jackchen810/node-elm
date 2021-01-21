@@ -1,5 +1,5 @@
 'use strict';
-const PickerTx = require("../picker/picker_tx.js");
+const PickerTx = require("../process-pick/picker_tx.js");
 const dtime = require('time-formater');
 
 module.exports = class PickstockBaseStrategy {
@@ -25,7 +25,7 @@ module.exports = class PickstockBaseStrategy {
     async to_end(msgObj){
         //console.log('to_buy', this.task_type);
         //1. 发送event:to_end 事件
-        PickerTx.send(msgObj, 'pickstock.status', 'finish', 'website');
+        PickerTx.send(msgObj, 'pickstock.status', 'finish', 'httper');
         return;
     }
 

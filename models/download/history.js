@@ -23,7 +23,10 @@ const historySchema = new mongoose.Schema({
 
 
 module.exports = function KTable(ktype, table) {
-    if (ktype == '5') {
+    if (ktype == '1') {
+        return db.db_minute1.model(table, historySchema);
+    }
+    else if (ktype == '5') {
         return db.db_minute5.model(table, historySchema);
     }
     else if (ktype == '15') {
@@ -38,4 +41,4 @@ module.exports = function KTable(ktype, table) {
     else if (ktype == 'day') {
         return db.db_day.model(table, historySchema);
     }
-}
+};

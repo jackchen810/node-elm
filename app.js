@@ -1,44 +1,31 @@
 'use strict';
 
-const fork = require('child_process').fork;
-
-
 //创建一个工作进程
-const worker = fork('./trader/worker_entry.js');
-worker.on('message', process_message_reactor);
-console.log('create worker_entry');
-
-//创建一个工作进程
-const picker = fork('./picker/picker_entry.js');
-picker.on('message', process_message_reactor);
-console.log('create picker_entry');
-
-//创建一个工作进程
-const website = fork('./website/website_entry.js');
-website.on('message', process_message_reactor);
-console.log('create website_entry');
+const http_hnd = require('./process-http/http_phandle.js');
+const trader_hnd = require('./process-trade/trader_phandle.js');
+const picker_hnd = require("./process-pick/picker_phandle.js");
+const gateway_hnd = require("./process-gateway/gateway_phandle.js");
+const market_hnd = require("./process-market/market_phandle.js");
+const backtest_hnd = require("./process-backtest/backtest_phandle.js");
 
 
-//创建一个工作进程
-const downloader = fork('./downloader/downloader_entry.js');
-downloader.on('message', process_message_reactor);
-console.log('create downloader_entry');
+//注册进程间消息接收
+// 进程1 ----》 主进程 （父进程）-----》进程2
+// 主进程监听各个消息
+http_hnd.on('message', process_message_reactor);
+trader_hnd.on('message', process_message_reactor);
+picker_hnd.on('message', process_message_reactor);
+gateway_hnd.on('message', process_message_reactor);
+market_hnd.on('message', process_message_reactor);
+backtest_hnd.on('message', process_message_reactor);
+
 
 //创建一个工作进程, 这个是主进程
-const GatewayTx = require("./gateway/gateway_tx");
+require("./process-main/miner_main.js");
 //初始化 gateway的发送函数；
-GatewayTx.on('message', process_message_reactor);
-const GatewayRx = require("./gateway/gateway_rx");
+//FatherTx.on('message', process_message_reactor);
+const FatherRx = require("./process-main/miner_rx");
 
-/*
-//初始化phandle
-const WorkerHandleClass = require("./trader/worker/worker_phandle");
-const WorkerHandle = new WorkerHandleClass(worker);
-
-
-const WebsiteHandleClass = require("./website/website_phandle");
-const WebsiteHandle = new WebsiteHandleClass(website);
-*/
 
 function process_message_reactor(message) {
 
@@ -47,9 +34,8 @@ function process_message_reactor(message) {
     var dest = head['dest'];
 
     if (process.env.NODE_ENV == 'development') {
-        console.log('[%s ---> %s] message:',  source, dest, JSON.stringify(message));
+        console.log('[//reactor//][%s ---> %s] message:',  source, dest, JSON.stringify(message));
     }
-
 
     //参数有效性检查，如果，不是数组，返回错误
     var dest_list = [];
@@ -63,31 +49,31 @@ function process_message_reactor(message) {
     //消息分发
     for (var i=0; i < dest_list.length; i++){
         head['dest'] = dest_list[i];   //dest替换
-        if (dest_list[i] == 'worker') {
-            worker.send(message);
+        if (dest_list[i] == 'trader') {
+            trader_hnd.send(message);
         }
         else if (dest_list[i] == 'picker') {
-            picker.send(message);
+            picker_hnd.send(message);
         }
-        else if (dest_list[i] == 'website') {
-            website.send(message);
+        else if (dest_list[i] == 'httper') {
+            http_hnd.send(message);
         }
-        else if (dest_list[i] == 'downloader') {
-            downloader.send(message);
+        else if (dest_list[i] == 'market') {
+            market_hnd.send(message);
         }
         else if (dest_list[i] == 'gateway') {
+            gateway_hnd.send(message);
+        }
+        else if (dest_list[i] == 'backtest') {
+            backtest_hnd.send(message);
+        }
+        else if (dest_list[i] == 'miner') {
             //父进程，直接调用
-            GatewayRx.onMessage(message);
+            FatherRx.onMessage(message);
         }
     }
 
     return;
 }
 
-
-
-process.on('unhandledRejection', (reason, p) => {
-    console.info("Unhandled Rejection:", p);
-    // application specific logging, throwing an error, or other logic here
-});
 

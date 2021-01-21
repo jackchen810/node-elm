@@ -18,7 +18,7 @@ const accountSchema = new Schema({
 	user_avatar: {type: String, default: 'default.jpg'},
     login_logs: Array,   //一些上下线的日志信息，辅助定位问题，记录5条
 	user_city: String,
-})
+});
 
 accountSchema.index({user_id: 1});
 const AccountTable = mongoose.model('AccountTable',accountSchema);

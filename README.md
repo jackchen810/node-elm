@@ -29,8 +29,24 @@ nodejs + express + mongodb + mongoose + es6/7 + vue + element-ui
 项目运行之前，请确保系统已经安装以下应用
 1、node (6.0 及以上版本)
 2、mongodb (开启状态)
-3、GraphicsMagick (裁切图片)
+3、python3.x 环境;使用 Anaconda安装python包;
+4、windows主要有三个环境的配置:
+  ①anaconda安装路径（为了Python检查正常）:
+  ②安装路径\Scripts（为了conda检查正常）:
+  ③另一个路径：安装路径\Library\bin
+5、安装tushare； pip install tushare
+
+
 ```
+conda 导出依赖包并批量安装
+conda list -e > requirements.txt #Save all the info about packages to your folder
+conda install --yes --file requirements.txt
+
+更改镜像源
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+conda config --set show_channel_urls yes
+
+修改后可以在~/.condarc配置文件中可以看到相应信息
 
 ```
 git clone https://github.com/bailicangdu/node-elm  
@@ -41,7 +57,7 @@ npm install
 
 npm run dev
 
-访问: http://localhost:8001（如果已启动前台程序，则不需打开此地址）
+访问: http://localhost:8100（如果已启动前台程序，则不需打开此地址）
 
 ```
 
@@ -58,35 +74,7 @@ npm run dev
 ├── controller                      处理中心，负责路由及数据库的具体操作
 │   ├── admin
 │   │   └── acount.js                管理员
-│   ├── bos
-│   ├── eus
-│   ├── member
-│   │   └── vipcart.js              会员卡
 │   ├── payapi
-│   ├── promotion
-│   │   └── hongbao.js              红包
-│   ├── shopping
-│   │   ├── category.js             餐馆分类
-│   │   ├── food.js                 食品
-│   │   └── shop.js                 餐馆
-│   ├── statis
-│   │   └── statis.js               数据统计
-│   ├── ugc
-│   │   └── rating.js               评论
-│   ├── v1
-│   │   ├── address.js              收获地址
-│   │   ├── captchas.js             验证码
-│   │   ├── carts.js                购物车
-│   │   ├── cities.js               城市列表
-│   │   ├── order.js                订单
-│   │   ├── remark.js               备注
-│   │   └── search.js               搜索
-│   ├── v2
-│   │   ├── entry.js                食品分类
-│   │   └── user.js                 用户信息
-│   ├── v3
-│   │   └── explain.js              解析说明
-│   └── v4
 ├── logs                            日志文件
 ├── middlewares                     中间价
 │   ├── check.js                    权限验证    
@@ -94,59 +82,12 @@ npm run dev
 ├── models                          模型(数据库)
 │   ├── admin
 │   │   └── acount.js                管理员模型
-│   ├── bos
-│   │   └── order.js                订单模型
-│   ├── eus
-│   ├── ids.js
-│   ├── member
-│   ├── payapi
-│   ├── promotion
-│   │   └── hongbao.js              红包模型
-│   ├── shopping
-│   │   ├── activity.js             餐馆活动模型
-│   │   ├── category.js             餐馆分类模型
-│   │   ├── delivery.js             配送方式模型
-│   │   ├── food.js                 食品模型
-│   │   └── shop.js                 餐馆模型
-│   ├── statis
-│   │   └── statis.js               数据统计模型
-│   ├── ugc
-│   │   └── rating.js               评论模型
-│   ├── v1
-│   │   ├── address.js              收获地址模型
-│   │   ├── cart.js                 购物车模型
-│   │   ├── cities.js               城市列表模型
-│   │   ├── payments.js             付款方式模型
-│   │   └── remark.js               备注模型
-│   ├── v2
-│   │   ├── entry.js                食品分类模型
-│   │   ├── user.js                 用户模型
-│   │   └── userInfo.js             用户信息模型
-│   ├── v3
-│   │   └── explain.js              解释说明模型
-│   └── v4
 ├── mongodb                         连接数据库
 │   └── db.js
 ├── prototype                       基础功能Class
 │   ├── addressComponent.js         与腾讯、百度地图API相关的Class
 │   └── baseComponent.js            底层类
 ├── public                          静态资源目录
-├── routes                          路由配置
-│   ├── acount.js                    管理员
-│   ├── bos.js                      订单
-│   ├── eus.js                      用户
-│   ├── index.js                    路由配置主文件
-│   ├── member.js                   会员卡
-│   ├── payapi.js                   付款
-│   ├── promotion.js                红包
-│   ├── shopping.js                 餐馆、食品、Menu
-│   ├── statis.js                   数据统计
-│   ├── ugc.js                      评论
-│   ├── v1.js                       城市、用户、收获地址
-│   ├── v2.js                       登陆、退出
-│   ├── v3.js                       解释说明
-│   └── v4.js                       餐馆
-├── screenshots                     项目截图
 ├── views   
 ├── .babelrc 
 ├── .gitignore

@@ -13,7 +13,7 @@ const db = mongoose.connection;
 
 db.once('openUri' ,() => {
 	console.log('连接数据库成功, pid:', process.pid);
-})
+});
 
 db.on('error', function(error) {
     console.error('Error in MongoDb connection: ' + error);
@@ -26,11 +26,28 @@ db.on('close', function() {
 });
 
 ///////////////////////////////////////////////////////////////
+var url = "mongodb://localhost:27017/minute1";
+const db_minute1 = mongoose.createConnection(url);
+db_minute1.once('open' ,() => {
+    console.log('连接数据库成功, pid:', process.pid);
+});
+
+db_minute1.on('error', function(error) {
+    console.error('Error in MongoDb connection: ' + error);
+    mongoose.disconnect();
+});
+
+db_minute1.on('close', function() {
+    console.log('数据库断开，重新连接数据库');
+    mongoose.connect(url, {server:{auto_reconnect:true}});
+});
+
+///////////////////////////////////////////////////////////////
 var url = "mongodb://localhost:27017/minute5";
 const db_minute5 = mongoose.createConnection(url);
 db_minute5.once('open' ,() => {
     console.log('连接数据库成功, pid:', process.pid);
-})
+});
 
 db_minute5.on('error', function(error) {
     console.error('Error in MongoDb connection: ' + error);
@@ -48,7 +65,7 @@ var url = "mongodb://localhost:27017/minute15";
 const db_minute15 = mongoose.createConnection(url);
 db_minute15.once('open' ,() => {
     console.log('连接数据库成功, pid:', process.pid);
-})
+});
 
 db_minute15.on('error', function(error) {
     console.error('Error in MongoDb connection: ' + error);
@@ -66,7 +83,7 @@ var url = "mongodb://localhost:27017/minute30";
 const db_minute30 = mongoose.createConnection(url);
 db_minute30.once('open' ,() => {
     console.log('连接数据库成功, pid:', process.pid);
-})
+});
 
 db_minute30.on('error', function(error) {
     console.error('Error in MongoDb connection: ' + error);
@@ -84,7 +101,7 @@ var url = "mongodb://localhost:27017/minute60";
 const db_minute60 = mongoose.createConnection(url);
 db_minute60.once('open' ,() => {
     console.log('连接数据库成功, pid:', process.pid);
-})
+});
 
 db_minute60.on('error', function(error) {
     console.error('Error in MongoDb connection: ' + error);
@@ -102,7 +119,7 @@ var url = "mongodb://localhost:27017/day";
 const db_day = mongoose.createConnection(url);
 db_day.once('open' ,() => {
     console.log('连接数据库成功, pid:', process.pid);
-})
+});
 
 db_day.on('error', function(error) {
     console.error('Error in MongoDb connection: ' + error);
@@ -120,6 +137,7 @@ db_day.on('close', function() {
 //导出模块
 module.exports = {};
 exports.db = db;
+exports.db_minute1 = db_minute1;
 exports.db_minute5 = db_minute5;
 exports.db_minute15 = db_minute15;
 exports.db_minute30 = db_minute30;

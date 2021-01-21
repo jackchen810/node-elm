@@ -2,12 +2,14 @@
 
 module.exports = {
 	firmware_dir:'./public',
-    pick_strategy_dir:'./picker/pick-strategy',
-    strategy_dir:'./trader/trade-strategy',
-    riskctrl_dir:'./trader/trade-riskctrl',
-    order_gateway_dir:'./gateway/gateway-order',
-    market_gateway_dir:'./gateway/gateway-market',
-    history_dl_dir:'./downloader/dl_way',
+    pick_strategy_dir:'./process-pick/pick-strategy',
+    strategy_dir:'./process-trade/trade-strategy',
+
+    riskctrl_dir:'./process-gateway/trade-riskctrl',
+    order_channel_dir:'./process-gateway/order-channel',
+
+    market_channel_dir:'./process-market/market-channel',
+    history_dl_dir:'./process-market/dl_channel',
 
 
     port:8000,    //监听端口
@@ -27,4 +29,4 @@ module.exports = {
 			maxAge:   60 * 60 * 1000,   //单位：ms
 		}
 	},
-}
+};

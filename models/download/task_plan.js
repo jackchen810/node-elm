@@ -19,5 +19,5 @@ const taskPlanSchema = new mongoose.Schema({
 
 });
 
-const TaskPlanTable = mongoose.model('TaskPlanTable', taskPlanSchema);
+const TaskPlanTable = mongoose.model('DlPlanTaskTable', taskPlanSchema);
 module.exports = TaskPlanTable;
